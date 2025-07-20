@@ -3,19 +3,22 @@ import Anthropic from '@anthropic-ai/sdk';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { createClient } from '@supabase/supabase-js';
 
-// Initialize clients (will use environment variables in production)
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY!,
-});
-
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY!);
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
 export async function POST(request: NextRequest) {
+  // Initialize clients inside the function to avoid build-time errors
+  const anthropic = process.env.ANTHROPIC_API_KEY 
+    ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+    : null;
+
+  const genAI = process.env.GEMINI_API_KEY
+    ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
+    : null;
+
+  const supabase = process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY
+    ? createClient(
+        process.env.SUPABASE_URL,
+        process.env.SUPABASE_SERVICE_ROLE_KEY
+      )
+    : null;
   try {
     const { prompt, model = 'claude', data } = await request.json();
 
@@ -26,6 +29,9 @@ export async function POST(request: NextRequest) {
     let response;
 
     if (model === 'claude') {
+      if (!anthropic) {
+        return NextResponse.json({ error: 'Claude API key not configured' }, { status: 500 });
+      }
       // Use Claude for analysis
       const message = await anthropic.messages.create({
         model: 'claude-3-sonnet-20240229',
@@ -40,6 +46,9 @@ export async function POST(request: NextRequest) {
 
       response = message.content[0].type === 'text' ? message.content[0].text : '';
     } else if (model === 'gemini') {
+      if (!genAI) {
+        return NextResponse.json({ error: 'Gemini API key not configured' }, { status: 500 });
+      }
       // Use Gemini for analysis
       const geminiModel = genAI.getGenerativeModel({ model: 'gemini-pro' });
       const result = await geminiModel.generateContent(
@@ -51,7 +60,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Store analysis results in Supabase if needed
-    if (process.env.STORE_ANALYSIS_RESULTS === 'true') {
+    if (process.env.STORE_ANALYSIS_RESULTS === 'true' && supabase) {
       const { error } = await supabase
         .from('analysis_results')
         .insert({
