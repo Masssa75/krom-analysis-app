@@ -8,10 +8,8 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
+# Next.js API routes are handled by the framework
+# Remove the redirect that was interfering
 
 [[headers]]
   for = "/*"
@@ -41,6 +39,4 @@
   directory = "netlify/functions"
   node_bundler = "esbuild"
 
-[[edge_functions]]
-  path = "/api/*"
-  function = "api-handler"
+# Edge functions not needed for Next.js API routes
