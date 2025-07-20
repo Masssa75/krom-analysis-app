@@ -34,42 +34,26 @@ export default function HomePage() {
         },
         body: JSON.stringify({
           limit: parseInt(count),
-          model: model,
-          prompt: 'Analyze these crypto calls and provide scores'
+          model: model
         })
       })
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
       const data = await response.json()
       
-      if (data.error) {
-        throw new Error(data.error)
+      if (!response.ok || data.error) {
+        throw new Error(data.error || `HTTP error! status: ${response.status}`)
       }
 
-      // Simulate progress
+      // Update progress based on actual analysis
       setProgress(50)
       setStatus('Analyzing with AI...')
       
-      // Mock results for now
-      const mockResults = {
-        count: parseInt(count),
-        model: model,
-        duration: '12',
-        results: [
-          { token: 'PEPE', contract: '0x6982508145454ce325ddbe47a25d4ec3d2311933', score: 9.2, legitimacy_factor: 'High' },
-          { token: 'SHIB', contract: '0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce', score: 8.7, legitimacy_factor: 'High' },
-          { token: 'DOGE', contract: '0xba2ae424d960c26247dd6c32edc70b295c744c43', score: 8.5, legitimacy_factor: 'High' },
-          { token: 'FLOKI', contract: '0xcf0c122c6b73ff809c693db761e7baebe62b6a2e', score: 7.8, legitimacy_factor: 'Medium' },
-          { token: 'SAITAMA', contract: null, score: 6.9, legitimacy_factor: 'Medium' }
-        ].slice(0, parseInt(count))
-      }
-
-      setProgress(100)
-      setStatus('Analysis complete!')
-      setResults(mockResults)
+      // Simulate progress update
+      setTimeout(() => {
+        setProgress(100)
+        setStatus('Analysis complete!')
+        setResults(data)
+      }, 500)
       
     } catch (err: any) {
       setError(err.message || 'Failed to connect to analysis service')
