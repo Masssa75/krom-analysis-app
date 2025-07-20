@@ -1,134 +1,289 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { BarChart, LineChart, Activity, TrendingUp, Users, Clock } from 'lucide-react'
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Progress } from '@/components/ui/progress'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Download, Copy, ExternalLink } from 'lucide-react'
 
 export default function HomePage() {
-  const [stats, setStats] = useState({
-    totalCalls: 0,
-    uniqueGroups: 0,
-    avgROI: 0,
-    successRate: 0
-  })
+  const [count, setCount] = useState('5')
+  const [model, setModel] = useState('claude-3-haiku-20240307')
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [progress, setProgress] = useState(0)
+  const [status, setStatus] = useState('')
+  const [error, setError] = useState('')
+  const [results, setResults] = useState<any>(null)
 
-  useEffect(() => {
-    // Placeholder for fetching stats
-    setStats({
-      totalCalls: 98040,
-      uniqueGroups: 127,
-      avgROI: 2.45,
-      successRate: 34.2
+  const startAnalysis = async () => {
+    setIsAnalyzing(true)
+    setError('')
+    setResults(null)
+    setProgress(0)
+    setStatus('Connecting to database...')
+
+    try {
+      const response = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          limit: parseInt(count),
+          model: model,
+          prompt: 'Analyze these crypto calls and provide scores'
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const data = await response.json()
+      
+      if (data.error) {
+        throw new Error(data.error)
+      }
+
+      // Simulate progress
+      setProgress(50)
+      setStatus('Analyzing with AI...')
+      
+      // Mock results for now
+      const mockResults = {
+        count: parseInt(count),
+        model: model,
+        duration: '12',
+        results: [
+          { token: 'PEPE', contract: '0x6982508145454ce325ddbe47a25d4ec3d2311933', score: 9.2, legitimacy_factor: 'High' },
+          { token: 'SHIB', contract: '0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce', score: 8.7, legitimacy_factor: 'High' },
+          { token: 'DOGE', contract: '0xba2ae424d960c26247dd6c32edc70b295c744c43', score: 8.5, legitimacy_factor: 'High' },
+          { token: 'FLOKI', contract: '0xcf0c122c6b73ff809c693db761e7baebe62b6a2e', score: 7.8, legitimacy_factor: 'Medium' },
+          { token: 'SAITAMA', contract: null, score: 6.9, legitimacy_factor: 'Medium' }
+        ].slice(0, parseInt(count))
+      }
+
+      setProgress(100)
+      setStatus('Analysis complete!')
+      setResults(mockResults)
+      
+    } catch (err: any) {
+      setError(err.message || 'Failed to connect to analysis service')
+    } finally {
+      setIsAnalyzing(false)
+      setProgress(0)
+      setStatus('')
+    }
+  }
+
+  const getTier = (score: number) => {
+    if (score >= 8) return 'ALPHA'
+    if (score >= 6) return 'SOLID'
+    if (score >= 4) return 'BASIC'
+    return 'TRASH'
+  }
+
+  const getTierClass = (tier: string) => {
+    switch (tier) {
+      case 'ALPHA': return 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400'
+      case 'SOLID': return 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/20 dark:text-cyan-400'
+      case 'BASIC': return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
+      case 'TRASH': return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
+      default: return ''
+    }
+  }
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      // Could add toast notification here
+    } catch (err) {
+      console.error('Failed to copy:', err)
+    }
+  }
+
+  const downloadCSV = async () => {
+    if (!results) return
+
+    const response = await fetch('/api/download-csv', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        data: results.results,
+        filename: 'krom-analysis.csv'
+      })
     })
-  }, [])
+
+    if (response.ok) {
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'krom-analysis.csv'
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+    }
+  }
+
+  const resetAnalysis = () => {
+    setResults(null)
+    setError('')
+  }
 
   return (
-    <div className="min-h-screen p-8">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold gradient-text mb-2">
-          KROM Analysis Dashboard
-        </h1>
-        <p className="text-muted-foreground">
-          Advanced cryptocurrency call analysis and monitoring platform
-        </p>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard
-          title="Total Calls"
-          value={stats.totalCalls.toLocaleString()}
-          icon={<Activity className="w-5 h-5" />}
-          trend="+12.5%"
-        />
-        <StatCard
-          title="Unique Groups"
-          value={stats.uniqueGroups}
-          icon={<Users className="w-5 h-5" />}
-          trend="+3"
-        />
-        <StatCard
-          title="Average ROI"
-          value={`${stats.avgROI}x`}
-          icon={<TrendingUp className="w-5 h-5" />}
-          trend="+0.3x"
-        />
-        <StatCard
-          title="Success Rate"
-          value={`${stats.successRate}%`}
-          icon={<BarChart className="w-5 h-5" />}
-          trend="-2.1%"
-        />
-      </div>
-
-      {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recent Activity */}
-        <div className="lg:col-span-2 bg-card rounded-lg p-6 border">
-          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-            <Clock className="w-5 h-5" />
-            Recent Activity
-          </h2>
-          <div className="space-y-3">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="p-3 bg-muted/50 rounded-md animate-in" style={{ animationDelay: `${i * 50}ms` }}>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="font-medium">Token #{i}</p>
-                    <p className="text-sm text-muted-foreground">Group Name • 2 minutes ago</p>
-                  </div>
-                  <span className="text-sm font-medium text-green-600 dark:text-green-400">
-                    +{(Math.random() * 10).toFixed(1)}x
-                  </span>
+    <div className="container max-w-4xl mx-auto py-8">
+      <Card>
+        <CardHeader className="text-center">
+          <CardTitle className="text-3xl">KROM Historical Analysis Tool</CardTitle>
+          <CardDescription>
+            Analyze cryptocurrency calls with AI-powered scoring
+          </CardDescription>
+        </CardHeader>
+        
+        <CardContent className="space-y-6">
+          {!results ? (
+            <>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="count">Number of calls to analyze (from oldest)</Label>
+                  <Input
+                    id="count"
+                    type="number"
+                    value={count}
+                    onChange={(e) => setCount(e.target.value)}
+                    min="1"
+                    max="100"
+                    disabled={isAnalyzing}
+                  />
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Top Performers */}
-        <div className="bg-card rounded-lg p-6 border">
-          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-            <TrendingUp className="w-5 h-5" />
-            Top Performers
-          </h2>
-          <div className="space-y-3">
-            {['Alpha Signals', 'Crypto Whales', 'Moon Hunters', 'Degen Plays'].map((group, i) => (
-              <div key={group} className="flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-muted-foreground">#{i + 1}</span>
-                  <span className="font-medium">{group}</span>
+                
+                <div>
+                  <Label htmlFor="model">AI Model</Label>
+                  <Select value={model} onValueChange={setModel} disabled={isAnalyzing}>
+                    <SelectTrigger id="model">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="claude-3-haiku-20240307">Claude 3 Haiku (Fast)</SelectItem>
+                      <SelectItem value="claude-3-sonnet-20240229">Claude 3 Sonnet (Better)</SelectItem>
+                      <SelectItem value="gemini-pro">Gemini Pro</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-                <span className="text-sm font-bold text-primary">
-                  {(5 - i) * 12}%
-                </span>
+                
+                <Button 
+                  onClick={startAnalysis} 
+                  disabled={isAnalyzing}
+                  className="w-full"
+                  size="lg"
+                >
+                  {isAnalyzing ? 'Analyzing...' : 'Start Analysis'}
+                </Button>
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function StatCard({ title, value, icon, trend }: {
-  title: string
-  value: string | number
-  icon: React.ReactNode
-  trend: string
-}) {
-  const isPositive = trend.startsWith('+')
-  
-  return (
-    <div className="bg-card p-6 rounded-lg border card-hover">
-      <div className="flex items-center justify-between mb-4">
-        <span className="text-muted-foreground">{icon}</span>
-        <span className={`text-sm font-medium ${isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-          {trend}
-        </span>
-      </div>
-      <p className="text-2xl font-bold">{value}</p>
-      <p className="text-sm text-muted-foreground">{title}</p>
+              
+              {isAnalyzing && (
+                <div className="space-y-2">
+                  <Progress value={progress} />
+                  <p className="text-sm text-center text-muted-foreground">{status}</p>
+                </div>
+              )}
+              
+              {error && (
+                <Alert variant="destructive">
+                  <AlertDescription>Error: {error}</AlertDescription>
+                </Alert>
+              )}
+            </>
+          ) : (
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-2xl font-semibold mb-2">Analysis Results</h2>
+                <p className="text-sm text-muted-foreground">
+                  Analyzed {results.count} calls • {results.model} • Completed in {results.duration}s
+                </p>
+              </div>
+              
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-3 px-2">Token</th>
+                      <th className="text-left py-3 px-2">Contract Address</th>
+                      <th className="text-left py-3 px-2">Score</th>
+                      <th className="text-left py-3 px-2">Tier</th>
+                      <th className="text-left py-3 px-2">Legitimacy Factor</th>
+                      <th className="text-left py-3 px-2">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {results.results.map((result: any, index: number) => {
+                      const tier = getTier(result.score)
+                      return (
+                        <tr key={index} className="border-b hover:bg-muted/50 transition-colors">
+                          <td className="py-3 px-2 font-mono text-sm">{result.token}</td>
+                          <td className="py-3 px-2 font-mono text-xs text-muted-foreground">
+                            {result.contract ? `${result.contract.substr(0, 6)}...${result.contract.substr(-4)}` : 'N/A'}
+                          </td>
+                          <td className="py-3 px-2 font-semibold">{result.score.toFixed(1)}</td>
+                          <td className="py-3 px-2">
+                            <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${getTierClass(tier)}`}>
+                              {tier}
+                            </span>
+                          </td>
+                          <td className="py-3 px-2 text-sm">{result.legitimacy_factor}</td>
+                          <td className="py-3 px-2">
+                            {result.contract && (
+                              <div className="flex gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => copyToClipboard(result.contract)}
+                                >
+                                  <Copy className="w-3 h-3 mr-1" />
+                                  Copy CA
+                                </Button>
+                                <a
+                                  href={`https://dexscreener.com/search/${result.contract}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center"
+                                >
+                                  <Button size="sm" variant="outline">
+                                    <ExternalLink className="w-3 h-3 mr-1" />
+                                    DexScreener
+                                  </Button>
+                                </a>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              
+              <div className="flex gap-4">
+                <Button onClick={downloadCSV} className="flex-1">
+                  <Download className="w-4 h-4 mr-2" />
+                  Download CSV
+                </Button>
+                <Button onClick={resetAnalysis} variant="outline" className="flex-1">
+                  New Analysis
+                </Button>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }
