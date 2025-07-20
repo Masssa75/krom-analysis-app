@@ -179,14 +179,16 @@ export default function HomePage() {
                   </Select>
                 </div>
                 
-                <Button 
-                  onClick={startAnalysis} 
-                  disabled={isAnalyzing}
-                  className="w-full"
-                  size="lg"
-                >
-                  {isAnalyzing ? 'Analyzing...' : 'Start Analysis'}
-                </Button>
+                <div className="pt-4">
+                  <Button 
+                    onClick={startAnalysis} 
+                    disabled={isAnalyzing}
+                    className="w-full"
+                    size="lg"
+                  >
+                    {isAnalyzing ? 'Analyzing...' : 'Start Analysis'}
+                  </Button>
+                </div>
               </div>
               
               {isAnalyzing && (
