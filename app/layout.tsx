@@ -1,0 +1,50 @@
+import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
+import { Navigation } from '@/components/navigation'
+import './globals.css'
+
+const inter = Inter({ subsets: ['latin'] })
+
+export const metadata: Metadata = {
+  title: 'KROM Analysis Dashboard',
+  description: 'Advanced cryptocurrency call analysis and monitoring platform',
+  keywords: 'crypto, analysis, trading, KROM, dashboard',
+  authors: [{ name: 'KROM Analysis Team' }],
+  viewport: 'width=device-width, initial-scale=1',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#0a0a0a' }
+  ],
+}
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                  document.documentElement.classList.add('dark')
+                } else {
+                  document.documentElement.classList.remove('dark')
+                }
+              } catch (_) {}
+            `,
+          }}
+        />
+      </head>
+      <body className={`${inter.className} min-h-screen bg-background antialiased`}>
+        <Navigation />
+        <main className="flex-1">
+          {children}
+        </main>
+      </body>
+    </html>
+  )
+}
