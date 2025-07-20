@@ -3,27 +3,6 @@ import Anthropic from '@anthropic-ai/sdk';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { createClient } from '@supabase/supabase-js';
 
-// Contract address extraction regex patterns
-const CONTRACT_PATTERNS = {
-  ethereum: /0x[a-fA-F0-9]{40}/g,
-  solana: /[1-9A-HJ-NP-Za-km-z]{32,44}/g
-};
-
-// Extract contract addresses from text
-function extractContractAddresses(text: string): { ethereum: string[], solana: string[] } {
-  const ethereum = text.match(CONTRACT_PATTERNS.ethereum) || [];
-  const solana = text.match(CONTRACT_PATTERNS.solana) || [];
-  
-  // Filter out common false positives for Solana (like regular words)
-  const validSolana = solana.filter(addr => 
-    addr.length >= 32 && 
-    !addr.match(/^[A-Z][a-z]+$/) && // Not a capitalized word
-    !addr.match(/^[a-z]+$/) // Not all lowercase
-  );
-  
-  return { ethereum, solana: validSolana };
-}
-
 export async function POST(request: NextRequest) {
   const startTime = Date.now();
   
@@ -50,7 +29,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
     }
 
-    // Fetch oldest unanalyzed calls from Supabase
+    // Fetch oldest calls that haven't been scored with the new 1-10 system
     const { data: calls, error: fetchError } = await supabase
       .from('crypto_calls')
       .select('*')
@@ -88,10 +67,11 @@ export async function POST(request: NextRequest) {
     
     for (const call of calls) {
       try {
-        // Extract contract addresses from raw data
-        const rawDataStr = JSON.stringify(call.raw_data || {});
-        const addresses = extractContractAddresses(rawDataStr);
-        const contract = addresses.ethereum[0] || addresses.solana[0] || null;
+        // Extract contract address from raw_data
+        const contract = call.raw_data?.token?.ca || null;
+        const network = call.raw_data?.token?.network || 'unknown';
+        const groupName = call.raw_data?.groupName || call.raw_data?.group?.name || 'Unknown';
+        const message = call.raw_data?.text || 'No message';
         
         // Prepare analysis prompt
         const analysisPrompt = `
@@ -99,15 +79,23 @@ Analyze this cryptocurrency call and provide a score from 1-10 based on potentia
 
 Call Data:
 - Token: ${call.ticker || 'Unknown'}
-- Group: ${call.raw_data?.group_name || 'Unknown'}
-- Message: ${call.raw_data?.message || call.raw_data?.text || 'No message'}
-- Timestamp: ${call.buy_timestamp}
+- Contract: ${contract || 'No contract'}
+- Network: ${network}
+- Group: ${groupName}
+- Message: ${message}
+- Timestamp: ${call.buy_timestamp || call.created_at}
 
 Scoring Criteria:
 - 8-10: ALPHA tier - High potential, legitimate project, strong fundamentals
 - 6-7: SOLID tier - Good potential, reasonable risk
 - 4-5: BASIC tier - Average, higher risk
 - 1-3: TRASH tier - Likely scam or very high risk
+
+Consider:
+- Is there a clear contract address?
+- Does the message contain substantial information?
+- Group reputation (if known)
+- Red flags like "pump", "moon", excessive emojis
 
 Response Format (JSON):
 {
@@ -143,13 +131,17 @@ Respond with JSON only.`;
           analysisResult = jsonMatch ? JSON.parse(jsonMatch[0]) : {};
         }
         
+        // Get full contract address for display
+        const displayContract = contract;
+        
         results.push({
           token: call.ticker || 'Unknown',
-          contract: contract,
+          contract: displayContract,
           score: analysisResult.score || 5,
           legitimacy_factor: analysisResult.legitimacy_factor || 'Medium',
           reasoning: analysisResult.reasoning || 'No analysis available',
-          krom_id: call.krom_id
+          krom_id: call.krom_id,
+          network: network
         });
         
         // Update the database with the analysis score
@@ -158,8 +150,8 @@ Respond with JSON only.`;
             .from('crypto_calls')
             .update({ 
               analysis_score: analysisResult.score,
-              analysis_legitimacy: analysisResult.legitimacy_factor,
-              contract_address: contract
+              analysis_legitimacy_factor: analysisResult.legitimacy_factor,
+              analysis_model: model
             })
             .eq('krom_id', call.krom_id);
         }
@@ -172,7 +164,8 @@ Respond with JSON only.`;
           score: 5,
           legitimacy_factor: 'Unknown',
           reasoning: 'Analysis failed',
-          krom_id: call.krom_id
+          krom_id: call.krom_id,
+          network: 'unknown'
         });
       }
     }

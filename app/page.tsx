@@ -216,7 +216,13 @@ export default function HomePage() {
                         <tr key={index} className="border-b hover:bg-muted/50 transition-colors">
                           <td className="py-3 px-2 font-mono text-sm">{result.token}</td>
                           <td className="py-3 px-2 font-mono text-xs text-muted-foreground">
-                            {result.contract ? `${result.contract.substr(0, 6)}...${result.contract.substr(-4)}` : 'N/A'}
+                            {result.contract ? (
+                              <span title={result.contract}>
+                                {result.contract.length > 15 
+                                  ? `${result.contract.substr(0, 6)}...${result.contract.substr(-4)}` 
+                                  : result.contract}
+                              </span>
+                            ) : 'N/A'}
                           </td>
                           <td className="py-3 px-2 font-semibold">{result.score.toFixed(1)}</td>
                           <td className="py-3 px-2">
@@ -237,7 +243,7 @@ export default function HomePage() {
                                   Copy CA
                                 </Button>
                                 <a
-                                  href={`https://dexscreener.com/search/${result.contract}`}
+                                  href={`https://dexscreener.com/${result.network === 'solana' ? 'solana' : 'ethereum'}/${result.contract}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="inline-flex items-center"
