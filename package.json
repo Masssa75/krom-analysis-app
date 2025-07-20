@@ -22,7 +22,7 @@
     "@radix-ui/react-progress": "^1.1.0",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
-    "tailwind-merge": "^2.7.0",
+    "tailwind-merge": "^2.2.0",
     "@anthropic-ai/sdk": "^0.32.1",
     "@google/generative-ai": "^0.21.0",
     "@supabase/supabase-js": "^2.47.10"
