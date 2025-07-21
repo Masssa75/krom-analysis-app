@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -18,6 +18,31 @@ export default function HomePage() {
   const [status, setStatus] = useState('')
   const [error, setError] = useState('')
   const [results, setResults] = useState<any>(null)
+  const [analyzedCalls, setAnalyzedCalls] = useState<any[]>([])
+  const [analyzedCount, setAnalyzedCount] = useState(0)
+  const [loadingAnalyzed, setLoadingAnalyzed] = useState(true)
+
+  // Fetch analyzed calls on mount
+  useEffect(() => {
+    fetchAnalyzedCalls()
+  }, [])
+
+  const fetchAnalyzedCalls = async () => {
+    setLoadingAnalyzed(true)
+    try {
+      const response = await fetch('/api/analyzed?limit=20')
+      const data = await response.json()
+      
+      if (data.success) {
+        setAnalyzedCalls(data.results)
+        setAnalyzedCount(data.count)
+      }
+    } catch (err) {
+      console.error('Failed to fetch analyzed calls:', err)
+    } finally {
+      setLoadingAnalyzed(false)
+    }
+  }
 
   const startAnalysis = async () => {
     setIsAnalyzing(true)
@@ -53,6 +78,8 @@ export default function HomePage() {
         setProgress(100)
         setStatus('Analysis complete!')
         setResults(data)
+        // Refresh analyzed calls list
+        fetchAnalyzedCalls()
       }, 500)
       
     } catch (err: any) {
@@ -276,6 +303,71 @@ export default function HomePage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Previously Analyzed Calls */}
+      {analyzedCalls.length > 0 && (
+        <Card className="mt-8">
+          <CardHeader>
+            <CardTitle>Previously Analyzed Calls</CardTitle>
+            <CardDescription>
+              {analyzedCount} total calls analyzed • Showing most recent {analyzedCalls.length}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {loadingAnalyzed ? (
+              <div className="text-center py-8 text-muted-foreground">Loading...</div>
+            ) : (
+              <div className="space-y-4">
+                {analyzedCalls.map((call) => {
+                  const tier = getTier(call.score)
+                  return (
+                    <div key={call.krom_id} className="rounded-lg border p-4 hover:bg-muted/50 transition-colors">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h3 className="font-semibold text-lg">{call.token}</h3>
+                            <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${getTierClass(tier)}`}>
+                              {tier}
+                            </span>
+                            <span className="text-2xl font-bold">{call.score}/10</span>
+                          </div>
+                          <p className="text-sm text-muted-foreground">Legitimacy: {call.legitimacy_factor}</p>
+                          {call.contract && (
+                            <p className="text-xs font-mono text-muted-foreground mt-1">
+                              {call.contract.substr(0, 6)}...{call.contract.substr(-4)}
+                            </p>
+                          )}
+                        </div>
+                        
+                        {call.contract && (
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => copyToClipboard(call.contract)}
+                            >
+                              <Copy className="w-3 h-3" />
+                            </Button>
+                            <a
+                              href={`https://dexscreener.com/${call.network === 'solana' ? 'solana' : 'ethereum'}/${call.contract}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <Button size="sm" variant="outline">
+                                <ExternalLink className="w-3 h-3" />
+                              </Button>
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }
