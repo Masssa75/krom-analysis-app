@@ -227,29 +227,47 @@ export default function HomePage() {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b">
-                      <th className="text-left py-3 px-2">Token</th>
-                      <th className="text-left py-3 px-2">Contract Address</th>
-                      <th className="text-left py-3 px-2">Score</th>
-                      <th className="text-left py-3 px-2">Tier</th>
-                      <th className="text-left py-3 px-2">Legitimacy Factor</th>
-                      <th className="text-left py-3 px-2">Actions</th>
+                    <tr className="border-b text-left">
+                      <th className="py-3 px-2 font-medium text-muted-foreground">Token</th>
+                      <th className="py-3 px-2 font-medium text-muted-foreground">Score</th>
+                      <th className="py-3 px-2 font-medium text-muted-foreground">Tier</th>
+                      <th className="py-3 px-2 font-medium text-muted-foreground">Legitimacy</th>
                     </tr>
                   </thead>
                   <tbody>
                     {results.results.map((result: any, index: number) => {
                       const tier = getTier(result.score)
+                      const legitimacyColor = result.legitimacy_factor === 'High' ? 'text-green-600 dark:text-green-400' : 
+                                             result.legitimacy_factor === 'Medium' ? 'text-orange-600 dark:text-orange-400' : 
+                                             'text-muted-foreground'
                       return (
                         <tr key={index} className="border-b hover:bg-muted/50 transition-colors">
-                          <td className="py-3 px-2 font-mono text-sm">{result.token}</td>
-                          <td className="py-3 px-2 font-mono text-xs text-muted-foreground">
-                            {result.contract ? (
-                              <span title={result.contract}>
-                                {result.contract.length > 15 
-                                  ? `${result.contract.substr(0, 6)}...${result.contract.substr(-4)}` 
-                                  : result.contract}
-                              </span>
-                            ) : 'N/A'}
+                          <td className="py-3 px-2">
+                            <div className="flex items-center gap-2">
+                              {result.contract ? (
+                                <a
+                                  href={`https://dexscreener.com/${result.network === 'solana' ? 'solana' : 'ethereum'}/${result.contract}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="font-mono text-sm hover:underline"
+                                >
+                                  {result.token}
+                                </a>
+                              ) : (
+                                <span className="font-mono text-sm">{result.token}</span>
+                              )}
+                              {result.contract && (
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="h-6 w-6 p-0"
+                                  onClick={() => copyToClipboard(result.contract)}
+                                  title="Copy contract address"
+                                >
+                                  <Copy className="h-3 w-3" />
+                                </Button>
+                              )}
+                            </div>
                           </td>
                           <td className="py-3 px-2 font-semibold">{result.score.toFixed(1)}</td>
                           <td className="py-3 px-2">
@@ -257,32 +275,7 @@ export default function HomePage() {
                               {tier}
                             </span>
                           </td>
-                          <td className="py-3 px-2 text-sm">{result.legitimacy_factor}</td>
-                          <td className="py-3 px-2">
-                            {result.contract && (
-                              <div className="flex gap-2">
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => copyToClipboard(result.contract)}
-                                >
-                                  <Copy className="w-3 h-3 mr-1" />
-                                  Copy CA
-                                </Button>
-                                <a
-                                  href={`https://dexscreener.com/${result.network === 'solana' ? 'solana' : 'ethereum'}/${result.contract}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-flex items-center"
-                                >
-                                  <Button size="sm" variant="outline">
-                                    <ExternalLink className="w-3 h-3 mr-1" />
-                                    DexScreener
-                                  </Button>
-                                </a>
-                              </div>
-                            )}
-                          </td>
+                          <td className={`py-3 px-2 ${legitimacyColor}`}>{result.legitimacy_factor}</td>
                         </tr>
                       )
                     })}
@@ -317,52 +310,62 @@ export default function HomePage() {
             {loadingAnalyzed ? (
               <div className="text-center py-8 text-muted-foreground">Loading...</div>
             ) : (
-              <div className="space-y-4">
-                {analyzedCalls.map((call) => {
-                  const tier = getTier(call.score)
-                  return (
-                    <div key={call.krom_id} className="rounded-lg border p-4 hover:bg-muted/50 transition-colors">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="font-semibold text-lg">{call.token}</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b text-left">
+                      <th className="py-3 px-2 font-medium text-muted-foreground">Token</th>
+                      <th className="py-3 px-2 font-medium text-muted-foreground">Score</th>
+                      <th className="py-3 px-2 font-medium text-muted-foreground">Tier</th>
+                      <th className="py-3 px-2 font-medium text-muted-foreground">Legitimacy</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {analyzedCalls.map((call) => {
+                      const tier = getTier(call.score)
+                      const legitimacyColor = call.legitimacy_factor === 'High' ? 'text-green-600 dark:text-green-400' : 
+                                             call.legitimacy_factor === 'Medium' ? 'text-orange-600 dark:text-orange-400' : 
+                                             'text-muted-foreground'
+                      return (
+                        <tr key={call.krom_id} className="border-b hover:bg-muted/50 transition-colors">
+                          <td className="py-3 px-2">
+                            <div className="flex items-center gap-2">
+                              {call.contract ? (
+                                <a
+                                  href={`https://dexscreener.com/${call.network === 'solana' ? 'solana' : 'ethereum'}/${call.contract}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="font-mono text-sm hover:underline"
+                                >
+                                  {call.token}
+                                </a>
+                              ) : (
+                                <span className="font-mono text-sm">{call.token}</span>
+                              )}
+                              {call.contract && (
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="h-6 w-6 p-0"
+                                  onClick={() => copyToClipboard(call.contract)}
+                                >
+                                  <Copy className="h-3 w-3" />
+                                </Button>
+                              )}
+                            </div>
+                          </td>
+                          <td className="py-3 px-2 font-semibold">{call.score.toFixed(1)}</td>
+                          <td className="py-3 px-2">
                             <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${getTierClass(tier)}`}>
                               {tier}
                             </span>
-                            <span className="text-2xl font-bold">{call.score}/10</span>
-                          </div>
-                          <p className="text-sm text-muted-foreground">Legitimacy: {call.legitimacy_factor}</p>
-                          {call.contract && (
-                            <p className="text-xs font-mono text-muted-foreground mt-1">
-                              {call.contract.substr(0, 6)}...{call.contract.substr(-4)}
-                            </p>
-                          )}
-                        </div>
-                        
-                        {call.contract && (
-                          <div className="flex gap-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => copyToClipboard(call.contract)}
-                            >
-                              <Copy className="w-3 h-3" />
-                            </Button>
-                            <a
-                              href={`https://dexscreener.com/${call.network === 'solana' ? 'solana' : 'ethereum'}/${call.contract}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              <Button size="sm" variant="outline">
-                                <ExternalLink className="w-3 h-3" />
-                              </Button>
-                            </a>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )
-                })}
+                          </td>
+                          <td className={`py-3 px-2 ${legitimacyColor}`}>{call.legitimacy_factor}</td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
               </div>
             )}
           </CardContent>
