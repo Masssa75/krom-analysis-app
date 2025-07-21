@@ -8,7 +8,8 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Progress } from '@/components/ui/progress'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Download, Copy, ExternalLink } from 'lucide-react'
+import { Download, Copy, ExternalLink, ChevronRight } from 'lucide-react'
+import { AnalysisDetailPanel } from '@/components/analysis-detail-panel'
 
 export default function HomePage() {
   const [count, setCount] = useState('5')
@@ -21,6 +22,8 @@ export default function HomePage() {
   const [analyzedCalls, setAnalyzedCalls] = useState<any[]>([])
   const [analyzedCount, setAnalyzedCount] = useState(0)
   const [loadingAnalyzed, setLoadingAnalyzed] = useState(true)
+  const [selectedCall, setSelectedCall] = useState<any>(null)
+  const [isPanelOpen, setIsPanelOpen] = useState(false)
 
   // Fetch analyzed calls on mount
   useEffect(() => {
@@ -149,6 +152,17 @@ export default function HomePage() {
     setError('')
   }
 
+  const openDetailPanel = (call: any) => {
+    setSelectedCall(call)
+    setIsPanelOpen(true)
+  }
+
+  const closeDetailPanel = () => {
+    setIsPanelOpen(false)
+    // Delay clearing selected call to allow exit animation
+    setTimeout(() => setSelectedCall(null), 300)
+  }
+
   return (
     <div className="container max-w-4xl mx-auto py-8">
       <Card>
@@ -232,6 +246,7 @@ export default function HomePage() {
                       <th className="py-3 px-2 font-medium text-muted-foreground">Score</th>
                       <th className="py-3 px-2 font-medium text-muted-foreground">Tier</th>
                       <th className="py-3 px-2 font-medium text-muted-foreground">Legitimacy</th>
+                      <th className="py-3 px-2 font-medium text-muted-foreground text-right">Details</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -276,6 +291,17 @@ export default function HomePage() {
                             </span>
                           </td>
                           <td className={`py-3 px-2 ${legitimacyColor}`}>{result.legitimacy_factor}</td>
+                          <td className="py-3 px-2 text-right">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => openDetailPanel(result)}
+                              className="text-xs"
+                            >
+                              View Details
+                              <ChevronRight className="h-3 w-3 ml-1" />
+                            </Button>
+                          </td>
                         </tr>
                       )
                     })}
@@ -318,6 +344,7 @@ export default function HomePage() {
                       <th className="py-3 px-2 font-medium text-muted-foreground">Score</th>
                       <th className="py-3 px-2 font-medium text-muted-foreground">Tier</th>
                       <th className="py-3 px-2 font-medium text-muted-foreground">Legitimacy</th>
+                      <th className="py-3 px-2 font-medium text-muted-foreground text-right">Details</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -361,6 +388,17 @@ export default function HomePage() {
                             </span>
                           </td>
                           <td className={`py-3 px-2 ${legitimacyColor}`}>{call.legitimacy_factor}</td>
+                          <td className="py-3 px-2 text-right">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => openDetailPanel(call)}
+                              className="text-xs"
+                            >
+                              View Details
+                              <ChevronRight className="h-3 w-3 ml-1" />
+                            </Button>
+                          </td>
                         </tr>
                       )
                     })}
@@ -371,6 +409,13 @@ export default function HomePage() {
           </CardContent>
         </Card>
       )}
+
+      {/* Analysis Detail Panel */}
+      <AnalysisDetailPanel
+        call={selectedCall}
+        isOpen={isPanelOpen}
+        onClose={closeDetailPanel}
+      />
     </div>
   )
 }

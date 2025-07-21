@@ -42,7 +42,13 @@ export async function GET(request: NextRequest) {
       legitimacy_factor: call.analysis_legitimacy_factor || 'Unknown',
       analysis_model: call.analysis_model,
       buy_timestamp: call.buy_timestamp,
-      analyzed_at: call.analysis_reanalyzed_at || call.analyzed_at || call.created_at
+      analyzed_at: call.analysis_reanalyzed_at || call.analyzed_at || call.created_at,
+      // New fields for detailed view
+      analysis_reasoning: call.analysis_reasoning,
+      analysis_batch_id: call.analysis_batch_id,
+      analysis_batch_timestamp: call.analysis_batch_timestamp,
+      analysis_prompt_used: call.analysis_prompt_used,
+      analysis_duration_ms: call.analysis_duration_ms
     })) || [];
 
     return NextResponse.json({

@@ -5,6 +5,8 @@ import { createClient } from '@supabase/supabase-js';
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now();
+  const batchId = crypto.randomUUID(); // Generate unique batch ID
+  const batchTimestamp = new Date().toISOString();
   
   // Initialize clients inside the function to avoid build-time errors
   const anthropic = process.env.ANTHROPIC_API_KEY 
@@ -107,6 +109,8 @@ Response Format (JSON):
 Respond with JSON only.`;
 
         let analysisResult;
+        let rawResponse;
+        const analysisStartTime = Date.now();
         
         if (isClaudeModel) {
           const message = await aiClient.messages.create({
@@ -120,16 +124,18 @@ Respond with JSON only.`;
             ]
           });
           
-          const responseText = message.content[0].type === 'text' ? message.content[0].text : '{}';
-          analysisResult = JSON.parse(responseText);
+          rawResponse = message.content[0].type === 'text' ? message.content[0].text : '{}';
+          analysisResult = JSON.parse(rawResponse);
         } else {
           const geminiModel = aiClient.getGenerativeModel({ model: 'gemini-pro' });
           const result = await geminiModel.generateContent(analysisPrompt);
-          const responseText = result.response.text();
+          rawResponse = result.response.text();
           // Extract JSON from response (Gemini sometimes adds extra text)
-          const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+          const jsonMatch = rawResponse.match(/\{[\s\S]*\}/);
           analysisResult = jsonMatch ? JSON.parse(jsonMatch[0]) : {};
         }
+        
+        const analysisDuration = Date.now() - analysisStartTime;
         
         // Get full contract address for display
         const displayContract = contract;
@@ -144,14 +150,19 @@ Respond with JSON only.`;
           network: network
         });
         
-        // Update the database with the analysis score
+        // Update the database with full analysis details
         if (analysisResult.score) {
           await supabase
             .from('crypto_calls')
             .update({ 
               analysis_score: analysisResult.score,
               analysis_legitimacy_factor: analysisResult.legitimacy_factor,
-              analysis_model: model
+              analysis_model: model,
+              analysis_reasoning: analysisResult.reasoning || rawResponse,
+              analysis_batch_id: batchId,
+              analysis_batch_timestamp: batchTimestamp,
+              analysis_prompt_used: analysisPrompt,
+              analysis_duration_ms: analysisDuration
             })
             .eq('krom_id', call.krom_id);
         }
