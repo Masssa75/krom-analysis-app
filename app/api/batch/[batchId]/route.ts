@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { batchId: string } }
+  context: { params: Promise<{ batchId: string }> }
 ) {
   const supabase = process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY
     ? createClient(
@@ -17,6 +17,7 @@ export async function GET(
   }
 
   try {
+    const params = await context.params;
     const { batchId } = params;
 
     // Fetch all calls from the same batch
