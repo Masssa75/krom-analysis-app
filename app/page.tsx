@@ -205,8 +205,8 @@ export default function HomePage() {
             </CardHeader>
           
             <CardContent className="space-y-6">
-          {!results ? (
-            <>
+              {!results && (
+                <>
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="count">Number of calls to analyze (from oldest)</Label>
@@ -259,8 +259,8 @@ export default function HomePage() {
                   <AlertDescription>Error: {error}</AlertDescription>
                 </Alert>
               )}
-            </>
-          )}
+                </>
+              )}
             </CardContent>
           </Card>
           
