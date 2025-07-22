@@ -15,6 +15,7 @@ import { TokenTypeBadge } from '@/components/token-type-badge'
 export default function HomePage() {
   const [count, setCount] = useState('5')
   const [model, setModel] = useState('claude-3-haiku-20240307')
+  const [useBatchMode, setUseBatchMode] = useState(true)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [progress, setProgress] = useState(0)
   const [status, setStatus] = useState('')
@@ -88,7 +89,12 @@ export default function HomePage() {
     setStatus('Connecting to database...')
 
     try {
-      const response = await fetch('/api/analyze', {
+      // Use batch endpoint for Gemini 2.5 Pro when batch mode is enabled
+      const endpoint = (model === 'google/gemini-2.5-pro' && useBatchMode) 
+        ? '/api/analyze-batch-gemini' 
+        : '/api/analyze'
+        
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -470,6 +476,21 @@ export default function HomePage() {
                     </SelectContent>
                   </Select>
                 </div>
+                
+                {model === 'google/gemini-2.5-pro' && (
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="batch-mode"
+                      checked={useBatchMode}
+                      onChange={(e) => setUseBatchMode(e.target.checked)}
+                      className="rounded"
+                    />
+                    <Label htmlFor="batch-mode" className="text-sm">
+                      Use batch processing (cost-effective, analyzes {count} calls in one request)
+                    </Label>
+                  </div>
+                )}
                 
                 <div className="pt-4">
                   <Button 
