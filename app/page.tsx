@@ -45,6 +45,7 @@ export default function HomePage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [searchQuery, setSearchQuery] = useState('')
   const [isSearching, setIsSearching] = useState(false)
+  const [showOnlyCoinsOfInterest, setShowOnlyCoinsOfInterest] = useState(false)
   const itemsPerPage = 20
 
   // Fetch analyzed calls on mount and when page/search/filter changes
@@ -345,7 +346,6 @@ export default function HomePage() {
   
   // Handle search with debouncing
   const [searchInput, setSearchInput] = useState('')
-  const [showOnlyCoinsOfInterest, setShowOnlyCoinsOfInterest] = useState(false)
   useEffect(() => {
     const timer = setTimeout(() => {
       setSearchQuery(searchInput)
