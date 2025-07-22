@@ -408,7 +408,7 @@ export default function HomePage() {
                   />
                 </div>
                 
-                <div>
+                <div className="space-y-2">
                   <Label htmlFor="model">AI Model</Label>
                   <Select value={model} onValueChange={setModel} disabled={isAnalyzing}>
                     <SelectTrigger id="model">
@@ -559,7 +559,7 @@ export default function HomePage() {
               </p>
             </div>
             
-            <div>
+            <div className="space-y-2">
               <Label htmlFor="x-model">AI Model</Label>
               <Select 
                 value={xModel} 
