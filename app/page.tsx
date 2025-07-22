@@ -569,14 +569,14 @@ export default function HomePage() {
                   <thead>
                     <tr className="border-b text-left">
                       <th className="py-3 px-2 font-medium text-muted-foreground">Token</th>
-                      <th className="py-3 px-2 font-medium text-muted-foreground" colSpan={2}>Call Analysis</th>
-                      <th className="py-3 px-2 font-medium text-muted-foreground" colSpan={2}>X Analysis</th>
-                      <th className="py-3 px-2 font-medium text-muted-foreground text-right">Details</th>
+                      <th className="py-3 px-2 font-medium text-muted-foreground" colSpan={3}>Call Analysis</th>
+                      <th className="py-3 px-2 font-medium text-muted-foreground" colSpan={3}>X Analysis</th>
                     </tr>
                     <tr className="border-b text-left text-xs">
                       <th className="py-2 px-2"></th>
                       <th className="py-2 px-2 font-normal text-muted-foreground">Score</th>
                       <th className="py-2 px-2 font-normal text-muted-foreground">Tier</th>
+                      <th className="py-2 px-2 font-normal text-muted-foreground"></th>
                       <th className="py-2 px-2 font-normal text-muted-foreground">Score</th>
                       <th className="py-2 px-2 font-normal text-muted-foreground">Tier</th>
                       <th className="py-2 px-2 font-normal text-muted-foreground"></th>
@@ -625,6 +625,18 @@ export default function HomePage() {
                               {callTier}
                             </span>
                           </td>
+                          <td className="py-3 px-2">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => openDetailPanel(call, 'call')}
+                              className="text-xs"
+                              title="View Call Analysis Details"
+                            >
+                              Details
+                              <ChevronRight className="h-3 w-3 ml-1" />
+                            </Button>
+                          </td>
                           <td className="py-3 px-2 font-semibold">
                             {call.x_score ? `${call.x_score}/10` : '-'}
                           </td>
@@ -637,31 +649,21 @@ export default function HomePage() {
                               <span className="text-muted-foreground">-</span>
                             )}
                           </td>
-                          <td className="py-3 px-2 text-right">
-                            <div className="flex justify-end gap-1">
+                          <td className="py-3 px-2">
+                            {call.x_score ? (
                               <Button
                                 size="sm"
                                 variant="ghost"
-                                onClick={() => openDetailPanel(call, 'call')}
+                                onClick={() => openDetailPanel(call, 'x')}
                                 className="text-xs"
-                                title="View Call Analysis Details"
+                                title="View X Analysis Details"
                               >
-                                Call
+                                Details
                                 <ChevronRight className="h-3 w-3 ml-1" />
                               </Button>
-                              {call.x_score && (
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  onClick={() => openDetailPanel(call, 'x')}
-                                  className="text-xs"
-                                  title="View X Analysis Details"
-                                >
-                                  X
-                                  <ChevronRight className="h-3 w-3 ml-1" />
-                                </Button>
-                              )}
-                            </div>
+                            ) : (
+                              <span className="text-muted-foreground">-</span>
+                            )}
                           </td>
                         </tr>
                       )
