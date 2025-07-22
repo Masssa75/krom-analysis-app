@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Progress } from '@/components/ui/progress'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Download, Copy, ExternalLink, ChevronRight } from 'lucide-react'
+import { Download, Copy, ExternalLink, ChevronRight, MessageSquare } from 'lucide-react'
 import { AnalysisDetailPanel } from '@/components/analysis-detail-panel'
 
 export default function HomePage() {
@@ -162,6 +162,25 @@ export default function HomePage() {
     // Delay clearing selected call to allow exit animation
     setTimeout(() => setSelectedCall(null), 300)
   }
+  
+  const onCommentSaved = (krom_id: string, hasComment: boolean) => {
+    // Update the comment status in results
+    if (results) {
+      setResults({
+        ...results,
+        results: results.results.map((r: any) => 
+          r.krom_id === krom_id ? { ...r, has_comment: hasComment } : r
+        )
+      })
+    }
+    
+    // Update the comment status in analyzed calls
+    setAnalyzedCalls(prev => 
+      prev.map(call => 
+        call.krom_id === krom_id ? { ...call, has_comment: hasComment } : call
+      )
+    )
+  }
 
   return (
     <div className="container max-w-4xl mx-auto py-8">
@@ -271,6 +290,9 @@ export default function HomePage() {
                               ) : (
                                 <span className="font-mono text-sm">{result.token}</span>
                               )}
+                              {result.has_comment && (
+                                <MessageSquare className="h-3 w-3 text-muted-foreground" title="Has comment" />
+                              )}
                               {result.contract && (
                                 <Button
                                   size="sm"
@@ -369,6 +391,9 @@ export default function HomePage() {
                               ) : (
                                 <span className="font-mono text-sm">{call.token}</span>
                               )}
+                              {call.has_comment && (
+                                <MessageSquare className="h-3 w-3 text-muted-foreground" title="Has comment" />
+                              )}
                               {call.contract && (
                                 <Button
                                   size="sm"
@@ -415,6 +440,7 @@ export default function HomePage() {
         call={selectedCall}
         isOpen={isPanelOpen}
         onClose={closeDetailPanel}
+        onCommentSaved={onCommentSaved}
       />
     </div>
   )

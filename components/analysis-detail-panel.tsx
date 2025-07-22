@@ -9,9 +9,10 @@ interface AnalysisDetailPanelProps {
   call: any
   isOpen: boolean
   onClose: () => void
+  onCommentSaved?: (krom_id: string, hasComment: boolean) => void
 }
 
-export function AnalysisDetailPanel({ call, isOpen, onClose }: AnalysisDetailPanelProps) {
+export function AnalysisDetailPanel({ call, isOpen, onClose, onCommentSaved }: AnalysisDetailPanelProps) {
   const [batchCalls, setBatchCalls] = useState<any[]>([])
   const [loadingBatch, setLoadingBatch] = useState(false)
   const [comment, setComment] = useState('')
@@ -90,6 +91,10 @@ export function AnalysisDetailPanel({ call, isOpen, onClose }: AnalysisDetailPan
       if (response.ok) {
         setOriginalComment(comment)
         setCommentUpdatedAt(new Date().toISOString())
+        // Call the callback to update the comment indicator
+        if (onCommentSaved) {
+          onCommentSaved(call.krom_id, !!comment)
+        }
       } else {
         const error = await response.json()
         console.error('Failed to save comment:', error)

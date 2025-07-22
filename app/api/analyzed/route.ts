@@ -48,7 +48,9 @@ export async function GET(request: NextRequest) {
       analysis_batch_id: call.analysis_batch_id,
       analysis_batch_timestamp: call.analysis_batch_timestamp,
       analysis_prompt_used: call.analysis_prompt_used,
-      analysis_duration_ms: call.analysis_duration_ms
+      analysis_duration_ms: call.analysis_duration_ms,
+      // Comment indicator
+      has_comment: call.user_comment ? true : false
     })) || [];
 
     return NextResponse.json({
