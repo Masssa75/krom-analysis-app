@@ -53,6 +53,7 @@ export async function GET(request: NextRequest) {
       // X analysis fields
       x_score: call.x_analysis_score,
       x_tier: call.x_analysis_tier,
+      x_token_type: call.x_analysis_token_type,
       x_legitimacy_factor: call.x_legitimacy_factor,
       x_analysis_reasoning: call.x_analysis_reasoning,
       x_best_tweet: call.x_best_tweet,

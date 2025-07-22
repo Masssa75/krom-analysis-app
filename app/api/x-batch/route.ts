@@ -29,10 +29,16 @@ SCORE GUIDE:
 
 For each token, provide:
 1. Score (1-10)
-2. Legitimacy Factor: "Low", "Medium", or "High"
-3. Best Tweet: The single most informative/relevant tweet (copy exact text)
-4. Key Observations: 2-3 bullet points about what you found (max 20 words each)
-5. Reasoning: Brief explanation of your score (2-3 sentences)
+2. Token Type: "meme", "utility", or "hybrid" based on social media presence
+3. Legitimacy Factor: "Low", "Medium", or "High"
+4. Best Tweet: The single most informative/relevant tweet (copy exact text)
+5. Key Observations: 2-3 bullet points about what you found (max 20 words each)
+6. Reasoning: Brief explanation of your score (2-3 sentences)
+
+TOKEN TYPE CLASSIFICATION:
+- Meme: Community-driven, humor/viral focus, price speculation, moon/rocket talk, animal themes
+- Utility: Technical discussions, real use cases, development updates, partnerships, solving problems
+- Hybrid: Shows both meme culture AND actual utility/development
 
 Remember: Focus on the quality of engagement and legitimate development activity, not just volume of tweets.`
 
@@ -101,6 +107,7 @@ export async function POST(request: NextRequest) {
             .update({
               x_analysis_score: 1,
               x_analysis_tier: 'TRASH',
+              x_analysis_token_type: 'meme',
               x_legitimacy_factor: 'Low',
               x_analysis_model: model,
               x_best_tweet: null,
@@ -179,6 +186,9 @@ export async function POST(request: NextRequest) {
         const scoreMatch = analysisText.match(/score[:\s]+(\d+)/i)
         const score = scoreMatch ? parseInt(scoreMatch[1]) : 1
         
+        const tokenTypeMatch = analysisText.match(/token\s*type[:\s]+(meme|utility|hybrid)/i)
+        const tokenType = tokenTypeMatch ? tokenTypeMatch[1].toLowerCase() : 'meme'
+        
         const legitimacyMatch = analysisText.match(/legitimacy\s*factor[:\s]+(low|medium|high)/i)
         const legitimacyFactor = legitimacyMatch ? legitimacyMatch[1].charAt(0).toUpperCase() + legitimacyMatch[1].slice(1) : 'Low'
         
@@ -204,6 +214,7 @@ export async function POST(request: NextRequest) {
           .update({
             x_analysis_score: score,
             x_analysis_tier: tier,
+            x_analysis_token_type: tokenType,
             x_legitimacy_factor: legitimacyFactor,
             x_analysis_model: model,
             x_best_tweet: bestTweet,

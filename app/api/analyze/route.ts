@@ -151,6 +151,7 @@ Respond with JSON only.`;
           contract: displayContract,
           score: analysisResult.score || 5,
           token_type: analysisResult.token_type || 'meme',
+          x_token_type: call.x_analysis_token_type || null,
           legitimacy_factor: analysisResult.legitimacy_factor || 'Medium',
           reasoning: analysisResult.reasoning || 'No analysis available',
           krom_id: call.krom_id,
