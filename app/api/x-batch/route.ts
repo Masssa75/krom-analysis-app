@@ -143,11 +143,11 @@ export async function POST(request: NextRequest) {
         const legitimacyFactor = legitimacyMatch ? legitimacyMatch[1].charAt(0).toUpperCase() + legitimacyMatch[1].slice(1) : 'Low'
         
         // Extract best tweet
-        const bestTweetMatch = analysisText.match(/best\s*tweet[:\s]*(.+?)(?=\n|key\s*observations|$)/is)
+        const bestTweetMatch = analysisText.match(/best\s*tweet[:\s]*(.+?)(?=\n|key\s*observations|$)/i)
         const bestTweet = bestTweetMatch ? bestTweetMatch[1].trim() : null
         
         // Extract reasoning
-        const reasoningMatch = analysisText.match(/reasoning[:\s]*(.+?)$/is)
+        const reasoningMatch = analysisText.match(/reasoning[:\s]*(.+?)$/i)
         const reasoning = reasoningMatch ? reasoningMatch[1].trim() : analysisText
         
         // Determine tier based on score
