@@ -1,8 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { X, ExternalLink, Copy, Clock, Cpu, Hash } from 'lucide-react'
+import { X, ExternalLink, Copy, Clock, Cpu, Hash, MessageSquare, Save } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
 
 interface AnalysisDetailPanelProps {
   call: any
@@ -13,12 +14,30 @@ interface AnalysisDetailPanelProps {
 export function AnalysisDetailPanel({ call, isOpen, onClose }: AnalysisDetailPanelProps) {
   const [batchCalls, setBatchCalls] = useState<any[]>([])
   const [loadingBatch, setLoadingBatch] = useState(false)
+  const [comment, setComment] = useState('')
+  const [originalComment, setOriginalComment] = useState('')
+  const [savingComment, setSavingComment] = useState(false)
+  const [commentUpdatedAt, setCommentUpdatedAt] = useState<string | null>(null)
 
   useEffect(() => {
-    if (isOpen && call?.analysis_batch_id) {
-      fetchBatchCalls()
+    if (isOpen && call) {
+      // Fetch batch calls if available
+      if (call.analysis_batch_id) {
+        fetchBatchCalls()
+      }
+      // Fetch existing comment
+      fetchComment()
     }
   }, [isOpen, call])
+  
+  // Reset comment when panel closes
+  useEffect(() => {
+    if (!isOpen) {
+      setComment('')
+      setOriginalComment('')
+      setCommentUpdatedAt(null)
+    }
+  }, [isOpen])
 
   const fetchBatchCalls = async () => {
     setLoadingBatch(true)
@@ -32,6 +51,55 @@ export function AnalysisDetailPanel({ call, isOpen, onClose }: AnalysisDetailPan
       console.error('Failed to fetch batch calls:', error)
     } finally {
       setLoadingBatch(false)
+    }
+  }
+  
+  const fetchComment = async () => {
+    if (!call?.krom_id) return
+    
+    try {
+      const response = await fetch(`/api/comment?krom_id=${call.krom_id}`)
+      const data = await response.json()
+      
+      if (data.comment) {
+        setComment(data.comment)
+        setOriginalComment(data.comment)
+        setCommentUpdatedAt(data.updated_at)
+      }
+    } catch (error) {
+      console.error('Failed to fetch comment:', error)
+    }
+  }
+  
+  const saveComment = async () => {
+    if (!call?.krom_id || comment === originalComment) return
+    
+    setSavingComment(true)
+    try {
+      const response = await fetch('/api/comment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          krom_id: call.krom_id,
+          comment: comment.trim()
+        }),
+      })
+      
+      if (response.ok) {
+        setOriginalComment(comment)
+        setCommentUpdatedAt(new Date().toISOString())
+      } else {
+        const error = await response.json()
+        console.error('Failed to save comment:', error)
+        alert('Failed to save comment. Please try again.')
+      }
+    } catch (error) {
+      console.error('Failed to save comment:', error)
+      alert('Failed to save comment. Please try again.')
+    } finally {
+      setSavingComment(false)
     }
   }
 
@@ -111,6 +179,38 @@ export function AnalysisDetailPanel({ call, isOpen, onClose }: AnalysisDetailPan
                 <p className="text-sm leading-relaxed">
                   {call.analysis_reasoning || 'No detailed analysis available.'}
                 </p>
+              </div>
+            </div>
+
+            {/* User Comments Section */}
+            <div>
+              <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                <MessageSquare className="h-5 w-5" />
+                Your Feedback
+              </h3>
+              <div className="space-y-3">
+                <Textarea
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="Add your feedback about this analysis. Was the score accurate? What was missed?"
+                  className="min-h-[100px] resize-y"
+                />
+                <div className="flex items-center justify-between">
+                  <div className="text-xs text-muted-foreground">
+                    {commentUpdatedAt && (
+                      <span>Last updated: {new Date(commentUpdatedAt).toLocaleString()}</span>
+                    )}
+                  </div>
+                  <Button
+                    onClick={saveComment}
+                    disabled={savingComment || comment === originalComment}
+                    size="sm"
+                    className="gap-2"
+                  >
+                    <Save className="h-4 w-4" />
+                    {savingComment ? 'Saving...' : 'Save Feedback'}
+                  </Button>
+                </div>
               </div>
             </div>
 
