@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
               x_analysis_batch_id: batchId,
               x_analysis_batch_timestamp: batchTimestamp,
               x_analysis_duration_ms: duration,
-              x_analysis_prompt_used: 'X_BATCH_ANALYSIS_V1',
+              x_analysis_prompt_used: X_BATCH_ANALYSIS_PROMPT,
               x_reanalyzed_at: new Date().toISOString()
             })
             .eq('krom_id', call.krom_id)
@@ -222,7 +222,7 @@ export async function POST(request: NextRequest) {
             x_analysis_batch_id: batchId,
             x_analysis_batch_timestamp: batchTimestamp,
             x_analysis_duration_ms: duration,
-            x_analysis_prompt_used: 'X_BATCH_ANALYSIS_V1',
+            x_analysis_prompt_used: X_BATCH_ANALYSIS_PROMPT,
             x_reanalyzed_at: new Date().toISOString()
           })
           .eq('krom_id', call.krom_id)

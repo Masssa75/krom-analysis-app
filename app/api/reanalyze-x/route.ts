@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
           x_best_tweet: null,
           x_analysis_reasoning: 'No valid tweets found for this token - indicates zero social media presence or community engagement.',
           x_analysis_duration_ms: duration,
-          x_analysis_prompt_used: 'X_REANALYSIS_V1',
+          x_analysis_prompt_used: X_ANALYSIS_PROMPT,
           x_reanalyzed_at: new Date().toISOString()
         })
         .eq('krom_id', krom_id);
@@ -187,7 +187,7 @@ export async function POST(request: NextRequest) {
         x_best_tweet: bestTweet,
         x_analysis_reasoning: reasoning,
         x_analysis_duration_ms: duration,
-        x_analysis_prompt_used: 'X_REANALYSIS_V1',
+        x_analysis_prompt_used: X_ANALYSIS_PROMPT,
         x_reanalyzed_at: new Date().toISOString()
       })
       .eq('krom_id', krom_id);

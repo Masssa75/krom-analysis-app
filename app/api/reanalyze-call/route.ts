@@ -33,19 +33,8 @@ export async function POST(request: NextRequest) {
 
     const startTime = Date.now();
 
-    // Analyze with Claude
-    const anthropicResponse = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY!,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: model,
-        max_tokens: 1024,
-        temperature: 0,
-        system: `You are an expert cryptocurrency analyst. Analyze the following crypto call and provide a score from 1-10 based on potential value and legitimacy.
+    // Store the full prompt for analysis_prompt_used
+    const REANALYSIS_PROMPT = `You are an expert cryptocurrency analyst. Analyze the following crypto call and provide a score from 1-10 based on potential value and legitimacy.
 
 Scoring Criteria:
 - 8-10: ALPHA tier - High potential, legitimate project, strong fundamentals
@@ -73,7 +62,21 @@ Score: [1-10]
 Token Type: [Meme/Utility/Hybrid]
 Legitimacy Factor: [High/Medium/Low]
 Key Observations: [2-3 bullet points]
-Reasoning: [Brief explanation of score]`,
+Reasoning: [Brief explanation of score]`;
+
+    // Analyze with Claude
+    const anthropicResponse = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.ANTHROPIC_API_KEY!,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: model,
+        max_tokens: 1024,
+        temperature: 0,
+        system: REANALYSIS_PROMPT,
         messages: [
           {
             role: 'user',
@@ -126,7 +129,7 @@ Group: ${call.raw_data?.groupName || call.raw_data?.group?.name || 'Unknown'}`
         analysis_reasoning: analysisText,
         analysis_reanalyzed_at: new Date().toISOString(),
         analysis_duration_ms: analysisTime,
-        analysis_prompt_used: 'REANALYSIS_V1'
+        analysis_prompt_used: REANALYSIS_PROMPT
       })
       .eq('krom_id', krom_id);
 
