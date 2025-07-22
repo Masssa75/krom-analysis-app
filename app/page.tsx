@@ -29,7 +29,6 @@ export default function HomePage() {
   
   // X Analysis states
   const [xCount, setXCount] = useState('5')
-  const [xModel, setXModel] = useState('claude-3-haiku-20240307')
   const [isXAnalyzing, setIsXAnalyzing] = useState(false)
   const [xProgress, setXProgress] = useState(0)
   const [xStatus, setXStatus] = useState('')
@@ -249,7 +248,7 @@ export default function HomePage() {
         },
         body: JSON.stringify({
           limit: parseInt(xCount),
-          model: xModel
+          model: model
         })
       })
       
@@ -361,7 +360,7 @@ export default function HomePage() {
         },
         body: JSON.stringify({
           krom_id: call.krom_id,
-          model: xModel
+          model: model
         })
       })
       
@@ -610,8 +609,8 @@ export default function HomePage() {
             <div className="space-y-2">
               <Label htmlFor="x-model">AI Model</Label>
               <Select 
-                value={xModel} 
-                onValueChange={setXModel}
+                value={model} 
+                onValueChange={setModel}
                 disabled={isXAnalyzing}
               >
                 <SelectTrigger id="x-model">
