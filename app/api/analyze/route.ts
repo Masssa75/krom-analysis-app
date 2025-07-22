@@ -84,40 +84,36 @@ export async function POST(request: NextRequest) {
         const message = call.raw_data?.text || 'No message';
         
         // Prepare analysis prompt
-        const analysisPrompt = `
-Analyze this cryptocurrency call and provide a score from 1-10 based on potential value and legitimacy.
+        const analysisPrompt = `You are analyzing a cryptocurrency call to assess the LEGITIMACY of the project based on available information. Your goal is to identify tokens backed by credible teams, established companies, reputable investors, or influential supporters.
 
 Call Data:
 - Token: ${call.ticker || 'Unknown'}
 - Contract: ${contract || 'No contract'}
 - Network: ${network}
-- Group: ${groupName}
+- Telegram Call Group: ${groupName} (Group ranking: TBD)
 - Message: ${message}
 - Timestamp: ${call.buy_timestamp || call.created_at}
 
-Scoring Criteria:
-- 8-10: ALPHA tier - High potential, legitimate project, strong fundamentals
-- 6-7: SOLID tier - Good potential, reasonable risk
-- 4-5: BASIC tier - Average, higher risk
-- 1-3: TRASH tier - Likely scam or very high risk
+Scoring Criteria (based on legitimacy indicators):
+- 8-10: Exceptional legitimacy or rare significance - Verifiable high-profile backing, substantial documented investment, OR something truly extraordinary (groundbreaking technical innovation, exceptional quality that stands out from typical crypto projects)
+- 6-7: Strong legitimacy - Clear signs of professional operation and accountability (transparent team/company structure, proven track record)
+- 4-5: Moderate legitimacy - Some credible elements present (demonstrated development effort, community building, partial transparency)
+- 1-3: Low/No legitimacy - Minimal to no verifiable information beyond basic token existence
 
-Consider:
-- Is there a clear contract address?
-- Does the message contain substantial information?
-- Group reputation (if known)
-- Red flags like "pump", "moon", excessive emojis
+When in doubt: If you encounter something unusual that seems significant but doesn't fit clear categories, err on the side of a higher score (5-7 range) and explain your uncertainty in the reasoning field. Better to flag potentially important projects for human review than to miss them.
+
+Also consider the quality and nature of discourse around the project. The way people communicate about a token often reflects its legitimacy - genuine projects tend to generate different conversation patterns than typical pump schemes.
 
 Also classify the token type:
 - Meme: Community-driven, humor/viral focus, dog/cat/pepe themes, no serious utility claims
 - Utility: Real use case, DeFi, infrastructure, gaming, AI tools, solving actual problems
-- Hybrid: Combines meme appeal with actual utility features
 
 Response Format (JSON):
 {
   "score": <number 1-10>,
-  "token_type": "<meme|utility|hybrid>",
+  "token_type": "<meme|utility>",
   "legitimacy_factor": "<High|Medium|Low>",
-  "reasoning": "<brief explanation>"
+  "reasoning": "<explain legitimacy indicators found or absent>"
 }
 
 Respond with JSON only.`;
