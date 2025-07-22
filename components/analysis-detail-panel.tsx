@@ -141,7 +141,7 @@ export function AnalysisDetailPanel({ call, isOpen, mode, onClose, onCommentSave
           {/* Header */}
           <div className="p-6 border-b">
             <div className="flex items-start justify-between">
-              <div>
+              <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
                   <h2 className="text-2xl font-bold">{call.token}</h2>
                   <TokenTypeBadge type={call.token_type} className="scale-110" />
@@ -165,14 +165,30 @@ export function AnalysisDetailPanel({ call, isOpen, mode, onClose, onCommentSave
                   </span>
                 </div>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onClose}
-                className="h-8 w-8 p-0"
-              >
-                <X className="h-4 w-4" />
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    const feedbackSection = document.getElementById('feedback-section')
+                    if (feedbackSection) {
+                      feedbackSection.scrollIntoView({ behavior: 'smooth' })
+                    }
+                  }}
+                  className="h-8 w-8 p-0"
+                  title="Add comment"
+                >
+                  <MessageSquare className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onClose}
+                  className="h-8 w-8 p-0"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
 
@@ -267,7 +283,7 @@ export function AnalysisDetailPanel({ call, isOpen, mode, onClose, onCommentSave
             </div>
 
             {/* User Comments Section */}
-            <div>
+            <div id="feedback-section">
               <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
                 <MessageSquare className="h-5 w-5" />
                 Your Feedback
