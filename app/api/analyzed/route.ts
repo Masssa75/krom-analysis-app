@@ -67,6 +67,7 @@ export async function GET(request: NextRequest) {
       x_token_type: call.x_analysis_token_type,
       x_legitimacy_factor: call.x_legitimacy_factor,
       x_analysis_reasoning: call.x_analysis_reasoning,
+      x_analysis_prompt_used: call.x_analysis_prompt_used,
       x_best_tweet: call.x_best_tweet,
       x_analyzed_at: call.x_reanalyzed_at || call.x_analyzed_at,
       x_tweet_count: call.x_raw_tweets ? call.x_raw_tweets.length : 0,

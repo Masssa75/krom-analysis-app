@@ -282,13 +282,13 @@ export function AnalysisDetailPanel({ call, isOpen, mode, onClose, onCommentSave
               </div>
             </div>
 
-            {/* Prompt Used - Only for Call Analysis */}
-            {mode === 'call' && call.analysis_prompt_used && (
+            {/* Prompt Used */}
+            {((mode === 'call' && call.analysis_prompt_used) || (mode === 'x' && call.x_analysis_prompt_used)) && (
               <div>
                 <h3 className="text-lg font-semibold mb-3">Analysis Prompt</h3>
                 <div className="bg-muted/50 rounded-lg p-4">
                   <pre className="text-xs font-mono whitespace-pre-wrap">
-                    {call.analysis_prompt_used}
+                    {mode === 'call' ? call.analysis_prompt_used : call.x_analysis_prompt_used}
                   </pre>
                 </div>
               </div>
