@@ -10,6 +10,7 @@ import { Progress } from '@/components/ui/progress'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Download, Copy, ExternalLink, ChevronRight, MessageSquare, RefreshCw } from 'lucide-react'
 import { AnalysisDetailPanel } from '@/components/analysis-detail-panel'
+import { TokenTypeBadge } from '@/components/token-type-badge'
 
 export default function HomePage() {
   const [count, setCount] = useState('5')
@@ -446,6 +447,7 @@ export default function HomePage() {
                             <td className="py-2 px-2">
                               <div className="flex items-center gap-1">
                                 <span className="font-mono text-xs">{result.token}</span>
+                                <TokenTypeBadge type={result.token_type} />
                                 {result.has_comment && (
                                   <span title="Has comment">
                                     <MessageSquare className="h-3 w-3 text-muted-foreground" />
@@ -688,6 +690,7 @@ export default function HomePage() {
                               ) : (
                                 <span className="font-mono text-sm">{call.token}</span>
                               )}
+                              <TokenTypeBadge type={call.token_type} />
                               {call.has_comment && (
                                 <span title="Has comment">
                                   <MessageSquare className="h-3 w-3 text-muted-foreground" />

@@ -39,6 +39,7 @@ export async function GET(request: NextRequest) {
       contract: call.raw_data?.token?.ca || null,
       network: call.raw_data?.token?.network || 'unknown',
       score: call.analysis_score,
+      token_type: call.analysis_token_type || 'meme',
       legitimacy_factor: call.analysis_legitimacy_factor || 'Unknown',
       analysis_model: call.analysis_model,
       buy_timestamp: call.buy_timestamp,

@@ -99,9 +99,15 @@ Consider:
 - Group reputation (if known)
 - Red flags like "pump", "moon", excessive emojis
 
+Also classify the token type:
+- Meme: Community-driven, humor/viral focus, dog/cat/pepe themes, no serious utility claims
+- Utility: Real use case, DeFi, infrastructure, gaming, AI tools, solving actual problems
+- Hybrid: Combines meme appeal with actual utility features
+
 Response Format (JSON):
 {
   "score": <number 1-10>,
+  "token_type": "<meme|utility|hybrid>",
   "legitimacy_factor": "<High|Medium|Low>",
   "reasoning": "<brief explanation>"
 }
@@ -144,6 +150,7 @@ Respond with JSON only.`;
           token: call.ticker || 'Unknown',
           contract: displayContract,
           score: analysisResult.score || 5,
+          token_type: analysisResult.token_type || 'meme',
           legitimacy_factor: analysisResult.legitimacy_factor || 'Medium',
           reasoning: analysisResult.reasoning || 'No analysis available',
           krom_id: call.krom_id,
@@ -164,6 +171,7 @@ Respond with JSON only.`;
             .from('crypto_calls')
             .update({ 
               analysis_score: analysisResult.score,
+              analysis_token_type: analysisResult.token_type || 'meme',
               analysis_legitimacy_factor: analysisResult.legitimacy_factor,
               analysis_model: model,
               analysis_reasoning: analysisResult.reasoning || rawResponse,
@@ -181,6 +189,7 @@ Respond with JSON only.`;
               .from('crypto_calls')
               .update({ 
                 analysis_score: analysisResult.score,
+                analysis_token_type: analysisResult.token_type || 'meme',
                 analysis_legitimacy_factor: analysisResult.legitimacy_factor,
                 analysis_model: model
               })

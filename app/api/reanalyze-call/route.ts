@@ -61,8 +61,14 @@ Consider:
 4. Technical details and utility
 5. Red flags (urgency, guaranteed returns, etc.)
 
+ALSO CLASSIFY THE TOKEN TYPE:
+- Meme: Community-driven, viral potential, entertainment value, dog/cat/pepe themes, no serious utility claims
+- Utility: Real use case, technical features, solving actual problems, DeFi/GameFi/Infrastructure
+- Hybrid: Combines meme appeal with actual utility features
+
 Response format:
 Score: [1-10]
+Token Type: [Meme/Utility/Hybrid]
 Legitimacy Factor: [High/Medium/Low]
 Key Observations: [2-3 bullet points]
 Investment Risk: [Very High/High/Medium/Low]`,
@@ -91,6 +97,9 @@ Group: ${call.raw_data?.groupName || 'Unknown'}`
     const scoreMatch = analysisText.match(/Score:\s*(\d+)/i);
     const score = scoreMatch ? parseInt(scoreMatch[1]) : 5;
 
+    const tokenTypeMatch = analysisText.match(/Token Type:\s*(Meme|Utility|Hybrid)/i);
+    const tokenType = tokenTypeMatch ? tokenTypeMatch[1].toLowerCase() : 'meme';
+
     const legitimacyMatch = analysisText.match(/Legitimacy Factor:\s*(High|Medium|Low)/i);
     const legitimacyFactor = legitimacyMatch ? legitimacyMatch[1] : 'Medium';
 
@@ -107,6 +116,7 @@ Group: ${call.raw_data?.groupName || 'Unknown'}`
       .update({
         analysis_score: score,
         analysis_tier: tier,
+        analysis_token_type: tokenType,
         analysis_legitimacy_factor: legitimacyFactor,
         analysis_model: model,
         analysis_reasoning: analysisText,
@@ -126,6 +136,7 @@ Group: ${call.raw_data?.groupName || 'Unknown'}`
         krom_id,
         score,
         tier,
+        token_type: tokenType,
         legitimacy_factor: legitimacyFactor,
         analysis_reasoning: analysisText,
         duration_ms: analysisTime
