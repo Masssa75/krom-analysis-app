@@ -147,7 +147,14 @@ Respond with JSON only.`;
           legitimacy_factor: analysisResult.legitimacy_factor || 'Medium',
           reasoning: analysisResult.reasoning || 'No analysis available',
           krom_id: call.krom_id,
-          network: network
+          network: network,
+          // Include all analysis fields for the detail panel
+          analysis_reasoning: analysisResult.reasoning || rawResponse,
+          analysis_model: model,
+          analysis_duration_ms: analysisDuration,
+          analysis_batch_id: batchId,
+          analysis_batch_timestamp: batchTimestamp,
+          analysis_prompt_used: analysisPrompt
         });
         
         // Update the database with full analysis details
@@ -176,7 +183,14 @@ Respond with JSON only.`;
           legitimacy_factor: 'Unknown',
           reasoning: 'Analysis failed',
           krom_id: call.krom_id,
-          network: 'unknown'
+          network: 'unknown',
+          // Include empty analysis fields for consistency
+          analysis_reasoning: 'Analysis failed',
+          analysis_model: model,
+          analysis_duration_ms: 0,
+          analysis_batch_id: batchId,
+          analysis_batch_timestamp: batchTimestamp,
+          analysis_prompt_used: ''
         });
       }
     }
