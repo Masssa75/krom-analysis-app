@@ -144,7 +144,10 @@ export function AnalysisDetailPanel({ call, isOpen, mode, onClose, onCommentSave
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
                   <h2 className="text-2xl font-bold">{call.token}</h2>
-                  <TokenTypeBadge type={call.token_type} className="scale-110" />
+                  <TokenTypeBadge 
+                    type={mode === 'call' ? call.token_type : (call.x_token_type || call.token_type)} 
+                    className="scale-110" 
+                  />
                   <span className="text-sm text-muted-foreground">
                     {mode === 'call' ? 'Call Analysis' : 'X Analysis'}
                   </span>

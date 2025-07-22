@@ -11,7 +11,6 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Download, Copy, ExternalLink, ChevronRight, MessageSquare, RefreshCw, Search, ChevronLeft } from 'lucide-react'
 import { AnalysisDetailPanel } from '@/components/analysis-detail-panel'
 import { TokenTypeBadge } from '@/components/token-type-badge'
-import { getCombinedTokenType } from '@/lib/token-utils'
 
 export default function HomePage() {
   const [count, setCount] = useState('5')
@@ -475,13 +474,12 @@ export default function HomePage() {
                     <tbody>
                       {results.results.map((result: any, index: number) => {
                         const tier = getTier(result.score)
-                        const combinedTokenType = getCombinedTokenType(result.token_type, result.x_token_type)
                         return (
                           <tr key={index} className="border-b hover:bg-muted/50 transition-colors">
                             <td className="py-2 px-2">
                               <div className="flex items-center gap-1">
                                 <span className="font-mono text-xs">{result.token}</span>
-                                <TokenTypeBadge type={combinedTokenType} />
+                                <TokenTypeBadge type={result.token_type} />
                                 {result.has_comment && (
                                   <span title="Has comment">
                                     <MessageSquare className="h-3 w-3 text-muted-foreground" />
@@ -726,7 +724,6 @@ export default function HomePage() {
                     {analyzedCalls.map((call) => {
                       const callTier = getTier(call.score)
                       const xTier = call.x_score ? getTier(call.x_score) : null
-                      const combinedTokenType = getCombinedTokenType(call.token_type, call.x_token_type)
                       return (
                         <tr key={call.krom_id} className="border-b hover:bg-muted/50 transition-colors">
                           <td className="py-3 px-2">
@@ -743,7 +740,6 @@ export default function HomePage() {
                               ) : (
                                 <span className="font-mono text-sm">{call.token}</span>
                               )}
-                              <TokenTypeBadge type={combinedTokenType} />
                               {call.has_comment && (
                                 <span title="Has comment">
                                   <MessageSquare className="h-3 w-3 text-muted-foreground" />
@@ -763,9 +759,12 @@ export default function HomePage() {
                           </td>
                           <td className="py-3 px-2 font-semibold">{call.score.toFixed(1)}</td>
                           <td className="py-3 px-2">
-                            <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${getTierClass(callTier)}`}>
-                              {callTier}
-                            </span>
+                            <div className="flex items-center gap-2">
+                              <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${getTierClass(callTier)}`}>
+                                {callTier}
+                              </span>
+                              <TokenTypeBadge type={call.token_type} className="scale-90" />
+                            </div>
                           </td>
                           <td className="py-3 px-2 border-r">
                             <div className="flex gap-1">
@@ -796,9 +795,14 @@ export default function HomePage() {
                           </td>
                           <td className="py-3 px-2">
                             {xTier ? (
-                              <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${getTierClass(xTier)}`}>
-                                {xTier}
-                              </span>
+                              <div className="flex items-center gap-2">
+                                <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${getTierClass(xTier)}`}>
+                                  {xTier}
+                                </span>
+                                {call.x_token_type && (
+                                  <TokenTypeBadge type={call.x_token_type} className="scale-90" />
+                                )}
+                              </div>
                             ) : (
                               <span className="text-muted-foreground">-</span>
                             )}
