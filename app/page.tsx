@@ -576,7 +576,7 @@ export default function HomePage() {
                       <th className="py-2 px-2"></th>
                       <th className="py-2 px-2 font-normal text-muted-foreground">Score</th>
                       <th className="py-2 px-2 font-normal text-muted-foreground">Tier</th>
-                      <th className="py-2 px-2 font-normal text-muted-foreground"></th>
+                      <th className="py-2 px-2 font-normal text-muted-foreground border-r"></th>
                       <th className="py-2 px-2 font-normal text-muted-foreground">Score</th>
                       <th className="py-2 px-2 font-normal text-muted-foreground">Tier</th>
                       <th className="py-2 px-2 font-normal text-muted-foreground"></th>
@@ -625,7 +625,7 @@ export default function HomePage() {
                               {callTier}
                             </span>
                           </td>
-                          <td className="py-3 px-2">
+                          <td className="py-3 px-2 border-r">
                             <Button
                               size="sm"
                               variant="ghost"
