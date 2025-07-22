@@ -89,9 +89,49 @@ export async function POST(request: NextRequest) {
       const callStartTime = Date.now()
       
       try {
-        // Skip if no tweets
+        // Handle empty tweet arrays - still analyze but with appropriate score
         if (!call.x_raw_tweets || call.x_raw_tweets.length === 0) {
-          console.log(`No tweets for ${call.ticker}, skipping`)
+          console.log(`No tweets for ${call.ticker}, giving minimum score`)
+          
+          // Give minimum score for tokens with no tweet data
+          const duration = Date.now() - callStartTime
+          
+          const { error: updateError } = await supabase
+            .from('crypto_calls')
+            .update({
+              x_analysis_score: 1,
+              x_analysis_tier: 'TRASH',
+              x_legitimacy_factor: 'Low',
+              x_analysis_model: model,
+              x_best_tweet: null,
+              x_analysis_reasoning: 'No tweets found for this token - indicates zero social media presence or community engagement.',
+              x_analysis_batch_id: batchId,
+              x_analysis_batch_timestamp: batchTimestamp,
+              x_analysis_duration_ms: duration,
+              x_analysis_prompt_used: 'X_BATCH_ANALYSIS_V1',
+              x_reanalyzed_at: new Date().toISOString()
+            })
+            .eq('krom_id', call.krom_id)
+          
+          if (updateError) {
+            console.error(`Error updating ${call.ticker}:`, updateError)
+            errors.push({
+              krom_id: call.krom_id,
+              ticker: call.ticker,
+              error: updateError.message
+            })
+          } else {
+            results.push({
+              krom_id: call.krom_id,
+              ticker: call.ticker,
+              score: 1,
+              tier: 'TRASH',
+              legitimacy_factor: 'Low',
+              tweet_count: 0,
+              duration_ms: duration
+            })
+          }
+          
           continue
         }
         
