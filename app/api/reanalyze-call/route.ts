@@ -45,25 +45,27 @@ export async function POST(request: NextRequest) {
         model: model,
         max_tokens: 1024,
         temperature: 0,
-        system: `You are an expert cryptocurrency analyst. Analyze the following crypto call and rate it on a scale of 1-10...
+        system: `You are an expert cryptocurrency analyst. Analyze the following crypto call and provide a score from 1-10 based on potential value and legitimacy.
 
-IMPORTANT SCORING CRITERIA:
-- 10/10: Extremely rare. Reserved for tokens with CONFIRMED major backing (e.g., Binance Labs, Google Ventures, major institutional investors with PUBLIC PROOF)
-- 8-9/10: Strong projects with verifiable partnerships, active development, transparent team
-- 6-7/10: Solid projects with good fundamentals, community, some red flags
-- 4-5/10: Basic legitimacy, limited information, higher risk
-- 1-3/10: Likely scams, pump and dumps, no real value proposition
+Scoring Criteria:
+- 8-10: ALPHA tier - High potential, legitimate project, strong fundamentals
+- 6-7: SOLID tier - Good potential, reasonable risk
+- 4-5: BASIC tier - Average, higher risk
+- 1-3: TRASH tier - Likely scam or very high risk
 
 Consider:
-1. Message quality and professionalism
-2. Specific details vs vague hype
-3. Verifiable claims vs empty promises
-4. Technical details and utility
-5. Red flags (urgency, guaranteed returns, etc.)
+- Is there a clear contract address?
+- Does the message contain substantial information?
+- Group reputation (if known)
+- Red flags like "pump", "moon", excessive emojis
+- Message quality and professionalism
+- Specific details vs vague hype
+- Verifiable claims vs empty promises
+- Technical details and utility
 
-ALSO CLASSIFY THE TOKEN TYPE:
-- Meme: Community-driven, viral potential, entertainment value, dog/cat/pepe themes, no serious utility claims
-- Utility: Real use case, technical features, solving actual problems, DeFi/GameFi/Infrastructure
+Also classify the token type:
+- Meme: Community-driven, humor/viral focus, dog/cat/pepe themes, no serious utility claims
+- Utility: Real use case, DeFi, infrastructure, gaming, AI tools, solving actual problems
 - Hybrid: Combines meme appeal with actual utility features
 
 Response format:
@@ -71,16 +73,18 @@ Score: [1-10]
 Token Type: [Meme/Utility/Hybrid]
 Legitimacy Factor: [High/Medium/Low]
 Key Observations: [2-3 bullet points]
-Investment Risk: [Very High/High/Medium/Low]`,
+Reasoning: [Brief explanation of score]`,
         messages: [
           {
             role: 'user',
             content: `Analyze this crypto call:
             
 Ticker: ${call.ticker || 'Unknown'}
-Message: ${call.raw_data?.callMessage || 'No message'}
-Buy Timestamp: ${new Date(call.buy_timestamp).toISOString()}
-Group: ${call.raw_data?.groupName || 'Unknown'}`
+Contract: ${call.raw_data?.token?.ca || 'No contract'}
+Network: ${call.raw_data?.token?.network || 'Unknown'}
+Message: ${call.raw_data?.text || 'No message'}
+Call Timestamp: ${call.created_at ? new Date(call.created_at).toISOString() : 'Unknown'}
+Group: ${call.raw_data?.groupName || call.raw_data?.group?.name || 'Unknown'}`
           }
         ]
       })
