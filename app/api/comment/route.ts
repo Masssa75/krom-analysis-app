@@ -17,59 +17,28 @@ export async function POST(request: NextRequest) {
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     
-    // First, try to update with the comment columns
+    // Update the comment in the database
     const { data, error } = await supabase
       .from('crypto_calls')
       .update({ 
-        user_comment: comment,
-        user_comment_updated_at: new Date().toISOString()
+        user_comment: comment || null,
+        user_comment_updated_at: comment ? new Date().toISOString() : null
       })
-      .eq('krom_id', krom_id);
+      .eq('krom_id', krom_id)
+      .select();
     
-    if (error && error.message.includes('column')) {
-      // If columns don't exist, create them first
-      console.log('Creating user_comment columns...');
-      
-      // Add columns using raw SQL
-      const { error: alterError1 } = await supabase.rpc('exec', {
-        sql: 'ALTER TABLE crypto_calls ADD COLUMN IF NOT EXISTS user_comment TEXT'
-      }).single();
-      
-      const { error: alterError2 } = await supabase.rpc('exec', {
-        sql: 'ALTER TABLE crypto_calls ADD COLUMN IF NOT EXISTS user_comment_updated_at TIMESTAMPTZ'
-      }).single();
-      
-      // If RPC doesn't work, we'll handle it differently
-      if (alterError1 || alterError2) {
-        // For now, we'll store comments in a separate table or handle differently
-        console.error('Could not add columns:', alterError1 || alterError2);
-        return NextResponse.json(
-          { error: 'Database schema update needed. Please contact admin.' },
-          { status: 500 }
-        );
-      }
-      
-      // Retry the update
-      const { data: retryData, error: retryError } = await supabase
-        .from('crypto_calls')
-        .update({ 
-          user_comment: comment,
-          user_comment_updated_at: new Date().toISOString()
-        })
-        .eq('krom_id', krom_id);
-      
-      if (retryError) {
-        console.error('Update error after adding columns:', retryError);
-        return NextResponse.json(
-          { error: 'Failed to save comment' },
-          { status: 500 }
-        );
-      }
-    } else if (error) {
+    if (error) {
       console.error('Update error:', error);
       return NextResponse.json(
-        { error: 'Failed to save comment' },
+        { error: 'Failed to save comment', details: error.message },
         { status: 500 }
+      );
+    }
+    
+    if (!data || data.length === 0) {
+      return NextResponse.json(
+        { error: 'Call not found' },
+        { status: 404 }
       );
     }
     
@@ -104,10 +73,18 @@ export async function GET(request: NextRequest) {
       .eq('krom_id', krom_id)
       .single();
     
-    if (error && !error.message.includes('column')) {
+    if (error) {
+      // If row not found, return empty comment
+      if (error.code === 'PGRST116') {
+        return NextResponse.json({ 
+          comment: null,
+          updated_at: null
+        });
+      }
+      
       console.error('Fetch error:', error);
       return NextResponse.json(
-        { error: 'Failed to fetch comment' },
+        { error: 'Failed to fetch comment', details: error.message },
         { status: 500 }
       );
     }
