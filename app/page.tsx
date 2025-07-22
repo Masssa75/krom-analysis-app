@@ -566,18 +566,23 @@ export default function HomePage() {
                   <thead>
                     <tr className="border-b text-left">
                       <th className="py-3 px-2 font-medium text-muted-foreground">Token</th>
-                      <th className="py-3 px-2 font-medium text-muted-foreground">Score</th>
-                      <th className="py-3 px-2 font-medium text-muted-foreground">Tier</th>
-                      <th className="py-3 px-2 font-medium text-muted-foreground">Legitimacy</th>
+                      <th className="py-3 px-2 font-medium text-muted-foreground" colSpan={2}>Call Analysis</th>
+                      <th className="py-3 px-2 font-medium text-muted-foreground" colSpan={2}>X Analysis</th>
                       <th className="py-3 px-2 font-medium text-muted-foreground text-right">Details</th>
+                    </tr>
+                    <tr className="border-b text-left text-xs">
+                      <th className="py-2 px-2"></th>
+                      <th className="py-2 px-2 font-normal text-muted-foreground">Score</th>
+                      <th className="py-2 px-2 font-normal text-muted-foreground">Tier</th>
+                      <th className="py-2 px-2 font-normal text-muted-foreground">Score</th>
+                      <th className="py-2 px-2 font-normal text-muted-foreground">Tier</th>
+                      <th className="py-2 px-2"></th>
                     </tr>
                   </thead>
                   <tbody>
                     {analyzedCalls.map((call) => {
-                      const tier = getTier(call.score)
-                      const legitimacyColor = call.legitimacy_factor === 'High' ? 'text-green-600 dark:text-green-400' : 
-                                             call.legitimacy_factor === 'Medium' ? 'text-orange-600 dark:text-orange-400' : 
-                                             'text-muted-foreground'
+                      const callTier = getTier(call.score)
+                      const xTier = call.x_score ? getTier(call.x_score) : null
                       return (
                         <tr key={call.krom_id} className="border-b hover:bg-muted/50 transition-colors">
                           <td className="py-3 px-2">
@@ -613,11 +618,22 @@ export default function HomePage() {
                           </td>
                           <td className="py-3 px-2 font-semibold">{call.score.toFixed(1)}</td>
                           <td className="py-3 px-2">
-                            <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${getTierClass(tier)}`}>
-                              {tier}
+                            <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${getTierClass(callTier)}`}>
+                              {callTier}
                             </span>
                           </td>
-                          <td className={`py-3 px-2 ${legitimacyColor}`}>{call.legitimacy_factor}</td>
+                          <td className="py-3 px-2 font-semibold">
+                            {call.x_score ? `${call.x_score}/10` : '-'}
+                          </td>
+                          <td className="py-3 px-2">
+                            {xTier ? (
+                              <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${getTierClass(xTier)}`}>
+                                {xTier}
+                              </span>
+                            ) : (
+                              <span className="text-muted-foreground">-</span>
+                            )}
+                          </td>
                           <td className="py-3 px-2 text-right">
                             <Button
                               size="sm"

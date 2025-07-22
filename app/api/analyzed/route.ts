@@ -49,6 +49,14 @@ export async function GET(request: NextRequest) {
       analysis_batch_timestamp: call.analysis_batch_timestamp,
       analysis_prompt_used: call.analysis_prompt_used,
       analysis_duration_ms: call.analysis_duration_ms,
+      // X analysis fields
+      x_score: call.x_analysis_score,
+      x_tier: call.x_analysis_tier,
+      x_legitimacy_factor: call.x_legitimacy_factor,
+      x_analysis_reasoning: call.x_analysis_reasoning,
+      x_best_tweet: call.x_best_tweet,
+      x_analyzed_at: call.x_reanalyzed_at || call.x_analyzed_at,
+      x_tweet_count: call.x_raw_tweets ? call.x_raw_tweets.length : 0,
       // Comment indicator
       has_comment: call.user_comment ? true : false
     })) || [];

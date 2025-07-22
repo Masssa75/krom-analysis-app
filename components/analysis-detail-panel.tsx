@@ -157,12 +157,30 @@ export function AnalysisDetailPanel({ call, isOpen, onClose, onCommentSaved }: A
           {/* Header */}
           <div className="p-6 border-b">
             <div className="flex items-start justify-between">
-              <div className="flex items-center gap-3">
-                <h2 className="text-2xl font-bold">{call.token}</h2>
-                <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${getTierClass(tier)}`}>
-                  {tier}
-                </span>
-                <span className="text-2xl font-bold">{call.score}/10</span>
+              <div>
+                <h2 className="text-2xl font-bold mb-3">{call.token}</h2>
+                <div className="flex items-center gap-6">
+                  <div>
+                    <div className="text-xs text-muted-foreground mb-1">Call Analysis</div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl font-bold">{call.score}/10</span>
+                      <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${getTierClass(tier)}`}>
+                        {tier}
+                      </span>
+                    </div>
+                  </div>
+                  {call.x_score && (
+                    <div>
+                      <div className="text-xs text-muted-foreground mb-1">X Analysis</div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xl font-bold">{call.x_score}/10</span>
+                        <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${getTierClass(call.x_tier || getTier(call.x_score))}`}>
+                          {call.x_tier || getTier(call.x_score)}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
               <Button
                 variant="ghost"
@@ -177,14 +195,73 @@ export function AnalysisDetailPanel({ call, isOpen, onClose, onCommentSaved }: A
 
           {/* Content */}
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
-            {/* Analysis Section */}
+            {/* Call Analysis Section */}
             <div>
-              <h3 className="text-lg font-semibold mb-3">AI Analysis</h3>
+              <h3 className="text-lg font-semibold mb-3">Call Analysis</h3>
               <div className="bg-muted/50 rounded-lg p-4">
+                <div className="flex items-center gap-4 mb-3">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold">{call.score}/10</div>
+                    <div className="text-xs text-muted-foreground">Score</div>
+                  </div>
+                  <div>
+                    <span className={`inline-block px-3 py-1 rounded text-sm font-semibold ${getTierClass(tier)}`}>
+                      {tier}
+                    </span>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-sm font-semibold">{call.legitimacy_factor}</div>
+                    <div className="text-xs text-muted-foreground">Legitimacy</div>
+                  </div>
+                </div>
                 <p className="text-sm leading-relaxed">
                   {call.analysis_reasoning || 'No detailed analysis available.'}
                 </p>
               </div>
+            </div>
+
+            {/* X Analysis Section */}
+            <div>
+              <h3 className="text-lg font-semibold mb-3">X (Twitter) Analysis</h3>
+              {call.x_score ? (
+                <div className="bg-muted/50 rounded-lg p-4">
+                  <div className="flex items-center gap-4 mb-3">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold">{call.x_score}/10</div>
+                      <div className="text-xs text-muted-foreground">Score</div>
+                    </div>
+                    <div>
+                      <span className={`inline-block px-3 py-1 rounded text-sm font-semibold ${getTierClass(call.x_tier || getTier(call.x_score))}`}>
+                        {call.x_tier || getTier(call.x_score)}
+                      </span>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-sm font-semibold">{call.x_legitimacy_factor || 'Unknown'}</div>
+                      <div className="text-xs text-muted-foreground">Legitimacy</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-sm font-semibold">{call.x_tweet_count || 0}</div>
+                      <div className="text-xs text-muted-foreground">Tweets</div>
+                    </div>
+                  </div>
+                  {call.x_best_tweet && (
+                    <div className="mb-3">
+                      <h4 className="text-sm font-semibold mb-1">Best Tweet:</h4>
+                      <div className="bg-background/50 rounded p-2 text-xs italic">
+                        "{call.x_best_tweet}"
+                      </div>
+                    </div>
+                  )}
+                  <p className="text-sm leading-relaxed">
+                    {call.x_analysis_reasoning || 'No detailed X analysis available.'}
+                  </p>
+                </div>
+              ) : (
+                <div className="bg-muted/50 rounded-lg p-4 text-center text-sm text-muted-foreground">
+                  <p>No X analysis available for this call yet.</p>
+                  <p className="text-xs mt-1">Run X batch analysis to score social media presence.</p>
+                </div>
+              )}
             </div>
 
             {/* User Comments Section */}
