@@ -136,7 +136,7 @@ export async function POST(request: NextRequest) {
         messages: [
           {
             role: 'user',
-            content: `Analyze these tweets about ${call.ticker} token (captured at ${new Date(call.buy_timestamp).toISOString()}):\n\n${tweetTexts}`
+            content: `Analyze these tweets about ${call.ticker} token (captured at ${call.raw_data?.timestamp ? new Date(call.raw_data.timestamp * 1000).toISOString() : 'unknown time'}):\n\n${tweetTexts}`
           }
         ]
       })

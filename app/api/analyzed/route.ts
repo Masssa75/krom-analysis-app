@@ -32,8 +32,9 @@ export async function GET(request: NextRequest) {
     }
     
     // Add ordering and pagination
+    // Using raw_data timestamp for reliable chronological ordering
     const { data: calls, error, count } = await query
-      .order('buy_timestamp', { ascending: false })
+      .order('raw_data->timestamp', { ascending: false })
       .range(offset, offset + limit - 1);
 
     if (error) {
@@ -52,6 +53,7 @@ export async function GET(request: NextRequest) {
       legitimacy_factor: call.analysis_legitimacy_factor || 'Unknown',
       analysis_model: call.analysis_model,
       buy_timestamp: call.buy_timestamp,
+      call_timestamp: call.raw_data?.timestamp ? new Date(call.raw_data.timestamp * 1000).toISOString() : null,
       analyzed_at: call.analysis_reanalyzed_at || call.analyzed_at || call.created_at,
       // New fields for detailed view
       analysis_reasoning: call.analysis_reasoning,

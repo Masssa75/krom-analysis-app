@@ -65,10 +65,10 @@ export async function POST(request: NextRequest) {
     // Order by oldest first to ensure systematic analysis
     const { data: callsToAnalyze, error: fetchError } = await supabase
       .from('crypto_calls')
-      .select('krom_id, ticker, x_raw_tweets, buy_timestamp')
+      .select('krom_id, ticker, x_raw_tweets, buy_timestamp, raw_data')
       .not('x_raw_tweets', 'is', null)
       .is('x_analysis_score', null)  // Only get calls without new scoring
-      .order('buy_timestamp', { ascending: true })
+      .order('raw_data->timestamp', { ascending: true })
       .limit(limit)
     
     if (fetchError) {
@@ -169,7 +169,7 @@ export async function POST(request: NextRequest) {
             messages: [
               {
                 role: 'user',
-                content: `Analyze these tweets about ${call.ticker} token (captured at ${new Date(call.buy_timestamp).toISOString()}):\n\n${tweetTexts}`
+                content: `Analyze these tweets about ${call.ticker} token (captured at ${call.raw_data?.timestamp ? new Date(call.raw_data.timestamp * 1000).toISOString() : 'unknown time'}):\n\n${tweetTexts}`
               }
             ]
           })
