@@ -8,13 +8,12 @@ import { Textarea } from '@/components/ui/textarea'
 interface AnalysisDetailPanelProps {
   call: any
   isOpen: boolean
+  mode: 'call' | 'x'
   onClose: () => void
   onCommentSaved?: (krom_id: string, hasComment: boolean) => void
 }
 
-export function AnalysisDetailPanel({ call, isOpen, onClose, onCommentSaved }: AnalysisDetailPanelProps) {
-  const [batchCalls, setBatchCalls] = useState<any[]>([])
-  const [loadingBatch, setLoadingBatch] = useState(false)
+export function AnalysisDetailPanel({ call, isOpen, mode, onClose, onCommentSaved }: AnalysisDetailPanelProps) {
   const [comment, setComment] = useState('')
   const [originalComment, setOriginalComment] = useState('')
   const [savingComment, setSavingComment] = useState(false)
@@ -22,10 +21,6 @@ export function AnalysisDetailPanel({ call, isOpen, onClose, onCommentSaved }: A
 
   useEffect(() => {
     if (isOpen && call) {
-      // Fetch batch calls if available
-      if (call.analysis_batch_id) {
-        fetchBatchCalls()
-      }
       // Fetch existing comment
       fetchComment()
     }
@@ -40,20 +35,6 @@ export function AnalysisDetailPanel({ call, isOpen, onClose, onCommentSaved }: A
     }
   }, [isOpen])
 
-  const fetchBatchCalls = async () => {
-    setLoadingBatch(true)
-    try {
-      const response = await fetch(`/api/batch/${call.analysis_batch_id}`)
-      const data = await response.json()
-      if (data.success) {
-        setBatchCalls(data.results.filter((c: any) => c.krom_id !== call.krom_id))
-      }
-    } catch (error) {
-      console.error('Failed to fetch batch calls:', error)
-    } finally {
-      setLoadingBatch(false)
-    }
-  }
   
   const fetchComment = async () => {
     if (!call?.krom_id) return
@@ -158,28 +139,26 @@ export function AnalysisDetailPanel({ call, isOpen, onClose, onCommentSaved }: A
           <div className="p-6 border-b">
             <div className="flex items-start justify-between">
               <div>
-                <h2 className="text-2xl font-bold mb-3">{call.token}</h2>
-                <div className="flex items-center gap-6">
-                  <div>
-                    <div className="text-xs text-muted-foreground mb-1">Call Analysis</div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xl font-bold">{call.score}/10</span>
-                      <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${getTierClass(tier)}`}>
-                        {tier}
-                      </span>
-                    </div>
-                  </div>
-                  {call.x_score && (
-                    <div>
-                      <div className="text-xs text-muted-foreground mb-1">X Analysis</div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xl font-bold">{call.x_score}/10</span>
-                        <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${getTierClass(call.x_tier || getTier(call.x_score))}`}>
-                          {call.x_tier || getTier(call.x_score)}
-                        </span>
-                      </div>
-                    </div>
-                  )}
+                <div className="flex items-center gap-3 mb-2">
+                  <h2 className="text-2xl font-bold">{call.token}</h2>
+                  <span className="text-sm text-muted-foreground">
+                    {mode === 'call' ? 'Call Analysis' : 'X Analysis'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl font-bold">
+                    {mode === 'call' ? call.score : call.x_score}/10
+                  </span>
+                  <span className={`inline-block px-3 py-1 rounded text-sm font-semibold ${
+                    mode === 'call' 
+                      ? getTierClass(tier) 
+                      : getTierClass(call.x_tier || getTier(call.x_score))
+                  }`}>
+                    {mode === 'call' ? tier : (call.x_tier || getTier(call.x_score))}
+                  </span>
+                  <span className="text-sm text-muted-foreground">
+                    Legitimacy: {mode === 'call' ? call.legitimacy_factor : call.x_legitimacy_factor || 'Unknown'}
+                  </span>
                 </div>
               </div>
               <Button
@@ -195,73 +174,47 @@ export function AnalysisDetailPanel({ call, isOpen, onClose, onCommentSaved }: A
 
           {/* Content */}
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
-            {/* Call Analysis Section */}
+            {/* Analysis Section */}
             <div>
-              <h3 className="text-lg font-semibold mb-3">Call Analysis</h3>
+              <h3 className="text-lg font-semibold mb-3">
+                {mode === 'call' ? 'AI Analysis' : 'Social Media Analysis'}
+              </h3>
               <div className="bg-muted/50 rounded-lg p-4">
-                <div className="flex items-center gap-4 mb-3">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold">{call.score}/10</div>
-                    <div className="text-xs text-muted-foreground">Score</div>
-                  </div>
-                  <div>
-                    <span className={`inline-block px-3 py-1 rounded text-sm font-semibold ${getTierClass(tier)}`}>
-                      {tier}
-                    </span>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-sm font-semibold">{call.legitimacy_factor}</div>
-                    <div className="text-xs text-muted-foreground">Legitimacy</div>
-                  </div>
-                </div>
-                <p className="text-sm leading-relaxed">
-                  {call.analysis_reasoning || 'No detailed analysis available.'}
-                </p>
-              </div>
-            </div>
-
-            {/* X Analysis Section */}
-            <div>
-              <h3 className="text-lg font-semibold mb-3">X (Twitter) Analysis</h3>
-              {call.x_score ? (
-                <div className="bg-muted/50 rounded-lg p-4">
-                  <div className="flex items-center gap-4 mb-3">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold">{call.x_score}/10</div>
-                      <div className="text-xs text-muted-foreground">Score</div>
-                    </div>
-                    <div>
-                      <span className={`inline-block px-3 py-1 rounded text-sm font-semibold ${getTierClass(call.x_tier || getTier(call.x_score))}`}>
-                        {call.x_tier || getTier(call.x_score)}
-                      </span>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-sm font-semibold">{call.x_legitimacy_factor || 'Unknown'}</div>
-                      <div className="text-xs text-muted-foreground">Legitimacy</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-sm font-semibold">{call.x_tweet_count || 0}</div>
-                      <div className="text-xs text-muted-foreground">Tweets</div>
-                    </div>
-                  </div>
-                  {call.x_best_tweet && (
-                    <div className="mb-3">
-                      <h4 className="text-sm font-semibold mb-1">Best Tweet:</h4>
-                      <div className="bg-background/50 rounded p-2 text-xs italic">
-                        "{call.x_best_tweet}"
-                      </div>
-                    </div>
-                  )}
+                {mode === 'call' ? (
                   <p className="text-sm leading-relaxed">
-                    {call.x_analysis_reasoning || 'No detailed X analysis available.'}
+                    {call.analysis_reasoning || 'No detailed analysis available.'}
                   </p>
-                </div>
-              ) : (
-                <div className="bg-muted/50 rounded-lg p-4 text-center text-sm text-muted-foreground">
-                  <p>No X analysis available for this call yet.</p>
-                  <p className="text-xs mt-1">Run X batch analysis to score social media presence.</p>
-                </div>
-              )}
+                ) : (
+                  <>
+                    {call.x_score ? (
+                      <>
+                        <div className="flex items-center gap-4 mb-3">
+                          <div className="text-center">
+                            <div className="text-lg font-semibold">{call.x_tweet_count || 0}</div>
+                            <div className="text-xs text-muted-foreground">Tweets Analyzed</div>
+                          </div>
+                        </div>
+                        {call.x_best_tweet && (
+                          <div className="mb-3">
+                            <h4 className="text-sm font-semibold mb-1">Most Relevant Tweet:</h4>
+                            <div className="bg-background/50 rounded p-3 text-sm italic">
+                              "{call.x_best_tweet}"
+                            </div>
+                          </div>
+                        )}
+                        <p className="text-sm leading-relaxed">
+                          {call.x_analysis_reasoning || 'No detailed X analysis available.'}
+                        </p>
+                      </>
+                    ) : (
+                      <div className="text-center text-sm text-muted-foreground">
+                        <p>No X analysis available for this call yet.</p>
+                        <p className="text-xs mt-1">Run X batch analysis to score social media presence.</p>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
 
             {/* User Comments Section */}
@@ -303,23 +256,32 @@ export function AnalysisDetailPanel({ call, isOpen, onClose, onCommentSaved }: A
                 <div className="flex items-center gap-2 text-sm">
                   <Cpu className="h-4 w-4 text-muted-foreground" />
                   <span className="text-muted-foreground">Model:</span>
-                  <span className="font-mono">{call.analysis_model || 'Unknown'}</span>
+                  <span className="font-mono">
+                    {mode === 'call' ? (call.analysis_model || 'Unknown') : 'claude-3-haiku'}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <Clock className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">Response Time:</span>
-                  <span>{call.analysis_duration_ms ? `${call.analysis_duration_ms}ms` : 'N/A'}</span>
+                  <span className="text-muted-foreground">Analyzed:</span>
+                  <span>
+                    {mode === 'call' 
+                      ? (call.analyzed_at ? new Date(call.analyzed_at).toLocaleDateString() : 'N/A')
+                      : (call.x_analyzed_at ? new Date(call.x_analyzed_at).toLocaleDateString() : 'N/A')
+                    }
+                  </span>
                 </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <Hash className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">Batch ID:</span>
-                  <span className="font-mono text-xs">{call.analysis_batch_id || 'N/A'}</span>
-                </div>
+                {mode === 'x' && call.x_score && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <Hash className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-muted-foreground">Data Source:</span>
+                    <span className="text-xs">X/Twitter via Nitter</span>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Prompt Used */}
-            {call.analysis_prompt_used && (
+            {/* Prompt Used - Only for Call Analysis */}
+            {mode === 'call' && call.analysis_prompt_used && (
               <div>
                 <h3 className="text-lg font-semibold mb-3">Analysis Prompt</h3>
                 <div className="bg-muted/50 rounded-lg p-4">
@@ -330,44 +292,6 @@ export function AnalysisDetailPanel({ call, isOpen, onClose, onCommentSaved }: A
               </div>
             )}
 
-            {/* Batch Calls */}
-            {call.analysis_batch_id && (
-              <div>
-                <h3 className="text-lg font-semibold mb-3">
-                  Other Calls in Batch
-                  {batchCalls.length > 0 && (
-                    <span className="text-sm font-normal text-muted-foreground ml-2">
-                      ({batchCalls.length} calls)
-                    </span>
-                  )}
-                </h3>
-                {loadingBatch ? (
-                  <p className="text-sm text-muted-foreground">Loading batch calls...</p>
-                ) : batchCalls.length > 0 ? (
-                  <div className="space-y-2">
-                    {batchCalls.map((batchCall) => {
-                      const batchTier = getTier(batchCall.score)
-                      return (
-                        <div
-                          key={batchCall.krom_id}
-                          className="flex items-center justify-between p-3 bg-muted/30 rounded-lg"
-                        >
-                          <div className="flex items-center gap-3">
-                            <span className="font-mono text-sm">{batchCall.token}</span>
-                            <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${getTierClass(batchTier)}`}>
-                              {batchTier}
-                            </span>
-                            <span className="text-sm font-semibold">{batchCall.score}/10</span>
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                ) : (
-                  <p className="text-sm text-muted-foreground">No other calls in this batch.</p>
-                )}
-              </div>
-            )}
           </div>
 
           {/* Footer Actions */}

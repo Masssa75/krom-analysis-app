@@ -24,6 +24,7 @@ export default function HomePage() {
   const [loadingAnalyzed, setLoadingAnalyzed] = useState(true)
   const [selectedCall, setSelectedCall] = useState<any>(null)
   const [isPanelOpen, setIsPanelOpen] = useState(false)
+  const [detailMode, setDetailMode] = useState<'call' | 'x'>('call')
   
   // X Analysis states
   const [xCount, setXCount] = useState('5')
@@ -162,8 +163,9 @@ export default function HomePage() {
     setError('')
   }
 
-  const openDetailPanel = (call: any) => {
+  const openDetailPanel = (call: any, mode: 'call' | 'x' = 'call') => {
     setSelectedCall(call)
+    setDetailMode(mode)
     setIsPanelOpen(true)
   }
 
@@ -375,8 +377,9 @@ export default function HomePage() {
                               <Button
                                 size="sm"
                                 variant="ghost"
-                                onClick={() => openDetailPanel(result)}
+                                onClick={() => openDetailPanel(result, 'call')}
                                 className="text-xs h-7 px-2"
+                                title="View Call Analysis Details"
                               >
                                 Details
                                 <ChevronRight className="h-3 w-3 ml-1" />
@@ -576,7 +579,7 @@ export default function HomePage() {
                       <th className="py-2 px-2 font-normal text-muted-foreground">Tier</th>
                       <th className="py-2 px-2 font-normal text-muted-foreground">Score</th>
                       <th className="py-2 px-2 font-normal text-muted-foreground">Tier</th>
-                      <th className="py-2 px-2"></th>
+                      <th className="py-2 px-2 font-normal text-muted-foreground"></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -635,15 +638,30 @@ export default function HomePage() {
                             )}
                           </td>
                           <td className="py-3 px-2 text-right">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => openDetailPanel(call)}
-                              className="text-xs"
-                            >
-                              View Details
-                              <ChevronRight className="h-3 w-3 ml-1" />
-                            </Button>
+                            <div className="flex justify-end gap-1">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => openDetailPanel(call, 'call')}
+                                className="text-xs"
+                                title="View Call Analysis Details"
+                              >
+                                Call
+                                <ChevronRight className="h-3 w-3 ml-1" />
+                              </Button>
+                              {call.x_score && (
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => openDetailPanel(call, 'x')}
+                                  className="text-xs"
+                                  title="View X Analysis Details"
+                                >
+                                  X
+                                  <ChevronRight className="h-3 w-3 ml-1" />
+                                </Button>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       )
@@ -660,6 +678,7 @@ export default function HomePage() {
       <AnalysisDetailPanel
         call={selectedCall}
         isOpen={isPanelOpen}
+        mode={detailMode}
         onClose={closeDetailPanel}
         onCommentSaved={onCommentSaved}
       />
