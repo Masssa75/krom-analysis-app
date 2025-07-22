@@ -193,17 +193,18 @@ export default function HomePage() {
         </CardHeader>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Call Analysis Column */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-xl">Call Analysis</CardTitle>
-            <CardDescription>
-              Analyze based on call messages
-            </CardDescription>
-          </CardHeader>
-        
-        <CardContent className="space-y-6">
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-xl">Call Analysis</CardTitle>
+              <CardDescription>
+                Analyze based on call messages
+              </CardDescription>
+            </CardHeader>
+          
+            <CardContent className="space-y-6">
           {!results ? (
             <>
               <div className="space-y-4">
@@ -259,107 +260,86 @@ export default function HomePage() {
                 </Alert>
               )}
             </>
-          ) : (
-            <div className="space-y-6">
-              <div>
-                <h2 className="text-2xl font-semibold mb-2">Analysis Results</h2>
-                <p className="text-sm text-muted-foreground">
-                  Analyzed {results.count} calls • {results.model} • Completed in {results.duration}s
-                </p>
-              </div>
-              
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b text-left">
-                      <th className="py-3 px-2 font-medium text-muted-foreground">Token</th>
-                      <th className="py-3 px-2 font-medium text-muted-foreground">Score</th>
-                      <th className="py-3 px-2 font-medium text-muted-foreground">Tier</th>
-                      <th className="py-3 px-2 font-medium text-muted-foreground">Legitimacy</th>
-                      <th className="py-3 px-2 font-medium text-muted-foreground text-right">Details</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {results.results.map((result: any, index: number) => {
-                      const tier = getTier(result.score)
-                      const legitimacyColor = result.legitimacy_factor === 'High' ? 'text-green-600 dark:text-green-400' : 
-                                             result.legitimacy_factor === 'Medium' ? 'text-orange-600 dark:text-orange-400' : 
-                                             'text-muted-foreground'
-                      return (
-                        <tr key={index} className="border-b hover:bg-muted/50 transition-colors">
-                          <td className="py-3 px-2">
-                            <div className="flex items-center gap-2">
-                              {result.contract ? (
-                                <a
-                                  href={`https://dexscreener.com/${result.network === 'solana' ? 'solana' : 'ethereum'}/${result.contract}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="font-mono text-sm hover:underline"
-                                >
-                                  {result.token}
-                                </a>
-                              ) : (
-                                <span className="font-mono text-sm">{result.token}</span>
-                              )}
-                              {result.has_comment && (
-                                <span title="Has comment">
-                                  <MessageSquare className="h-3 w-3 text-muted-foreground" />
-                                </span>
-                              )}
-                              {result.contract && (
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  className="h-6 w-6 p-0"
-                                  onClick={() => copyToClipboard(result.contract)}
-                                  title="Copy contract address"
-                                >
-                                  <Copy className="h-3 w-3" />
-                                </Button>
-                              )}
-                            </div>
-                          </td>
-                          <td className="py-3 px-2 font-semibold">{result.score.toFixed(1)}</td>
-                          <td className="py-3 px-2">
-                            <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${getTierClass(tier)}`}>
-                              {tier}
-                            </span>
-                          </td>
-                          <td className={`py-3 px-2 ${legitimacyColor}`}>{result.legitimacy_factor}</td>
-                          <td className="py-3 px-2 text-right">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => openDetailPanel(result)}
-                              className="text-xs"
-                            >
-                              View Details
-                              <ChevronRight className="h-3 w-3 ml-1" />
-                            </Button>
-                          </td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
-              </div>
-              
-              <div className="flex gap-4">
-                <Button onClick={downloadCSV} className="flex-1">
-                  <Download className="w-4 h-4 mr-2" />
-                  Download CSV
-                </Button>
-                <Button onClick={resetAnalysis} variant="outline" className="flex-1">
-                  New Analysis
-                </Button>
-              </div>
-            </div>
           )}
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+          
+          {/* Call Analysis Results */}
+          {results && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Call Analysis Results</CardTitle>
+                <CardDescription>
+                  Analyzed {results.count} calls • {results.model} • Completed in {results.duration}s
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b text-left">
+                        <th className="py-2 px-2 font-medium text-muted-foreground">Token</th>
+                        <th className="py-2 px-2 font-medium text-muted-foreground">Score</th>
+                        <th className="py-2 px-2 font-medium text-muted-foreground">Tier</th>
+                        <th className="py-2 px-2"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {results.results.map((result: any, index: number) => {
+                        const tier = getTier(result.score)
+                        return (
+                          <tr key={index} className="border-b hover:bg-muted/50 transition-colors">
+                            <td className="py-2 px-2">
+                              <div className="flex items-center gap-1">
+                                <span className="font-mono text-xs">{result.token}</span>
+                                {result.has_comment && (
+                                  <span title="Has comment">
+                                    <MessageSquare className="h-3 w-3 text-muted-foreground" />
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                            <td className="py-2 px-2 font-semibold text-xs">{result.score.toFixed(1)}</td>
+                            <td className="py-2 px-2">
+                              <span className={`inline-block px-1.5 py-0.5 rounded text-xs font-semibold ${getTierClass(tier)}`}>
+                                {tier}
+                              </span>
+                            </td>
+                            <td className="py-2 px-2 text-right">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => openDetailPanel(result)}
+                                className="text-xs h-7 px-2"
+                              >
+                                Details
+                                <ChevronRight className="h-3 w-3 ml-1" />
+                              </Button>
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+                
+                <div className="flex gap-4 mt-4">
+                  <Button onClick={downloadCSV} className="flex-1">
+                    <Download className="w-4 h-4 mr-2" />
+                    Download CSV
+                  </Button>
+                  <Button onClick={resetAnalysis} variant="outline" className="flex-1">
+                    New Analysis
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
 
-      {/* X Analysis Column */}
-      <Card>
+        {/* X Analysis Column */}
+        <div className="space-y-6">
+          <Card>
         <CardHeader>
           <CardTitle className="text-xl">X (Twitter) Analysis</CardTitle>
           <CardDescription>
@@ -407,8 +387,26 @@ export default function HomePage() {
           <div className="text-center text-muted-foreground p-8">
             <p className="text-sm">X analysis will be available soon</p>
           </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+          
+          {/* X Analysis Results - Placeholder */}
+          {false && (
+            <Card>
+              <CardHeader>
+                <CardTitle>X Analysis Results</CardTitle>
+                <CardDescription>
+                  Social media sentiment analysis
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center text-muted-foreground p-8">
+                  <p className="text-sm">Results will appear here</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
       </div>
 
       {/* Previously Analyzed Calls */}
