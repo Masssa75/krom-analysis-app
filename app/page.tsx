@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Progress } from '@/components/ui/progress'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Download, Copy, ExternalLink, ChevronRight, MessageSquare, RefreshCw, Search, ChevronLeft } from 'lucide-react'
+import { Download, Copy, ExternalLink, ChevronRight, MessageSquare, RefreshCw, Search, ChevronLeft, Trash2 } from 'lucide-react'
 import { AnalysisDetailPanel } from '@/components/analysis-detail-panel'
 import { TokenTypeBadge } from '@/components/token-type-badge'
 
@@ -369,6 +369,37 @@ export default function HomePage() {
     }
   }
 
+  const deleteAnalysis = async (call: any) => {
+    if (!confirm(`Are you sure you want to delete the analysis for ${call.token}? This will only remove the new analysis scores, keeping the original tier analysis.`)) {
+      return
+    }
+
+    try {
+      const response = await fetch('/api/delete-analysis', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          krom_id: call.krom_id
+        })
+      })
+
+      const data = await response.json()
+      
+      if (!response.ok || data.error) {
+        throw new Error(data.error || 'Failed to delete analysis')
+      }
+      
+      // Refresh the analyzed calls list
+      await fetchAnalyzedCalls()
+      
+    } catch (err: any) {
+      console.error('Failed to delete analysis:', err)
+      alert(`Failed to delete analysis: ${err.message}`)
+    }
+  }
+
   return (
     <div className="container max-w-7xl mx-auto py-8">
       <Card className="mb-8">
@@ -715,6 +746,7 @@ export default function HomePage() {
                       <th className="py-3 px-2 font-medium text-muted-foreground">Token</th>
                       <th className="py-3 px-2 font-medium text-muted-foreground" colSpan={3}>Call Analysis</th>
                       <th className="py-3 px-2 font-medium text-muted-foreground" colSpan={3}>X Analysis</th>
+                      <th className="py-3 px-2"></th>
                     </tr>
                     <tr className="border-b text-left text-xs">
                       <th className="py-2 px-2"></th>
@@ -724,6 +756,7 @@ export default function HomePage() {
                       <th className="py-2 px-2 font-normal text-muted-foreground">Score</th>
                       <th className="py-2 px-2 font-normal text-muted-foreground">Tier</th>
                       <th className="py-2 px-2 font-normal text-muted-foreground"></th>
+                      <th className="py-2 px-2"></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -850,6 +883,17 @@ export default function HomePage() {
                                 Analyze
                               </Button>
                             )}
+                          </td>
+                          <td className="py-3 px-2">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => deleteAnalysis(call)}
+                              className="text-xs text-destructive hover:text-destructive/90"
+                              title="Delete new analysis (keeps original tier analysis)"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
                           </td>
                         </tr>
                       )
