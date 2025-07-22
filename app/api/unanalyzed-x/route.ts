@@ -12,8 +12,8 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '10')
 
     // Fetch calls that haven't been X analyzed yet
-    // Prioritize calls with call analysis already done
-    const { data: calls, error } = await supabase
+    // First try to get calls with analysis already done
+    let { data: calls, error } = await supabase
       .from('crypto_calls')
       .select('krom_id, ticker, buy_timestamp, raw_data, analysis_tier, analysis_score')
       .is('x_analyzed_at', null)
@@ -21,6 +21,20 @@ export async function GET(request: NextRequest) {
       .not('analysis_tier', 'is', null)  // Prefer calls with analysis already done
       .order('buy_timestamp', { ascending: true })  // Oldest first
       .limit(limit)
+    
+    // If no calls with analysis_tier, get any calls with contract address
+    if (!error && (!calls || calls.length === 0)) {
+      const result = await supabase
+        .from('crypto_calls')
+        .select('krom_id, ticker, buy_timestamp, raw_data, analysis_tier, analysis_score')
+        .is('x_analyzed_at', null)
+        .not('raw_data->token->ca', 'is', null)
+        .order('buy_timestamp', { ascending: true })  // Oldest first
+        .limit(limit)
+      
+      calls = result.data
+      error = result.error
+    }
 
     if (error) {
       console.error('Database query error:', error)
