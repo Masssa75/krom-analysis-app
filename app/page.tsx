@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Progress } from '@/components/ui/progress'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Download, Copy, ExternalLink, ChevronRight, MessageSquare } from 'lucide-react'
+import { Download, Copy, ExternalLink, ChevronRight, MessageSquare, RefreshCw } from 'lucide-react'
 import { AnalysisDetailPanel } from '@/components/analysis-detail-panel'
 
 export default function HomePage() {
@@ -35,6 +35,10 @@ export default function HomePage() {
   const [xError, setXError] = useState('')
   const [xResults, setXResults] = useState<any>(null)
   const [xAnalyzingCall, setXAnalyzingCall] = useState<any>(null)
+  
+  // Reanalysis states
+  const [reanalyzingCalls, setReanalyzingCalls] = useState<Set<string>>(new Set())
+  const [reanalyzingXCalls, setReanalyzingXCalls] = useState<Set<string>>(new Set())
 
   // Fetch analyzed calls on mount
   useEffect(() => {
@@ -248,6 +252,88 @@ export default function HomePage() {
     setXResults(null)
     setXError('')
     setXAnalyzingCall(null)
+  }
+  
+  const reanalyzeCall = async (call: any) => {
+    setReanalyzingCalls(prev => new Set(prev).add(call.krom_id))
+    
+    try {
+      const response = await fetch('/api/reanalyze-call', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          krom_id: call.krom_id,
+          model: model
+        })
+      })
+      
+      const data = await response.json()
+      
+      if (!response.ok || data.error) {
+        throw new Error(data.error || 'Failed to reanalyze call')
+      }
+      
+      // Refresh the analyzed calls list
+      await fetchAnalyzedCalls()
+      
+      // Update results if it's in the current results
+      if (results) {
+        setResults({
+          ...results,
+          results: results.results.map((r: any) => 
+            r.krom_id === call.krom_id ? { ...r, ...data.result } : r
+          )
+        })
+      }
+      
+    } catch (err: any) {
+      console.error('Failed to reanalyze call:', err)
+      alert(`Failed to reanalyze: ${err.message}`)
+    } finally {
+      setReanalyzingCalls(prev => {
+        const newSet = new Set(prev)
+        newSet.delete(call.krom_id)
+        return newSet
+      })
+    }
+  }
+  
+  const reanalyzeX = async (call: any) => {
+    setReanalyzingXCalls(prev => new Set(prev).add(call.krom_id))
+    
+    try {
+      const response = await fetch('/api/reanalyze-x', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          krom_id: call.krom_id,
+          model: xModel
+        })
+      })
+      
+      const data = await response.json()
+      
+      if (!response.ok || data.error) {
+        throw new Error(data.error || 'Failed to reanalyze X data')
+      }
+      
+      // Refresh the analyzed calls list
+      await fetchAnalyzedCalls()
+      
+    } catch (err: any) {
+      console.error('Failed to reanalyze X:', err)
+      alert(`Failed to reanalyze X: ${err.message}`)
+    } finally {
+      setReanalyzingXCalls(prev => {
+        const newSet = new Set(prev)
+        newSet.delete(call.krom_id)
+        return newSet
+      })
+    }
   }
 
   return (
@@ -626,16 +712,28 @@ export default function HomePage() {
                             </span>
                           </td>
                           <td className="py-3 px-2 border-r">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => openDetailPanel(call, 'call')}
-                              className="text-xs"
-                              title="View Call Analysis Details"
-                            >
-                              Details
-                              <ChevronRight className="h-3 w-3 ml-1" />
-                            </Button>
+                            <div className="flex gap-1">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => openDetailPanel(call, 'call')}
+                                className="text-xs"
+                                title="View Call Analysis Details"
+                              >
+                                Details
+                                <ChevronRight className="h-3 w-3 ml-1" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => reanalyzeCall(call)}
+                                disabled={reanalyzingCalls.has(call.krom_id)}
+                                className="text-xs"
+                                title="Reanalyze Call"
+                              >
+                                <RefreshCw className={`h-3 w-3 ${reanalyzingCalls.has(call.krom_id) ? 'animate-spin' : ''}`} />
+                              </Button>
+                            </div>
                           </td>
                           <td className="py-3 px-2 font-semibold">
                             {call.x_score ? `${call.x_score}/10` : '-'}
@@ -651,18 +749,40 @@ export default function HomePage() {
                           </td>
                           <td className="py-3 px-2">
                             {call.x_score ? (
+                              <div className="flex gap-1">
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => openDetailPanel(call, 'x')}
+                                  className="text-xs"
+                                  title="View X Analysis Details"
+                                >
+                                  Details
+                                  <ChevronRight className="h-3 w-3 ml-1" />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => reanalyzeX(call)}
+                                  disabled={reanalyzingXCalls.has(call.krom_id)}
+                                  className="text-xs"
+                                  title="Reanalyze X"
+                                >
+                                  <RefreshCw className={`h-3 w-3 ${reanalyzingXCalls.has(call.krom_id) ? 'animate-spin' : ''}`} />
+                                </Button>
+                              </div>
+                            ) : (
                               <Button
                                 size="sm"
                                 variant="ghost"
-                                onClick={() => openDetailPanel(call, 'x')}
+                                onClick={() => reanalyzeX(call)}
+                                disabled={reanalyzingXCalls.has(call.krom_id)}
                                 className="text-xs"
-                                title="View X Analysis Details"
+                                title="Analyze X for first time"
                               >
-                                Details
-                                <ChevronRight className="h-3 w-3 ml-1" />
+                                <RefreshCw className={`h-3 w-3 ${reanalyzingXCalls.has(call.krom_id) ? 'animate-spin' : ''}`} />
+                                Analyze
                               </Button>
-                            ) : (
-                              <span className="text-muted-foreground">-</span>
                             )}
                           </td>
                         </tr>
