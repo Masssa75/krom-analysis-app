@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
   const startTime = Date.now()
   
   try {
-    const { limit = 10, model = 'claude-3-haiku-20240307' } = await request.json()
+    const { limit = 10, model = 'moonshotai/kimi-k2:free' } = await request.json()
     
     // Generate batch ID
     const batchId = crypto.randomUUID()
@@ -153,34 +153,71 @@ export async function POST(request: NextRequest) {
           continue
         }
         
-        // Call Claude for analysis
-        const anthropicResponse = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': process.env.ANTHROPIC_API_KEY!,
-            'anthropic-version': '2023-06-01'
-          },
-          body: JSON.stringify({
-            model: model,
-            max_tokens: 800,
-            temperature: 0,
-            system: X_BATCH_ANALYSIS_PROMPT,
-            messages: [
-              {
-                role: 'user',
-                content: `Analyze these tweets about ${call.ticker} token (captured at ${call.raw_data?.timestamp ? new Date(call.raw_data.timestamp * 1000).toISOString() : 'unknown time'}):\n\n${tweetTexts}`
-              }
-            ]
+        // Call AI model for analysis
+        const isOpenRouterModel = model.includes('moonshotai') || model.includes('/');
+        let analysisText: string;
+        
+        if (isOpenRouterModel) {
+          // Use OpenRouter API
+          const openRouterResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${process.env.OPEN_ROUTER_API_KEY}`,
+            },
+            body: JSON.stringify({
+              model: model,
+              messages: [
+                {
+                  role: 'system',
+                  content: X_BATCH_ANALYSIS_PROMPT
+                },
+                {
+                  role: 'user',
+                  content: `Analyze these tweets about ${call.ticker} token (captured at ${call.raw_data?.timestamp ? new Date(call.raw_data.timestamp * 1000).toISOString() : 'unknown time'}):\n\n${tweetTexts}`
+                }
+              ],
+              temperature: 0,
+              max_tokens: 800
+            })
           })
-        })
-        
-        if (!anthropicResponse.ok) {
-          throw new Error(`Claude API error: ${anthropicResponse.status}`)
+          
+          if (!openRouterResponse.ok) {
+            throw new Error(`OpenRouter API error: ${openRouterResponse.status}`)
+          }
+          
+          const openRouterResult = await openRouterResponse.json()
+          analysisText = openRouterResult.choices[0].message.content
+        } else {
+          // Use Claude API directly
+          const anthropicResponse = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-key': process.env.ANTHROPIC_API_KEY!,
+              'anthropic-version': '2023-06-01'
+            },
+            body: JSON.stringify({
+              model: model,
+              max_tokens: 800,
+              temperature: 0,
+              system: X_BATCH_ANALYSIS_PROMPT,
+              messages: [
+                {
+                  role: 'user',
+                  content: `Analyze these tweets about ${call.ticker} token (captured at ${call.raw_data?.timestamp ? new Date(call.raw_data.timestamp * 1000).toISOString() : 'unknown time'}):\n\n${tweetTexts}`
+                }
+              ]
+            })
+          })
+          
+          if (!anthropicResponse.ok) {
+            throw new Error(`Claude API error: ${anthropicResponse.status}`)
+          }
+          
+          const anthropicResult = await anthropicResponse.json()
+          analysisText = anthropicResult.content[0].text
         }
-        
-        const anthropicResult = await anthropicResponse.json()
-        const analysisText = anthropicResult.content[0].text
         
         // Parse the response
         const scoreMatch = analysisText.match(/score[:\s]+(\d+)/i)

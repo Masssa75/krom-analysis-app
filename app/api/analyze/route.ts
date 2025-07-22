@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     : null;
     
   try {
-    const { limit = 5, model = 'claude-3-haiku-20240307' } = await request.json();
+    const { limit = 5, model = 'moonshotai/kimi-k2:free' } = await request.json();
 
     if (!supabase) {
       return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
@@ -52,8 +52,15 @@ export async function POST(request: NextRequest) {
     // Prepare AI client based on model selection
     let aiClient: any;
     const isClaudeModel = model.includes('claude');
+    const isOpenRouterModel = model.includes('moonshotai') || model.includes('/');
     
-    if (isClaudeModel) {
+    if (isOpenRouterModel) {
+      if (!process.env.OPEN_ROUTER_API_KEY) {
+        return NextResponse.json({ error: 'OpenRouter API key not configured' }, { status: 500 });
+      }
+      // OpenRouter doesn't need a client initialization
+      aiClient = null;
+    } else if (isClaudeModel) {
       if (!anthropic) {
         return NextResponse.json({ error: 'Claude API key not configured' }, { status: 500 });
       }
@@ -119,7 +126,37 @@ Respond with JSON only.`;
         let rawResponse;
         const analysisStartTime = Date.now();
         
-        if (isClaudeModel) {
+        if (isOpenRouterModel) {
+          // Call OpenRouter API
+          const openRouterResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${process.env.OPEN_ROUTER_API_KEY}`,
+            },
+            body: JSON.stringify({
+              model: model,
+              messages: [
+                {
+                  role: 'user',
+                  content: analysisPrompt
+                }
+              ],
+              temperature: 0.1,
+              max_tokens: 1000
+            })
+          });
+          
+          if (!openRouterResponse.ok) {
+            throw new Error(`OpenRouter API error: ${openRouterResponse.status}`);
+          }
+          
+          const openRouterResult = await openRouterResponse.json();
+          rawResponse = openRouterResult.choices[0].message.content;
+          // Extract JSON from response
+          const jsonMatch = rawResponse.match(/\{[\s\S]*\}/);
+          analysisResult = jsonMatch ? JSON.parse(jsonMatch[0]) : {};
+        } else if (isClaudeModel) {
           const message = await aiClient.messages.create({
             model: model,
             max_tokens: 1024,
