@@ -159,7 +159,8 @@ Respond with JSON only.`;
         
         // Update the database with full analysis details
         if (analysisResult.score) {
-          await supabase
+          // First try with all fields
+          const fullUpdate = await supabase
             .from('crypto_calls')
             .update({ 
               analysis_score: analysisResult.score,
@@ -172,6 +173,19 @@ Respond with JSON only.`;
               analysis_duration_ms: analysisDuration
             })
             .eq('krom_id', call.krom_id);
+          
+          // If it fails due to missing columns, fall back to basic update
+          if (fullUpdate.error && fullUpdate.error.message.includes('column')) {
+            console.log('New columns not yet available, using basic update');
+            await supabase
+              .from('crypto_calls')
+              .update({ 
+                analysis_score: analysisResult.score,
+                analysis_legitimacy_factor: analysisResult.legitimacy_factor,
+                analysis_model: model
+              })
+              .eq('krom_id', call.krom_id);
+          }
         }
         
       } catch (err) {
