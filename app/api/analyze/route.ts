@@ -153,10 +153,29 @@ Respond with JSON only.`;
           }
           
           const openRouterResult = await openRouterResponse.json();
+          
+          // Check if we have a valid response structure
+          if (!openRouterResult.choices || !openRouterResult.choices[0] || !openRouterResult.choices[0].message) {
+            console.error('Invalid OpenRouter response structure:', openRouterResult);
+            throw new Error('Invalid response from OpenRouter API');
+          }
+          
           rawResponse = openRouterResult.choices[0].message.content;
+          console.log(`Raw response for ${call.ticker}:`, rawResponse);
+          
           // Extract JSON from response
           const jsonMatch = rawResponse.match(/\{[\s\S]*\}/);
-          analysisResult = jsonMatch ? JSON.parse(jsonMatch[0]) : {};
+          if (!jsonMatch) {
+            console.error('No JSON found in response:', rawResponse);
+            throw new Error('No valid JSON in AI response');
+          }
+          
+          try {
+            analysisResult = JSON.parse(jsonMatch[0]);
+          } catch (parseError) {
+            console.error('JSON parse error:', parseError, 'Raw JSON:', jsonMatch[0]);
+            throw new Error('Failed to parse AI response JSON');
+          }
         } else if (isClaudeModel) {
           const message = await aiClient.messages.create({
             model: model,
@@ -260,12 +279,23 @@ Respond with JSON only.`;
     
     const duration = ((Date.now() - startTime) / 1000).toFixed(1);
     
-    return NextResponse.json({
+    const responseData = {
       success: true,
       count: results.length,
       model: model,
       duration: duration,
       results: results
+    };
+    
+    // Ensure response is properly stringified
+    const jsonResponse = JSON.stringify(responseData);
+    
+    return new NextResponse(jsonResponse, {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': jsonResponse.length.toString()
+      }
     });
     
   } catch (error) {

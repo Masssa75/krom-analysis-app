@@ -100,7 +100,24 @@ export default function HomePage() {
         })
       })
 
-      const data = await response.json()
+      let data
+      try {
+        const responseText = await response.text()
+        console.log('Raw response:', responseText)
+        data = JSON.parse(responseText)
+      } catch (parseError) {
+        console.error('Failed to parse response:', parseError)
+        // If parsing fails but response was ok, the analysis might have succeeded
+        if (response.ok) {
+          // Refresh the page data to see if analysis was saved
+          await fetchAnalyzedCalls()
+          setIsAnalyzing(false)
+          setProgress(0)
+          setStatus('')
+          return
+        }
+        throw new Error('Invalid response from server')
+      }
       
       if (!response.ok || data.error) {
         throw new Error(data.error || `HTTP error! status: ${response.status}`)
