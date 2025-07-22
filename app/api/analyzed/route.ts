@@ -19,6 +19,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '50', 10);
     const offset = parseInt(searchParams.get('offset') || '0', 10);
     const search = searchParams.get('search') || '';
+    const coinsOfInterest = searchParams.get('coinsOfInterest') === 'true';
 
     // Build query
     let query = supabase
@@ -29,6 +30,11 @@ export async function GET(request: NextRequest) {
     // Add search filter if provided
     if (search) {
       query = query.ilike('ticker', `%${search}%`);
+    }
+    
+    // Add coins of interest filter if requested
+    if (coinsOfInterest) {
+      query = query.eq('is_coin_of_interest', true);
     }
     
     // Add ordering and pagination
@@ -76,7 +82,10 @@ export async function GET(request: NextRequest) {
       x_tweet_count: call.x_raw_tweets ? call.x_raw_tweets.length : 0,
       x_raw_tweets: call.x_raw_tweets || [],
       // Comment indicator
-      has_comment: call.user_comment ? true : false
+      has_comment: call.user_comment ? true : false,
+      // Coin of interest indicator
+      is_coin_of_interest: call.is_coin_of_interest || false,
+      coin_of_interest_notes: call.coin_of_interest_notes || null
     })) || [];
 
     return NextResponse.json({

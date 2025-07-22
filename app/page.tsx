@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Progress } from '@/components/ui/progress'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Download, Copy, ExternalLink, ChevronRight, MessageSquare, RefreshCw, Search, ChevronLeft, Trash2 } from 'lucide-react'
+import { Download, Copy, ExternalLink, ChevronRight, MessageSquare, RefreshCw, Search, ChevronLeft, Trash2, Star } from 'lucide-react'
 import { AnalysisDetailPanel } from '@/components/analysis-detail-panel'
 import { TokenTypeBadge } from '@/components/token-type-badge'
 
@@ -47,10 +47,10 @@ export default function HomePage() {
   const [isSearching, setIsSearching] = useState(false)
   const itemsPerPage = 20
 
-  // Fetch analyzed calls on mount and when page/search changes
+  // Fetch analyzed calls on mount and when page/search/filter changes
   useEffect(() => {
     fetchAnalyzedCalls()
-  }, [currentPage, searchQuery])
+  }, [currentPage, searchQuery, showOnlyCoinsOfInterest])
 
   const fetchAnalyzedCalls = async () => {
     setLoadingAnalyzed(true)
@@ -64,6 +64,10 @@ export default function HomePage() {
       
       if (searchQuery) {
         params.append('search', searchQuery)
+      }
+      
+      if (showOnlyCoinsOfInterest) {
+        params.append('coinsOfInterest', 'true')
       }
       
       const response = await fetch(`/api/analyzed?${params}`)
@@ -239,6 +243,50 @@ export default function HomePage() {
     )
   }
   
+  const toggleCoinOfInterest = async (call: any) => {
+    const newStatus = !call.is_coin_of_interest
+    
+    try {
+      const response = await fetch('/api/mark-coin-of-interest', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          krom_id: call.krom_id,
+          is_marked: newStatus
+        })
+      })
+      
+      const data = await response.json()
+      
+      if (!response.ok || data.error) {
+        throw new Error(data.error || 'Failed to update coin of interest')
+      }
+      
+      // Update the status in results
+      if (results) {
+        setResults({
+          ...results,
+          results: results.results.map((r: any) => 
+            r.krom_id === call.krom_id ? { ...r, is_coin_of_interest: newStatus } : r
+          )
+        })
+      }
+      
+      // Update the status in analyzed calls
+      setAnalyzedCalls(prev => 
+        prev.map(c => 
+          c.krom_id === call.krom_id ? { ...c, is_coin_of_interest: newStatus } : c
+        )
+      )
+      
+    } catch (err: any) {
+      console.error('Failed to toggle coin of interest:', err)
+      alert(`Failed to update: ${err.message}`)
+    }
+  }
+  
   const startXAnalysis = async () => {
     setIsXAnalyzing(true)
     setXError('')
@@ -297,6 +345,7 @@ export default function HomePage() {
   
   // Handle search with debouncing
   const [searchInput, setSearchInput] = useState('')
+  const [showOnlyCoinsOfInterest, setShowOnlyCoinsOfInterest] = useState(false)
   useEffect(() => {
     const timer = setTimeout(() => {
       setSearchQuery(searchInput)
@@ -555,6 +604,13 @@ export default function HomePage() {
                                     <MessageSquare className="h-3 w-3 text-muted-foreground" />
                                   </span>
                                 )}
+                                <button
+                                  onClick={() => toggleCoinOfInterest(result)}
+                                  className="hover:text-yellow-500 transition-colors"
+                                  title={result.is_coin_of_interest ? "Unmark as coin of interest" : "Mark as coin of interest"}
+                                >
+                                  <Star className={`h-3 w-3 ${result.is_coin_of_interest ? 'fill-yellow-500 text-yellow-500' : 'text-muted-foreground'}`} />
+                                </button>
                               </div>
                             </td>
                             <td className="py-2 px-2 font-semibold text-xs">{result.score.toFixed(1)}</td>
@@ -760,15 +816,33 @@ export default function HomePage() {
                   )}
                 </CardDescription>
               </div>
-              <div className="relative w-64">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                <Input
-                  type="text"
-                  placeholder="Search by token name..."
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                  className="pl-10"
-                />
+              <div className="space-y-2">
+                <div className="relative w-64">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                  <Input
+                    type="text"
+                    placeholder="Search by token name..."
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="coins-of-interest"
+                    checked={showOnlyCoinsOfInterest}
+                    onChange={(e) => {
+                      setShowOnlyCoinsOfInterest(e.target.checked)
+                      setCurrentPage(1) // Reset to first page when filter changes
+                    }}
+                    className="rounded"
+                  />
+                  <Label htmlFor="coins-of-interest" className="text-sm cursor-pointer flex items-center gap-1">
+                    <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
+                    Show only coins of interest
+                  </Label>
+                </div>
               </div>
             </div>
           </CardHeader>
@@ -821,6 +895,13 @@ export default function HomePage() {
                                   <MessageSquare className="h-3 w-3 text-muted-foreground" />
                                 </span>
                               )}
+                              <button
+                                onClick={() => toggleCoinOfInterest(call)}
+                                className="hover:text-yellow-500 transition-colors"
+                                title={call.is_coin_of_interest ? "Unmark as coin of interest" : "Mark as coin of interest"}
+                              >
+                                <Star className={`h-3 w-3 ${call.is_coin_of_interest ? 'fill-yellow-500 text-yellow-500' : 'text-muted-foreground'}`} />
+                              </button>
                               {call.contract && (
                                 <Button
                                   size="sm"
