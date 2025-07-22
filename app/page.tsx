@@ -183,14 +183,25 @@ export default function HomePage() {
   }
 
   return (
-    <div className="container max-w-4xl mx-auto py-8">
-      <Card>
+    <div className="container max-w-7xl mx-auto py-8">
+      <Card className="mb-8">
         <CardHeader className="text-center">
           <CardTitle className="text-3xl">KROM Historical Analysis Tool</CardTitle>
           <CardDescription>
             Analyze cryptocurrency calls with AI-powered scoring
           </CardDescription>
         </CardHeader>
+      </Card>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        {/* Call Analysis Column */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-xl">Call Analysis</CardTitle>
+            <CardDescription>
+              Analyze based on call messages
+            </CardDescription>
+          </CardHeader>
         
         <CardContent className="space-y-6">
           {!results ? (
@@ -346,6 +357,59 @@ export default function HomePage() {
           )}
         </CardContent>
       </Card>
+
+      {/* X Analysis Column */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-xl">X (Twitter) Analysis</CardTitle>
+          <CardDescription>
+            Analyze based on social media sentiment
+          </CardDescription>
+        </CardHeader>
+        
+        <CardContent className="space-y-6">
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="x-count">Number of calls to analyze (from oldest)</Label>
+              <Input
+                id="x-count"
+                type="number"
+                value="5"
+                min="1"
+                max="100"
+                disabled={true}
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="x-model">AI Model</Label>
+              <Select value="claude-3-haiku-20240307" disabled={true}>
+                <SelectTrigger id="x-model">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="claude-3-haiku-20240307">Claude 3 Haiku (Fast)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="pt-4">
+              <Button 
+                disabled={true}
+                className="w-full"
+                size="lg"
+              >
+                Start X Analysis
+              </Button>
+            </div>
+          </div>
+          
+          <div className="text-center text-muted-foreground p-8">
+            <p className="text-sm">X analysis will be available soon</p>
+          </div>
+        </CardContent>
+      </Card>
+      </div>
 
       {/* Previously Analyzed Calls */}
       {analyzedCalls.length > 0 && (
