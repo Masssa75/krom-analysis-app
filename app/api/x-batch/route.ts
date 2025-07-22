@@ -159,6 +159,9 @@ export async function POST(request: NextRequest) {
         
         if (isOpenRouterModel) {
           // Use OpenRouter API
+          // Special handling for Gemini 2.5 Pro which needs 4000 tokens
+          const maxTokens = model === 'google/gemini-2.5-pro' ? 4000 : 1000;
+          
           const openRouterResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
             method: 'POST',
             headers: {
@@ -178,7 +181,9 @@ export async function POST(request: NextRequest) {
                 }
               ],
               temperature: 0,
-              max_tokens: 800
+              max_tokens: maxTokens,
+              // Add response format for models that support it
+              ...(model === 'google/gemini-2.5-pro' ? { response_format: { type: "json_object" } } : {})
             })
           })
           

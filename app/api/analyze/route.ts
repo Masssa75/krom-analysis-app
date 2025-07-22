@@ -128,6 +128,9 @@ Respond with JSON only.`;
         
         if (isOpenRouterModel) {
           // Call OpenRouter API
+          // Special handling for Gemini 2.5 Pro which needs 4000 tokens
+          const maxTokens = model === 'google/gemini-2.5-pro' ? 4000 : 1000;
+          
           const openRouterResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
             method: 'POST',
             headers: {
@@ -143,7 +146,9 @@ Respond with JSON only.`;
                 }
               ],
               temperature: 0.1,
-              max_tokens: 1000
+              max_tokens: maxTokens,
+              // Add response format for models that support it
+              ...(model === 'google/gemini-2.5-pro' ? { response_format: { type: "json_object" } } : {})
             })
           });
           

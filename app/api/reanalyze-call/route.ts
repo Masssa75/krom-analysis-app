@@ -34,15 +34,7 @@ export async function POST(request: NextRequest) {
     const startTime = Date.now();
 
     // Store the full prompt for analysis_prompt_used
-    const REANALYSIS_PROMPT = `You are an expert cryptocurrency analyst. Pay close attention to technical terminology and crypto community slang.
-
-Key crypto terms to recognize:
-- "tek" = technical analysis/technology (indicates utility focus)
-- "tool" = actual software/utility application
-- References to specific development tools, platforms, or technical features indicate utility projects
-- "awesome tool", "building something", "dev", "platform" = utility indicators
-
-Analyze the following crypto call and provide a score from 1-10 based on potential value and legitimacy.
+    const REANALYSIS_PROMPT = `You are an expert cryptocurrency analyst. Analyze the following crypto call and provide a score from 1-10 based on potential value and legitimacy.
 
 Scoring Criteria:
 - 8-10: ALPHA tier - High potential, legitimate project, strong fundamentals

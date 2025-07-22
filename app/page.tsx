@@ -417,7 +417,9 @@ export default function HomePage() {
                     <SelectContent>
                       <SelectItem value="claude-3-haiku-20240307">Claude 3 Haiku (Fast)</SelectItem>
                       <SelectItem value="claude-3-sonnet-20240229">Claude 3 Sonnet (Better)</SelectItem>
-                      <SelectItem value="gemini-pro">Gemini Pro</SelectItem>
+                      <SelectItem value="openai/gpt-4">GPT-4 (Most Accurate)</SelectItem>
+                      <SelectItem value="moonshotai/kimi-k2">Kimi K2 (Good Value)</SelectItem>
+                      <SelectItem value="google/gemini-2.5-pro">Gemini 2.5 Pro (Needs 4K tokens)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -569,6 +571,10 @@ export default function HomePage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="claude-3-haiku-20240307">Claude 3 Haiku (Fast)</SelectItem>
+                  <SelectItem value="claude-3-sonnet-20240229">Claude 3 Sonnet (Better)</SelectItem>
+                  <SelectItem value="openai/gpt-4">GPT-4 (Most Accurate)</SelectItem>
+                  <SelectItem value="moonshotai/kimi-k2">Kimi K2 (Good Value)</SelectItem>
+                  <SelectItem value="google/gemini-2.5-pro">Gemini 2.5 Pro (Needs 4K tokens)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
