@@ -32,9 +32,9 @@ export async function GET(request: NextRequest) {
     }
     
     // Add ordering and pagination
-    // Using raw_data timestamp for reliable chronological ordering
+    // Using created_at for chronological ordering
     const { data: calls, error, count } = await query
-      .order('raw_data->timestamp', { ascending: false })
+      .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
 
     if (error) {

@@ -32,12 +32,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Fetch oldest calls that haven't been scored with the new 1-10 system
-    // Using raw_data timestamp for reliable chronological ordering
+    // Using created_at timestamp for chronological ordering
     const { data: calls, error: fetchError } = await supabase
       .from('crypto_calls')
       .select('*')
       .is('analysis_score', null)
-      .order('raw_data->timestamp', { ascending: true })
+      .order('created_at', { ascending: true })
       .limit(limit);
 
     if (fetchError) {

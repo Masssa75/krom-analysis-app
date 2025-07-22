@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
       .select('krom_id, ticker, x_raw_tweets, buy_timestamp, raw_data')
       .not('x_raw_tweets', 'is', null)
       .is('x_analysis_score', null)  // Only get calls without new scoring
-      .order('raw_data->timestamp', { ascending: true })
+      .order('created_at', { ascending: true })
       .limit(limit)
     
     if (fetchError) {
