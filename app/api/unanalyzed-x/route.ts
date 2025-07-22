@@ -10,31 +10,22 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
     const limit = parseInt(searchParams.get('limit') || '10')
+    const includeAnalyzed = searchParams.get('includeAnalyzed') === 'true'
 
-    // Fetch calls that haven't been X analyzed yet
-    // First try to get calls with analysis already done
-    let { data: calls, error } = await supabase
+    // Build query
+    let query = supabase
       .from('crypto_calls')
-      .select('krom_id, ticker, buy_timestamp, raw_data, analysis_tier, analysis_score')
-      .is('x_analyzed_at', null)
-      .not('raw_data->token->ca', 'is', null)
-      .not('analysis_tier', 'is', null)  // Prefer calls with analysis already done
+      .select('krom_id, ticker, buy_timestamp, raw_data, analysis_tier, analysis_score, x_analysis_tier, x_analyzed_at')
+      .not('raw_data->token->ca', 'is', null)  // Must have contract address
       .order('buy_timestamp', { ascending: true })  // Oldest first
       .limit(limit)
     
-    // If no calls with analysis_tier, get any calls with contract address
-    if (!error && (!calls || calls.length === 0)) {
-      const result = await supabase
-        .from('crypto_calls')
-        .select('krom_id, ticker, buy_timestamp, raw_data, analysis_tier, analysis_score')
-        .is('x_analyzed_at', null)
-        .not('raw_data->token->ca', 'is', null)
-        .order('buy_timestamp', { ascending: true })  // Oldest first
-        .limit(limit)
-      
-      calls = result.data
-      error = result.error
+    // Only filter out previously X-analyzed if not including analyzed
+    if (!includeAnalyzed) {
+      query = query.is('x_analyzed_at', null)
     }
+    
+    const { data: calls, error } = await query
 
     if (error) {
       console.error('Database query error:', error)
@@ -50,7 +41,9 @@ export async function GET(request: NextRequest) {
       buy_timestamp: call.buy_timestamp,
       contract: call.raw_data?.token?.ca,
       analysis_score: call.analysis_score || call.raw_data?.analysis_score,
-      analysis_tier: call.analysis_tier
+      analysis_tier: call.analysis_tier,
+      x_analysis_tier: call.x_analysis_tier,
+      x_analyzed_at: call.x_analyzed_at
     }))
 
     return NextResponse.json({

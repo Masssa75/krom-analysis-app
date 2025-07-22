@@ -205,7 +205,8 @@ export default function HomePage() {
       
       if (!targetCallId) {
         setXStatus('Finding call to analyze...')
-        const response = await fetch('/api/unanalyzed-x?limit=1')
+        // Include previously analyzed calls to allow re-analysis
+        const response = await fetch('/api/unanalyzed-x?limit=1&includeAnalyzed=true')
         const data = await response.json()
         
         if (!data.success || data.results.length === 0) {
@@ -437,6 +438,9 @@ export default function HomePage() {
               />
               <p className="text-xs text-muted-foreground mt-1">
                 Analyzes 1 token at a time (10-15 tweets per token)
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Analyzes oldest calls first • Re-analyzes previously checked calls
               </p>
             </div>
             
