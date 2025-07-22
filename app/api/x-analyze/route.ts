@@ -161,7 +161,7 @@ export async function POST(request: NextRequest) {
       const score = scoreMatch ? parseInt(scoreMatch[1]) : 1
 
       // Extract structured data from response
-      const lines = analysisText.split('\n').filter(line => line.trim())
+      const lines = analysisText.split('\n').filter((line: string) => line.trim())
       const positiveSignals: string[] = []
       const redFlags: string[] = []
       let assessment = ''
