@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { X, ExternalLink, Copy, Clock, Cpu, Hash, MessageSquare, Save } from 'lucide-react'
+import { X, ExternalLink, Copy, Clock, Cpu, Hash, MessageSquare, Save, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { TokenTypeBadge } from '@/components/token-type-badge'
@@ -19,6 +19,7 @@ export function AnalysisDetailPanel({ call, isOpen, mode, onClose, onCommentSave
   const [originalComment, setOriginalComment] = useState('')
   const [savingComment, setSavingComment] = useState(false)
   const [commentUpdatedAt, setCommentUpdatedAt] = useState<string | null>(null)
+  const [currentTweetIndex, setCurrentTweetIndex] = useState(0)
 
   useEffect(() => {
     if (isOpen && call) {
@@ -27,12 +28,13 @@ export function AnalysisDetailPanel({ call, isOpen, mode, onClose, onCommentSave
     }
   }, [isOpen, call])
   
-  // Reset comment when panel closes
+  // Reset comment and tweet index when panel closes
   useEffect(() => {
     if (!isOpen) {
       setComment('')
       setOriginalComment('')
       setCommentUpdatedAt(null)
+      setCurrentTweetIndex(0)
     }
   }, [isOpen])
 
@@ -176,6 +178,59 @@ export function AnalysisDetailPanel({ call, isOpen, mode, onClose, onCommentSave
 
           {/* Content */}
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
+            {/* Call Message or Tweet Display */}
+            {mode === 'call' ? (
+              <div>
+                <h3 className="text-lg font-semibold mb-3">Call Message</h3>
+                <div className="bg-muted/50 rounded-lg p-4">
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                    {call.call_message || 'No message available'}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    From: {call.group_name}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              call.x_raw_tweets && call.x_raw_tweets.length > 0 && (
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-lg font-semibold">
+                      Tweets ({currentTweetIndex + 1} of {call.x_raw_tweets.length})
+                    </h3>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setCurrentTweetIndex(Math.max(0, currentTweetIndex - 1))}
+                        disabled={currentTweetIndex === 0}
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setCurrentTweetIndex(Math.min(call.x_raw_tweets.length - 1, currentTweetIndex + 1))}
+                        disabled={currentTweetIndex === call.x_raw_tweets.length - 1}
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="bg-muted/50 rounded-lg p-4">
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                      {call.x_raw_tweets[currentTweetIndex]?.text || 'No tweet text available'}
+                    </p>
+                    {call.x_raw_tweets[currentTweetIndex]?.username && (
+                      <p className="text-xs text-muted-foreground mt-2">
+                        @{call.x_raw_tweets[currentTweetIndex].username}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )
+            )}
+
             {/* Analysis Section */}
             <div>
               <h3 className="text-lg font-semibold mb-3">
@@ -196,14 +251,6 @@ export function AnalysisDetailPanel({ call, isOpen, mode, onClose, onCommentSave
                             <div className="text-xs text-muted-foreground">Tweets Analyzed</div>
                           </div>
                         </div>
-                        {call.x_best_tweet && (
-                          <div className="mb-3">
-                            <h4 className="text-sm font-semibold mb-1">Most Relevant Tweet:</h4>
-                            <div className="bg-background/50 rounded p-3 text-sm italic">
-                              "{call.x_best_tweet}"
-                            </div>
-                          </div>
-                        )}
                         <p className="text-sm leading-relaxed">
                           {call.x_analysis_reasoning || 'No detailed X analysis available.'}
                         </p>

@@ -61,6 +61,9 @@ export async function GET(request: NextRequest) {
       analysis_batch_timestamp: call.analysis_batch_timestamp,
       analysis_prompt_used: call.analysis_prompt_used,
       analysis_duration_ms: call.analysis_duration_ms,
+      // Call message
+      call_message: call.raw_data?.text || 'No message available',
+      group_name: call.raw_data?.groupName || call.raw_data?.group?.name || 'Unknown',
       // X analysis fields
       x_score: call.x_analysis_score,
       x_tier: call.x_analysis_tier,
@@ -71,6 +74,7 @@ export async function GET(request: NextRequest) {
       x_best_tweet: call.x_best_tweet,
       x_analyzed_at: call.x_reanalyzed_at || call.x_analyzed_at,
       x_tweet_count: call.x_raw_tweets ? call.x_raw_tweets.length : 0,
+      x_raw_tweets: call.x_raw_tweets || [],
       // Comment indicator
       has_comment: call.user_comment ? true : false
     })) || [];
