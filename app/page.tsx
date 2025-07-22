@@ -26,7 +26,7 @@ export default function HomePage() {
   const [isPanelOpen, setIsPanelOpen] = useState(false)
   
   // X Analysis states
-  const [xCount, setXCount] = useState('1')
+  const [xCount, setXCount] = useState('5')
   const [xModel, setXModel] = useState('claude-3-haiku-20240307')
   const [isXAnalyzing, setIsXAnalyzing] = useState(false)
   const [xProgress, setXProgress] = useState(0)
@@ -192,53 +192,43 @@ export default function HomePage() {
     )
   }
   
-  const startXAnalysis = async (callId?: string) => {
+  const startXAnalysis = async () => {
     setIsXAnalyzing(true)
     setXError('')
     setXResults(null)
     setXProgress(0)
-    setXStatus('Fetching X data...')
+    setXStatus('Starting batch X analysis...')
     
     try {
-      // If no specific callId, get the oldest unanalyzed call with X
-      let targetCallId = callId
-      
-      if (!targetCallId) {
-        setXStatus('Finding call to analyze...')
-        // Include previously analyzed calls to allow re-analysis
-        const response = await fetch('/api/unanalyzed-x?limit=1&includeAnalyzed=true')
-        const data = await response.json()
-        
-        if (!data.success || data.results.length === 0) {
-          throw new Error('No calls available for X analysis')
-        }
-        
-        targetCallId = data.results[0].krom_id
-        setXAnalyzingCall(data.results[0])
-      }
-      
-      setXProgress(25)
-      setXStatus('Analyzing X/Twitter data...')
-      
-      const response = await fetch('/api/x-analyze', {
+      const response = await fetch('/api/x-batch', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          callId: targetCallId
+          limit: parseInt(xCount),
+          model: xModel
         })
       })
       
       const result = await response.json()
       
-      if (!response.ok || !result.success) {
-        throw new Error(result.error || 'X analysis failed')
+      if (!response.ok) {
+        throw new Error(result.error || 'X batch analysis failed')
       }
       
+      if (result.analyzed === 0) {
+        throw new Error('No calls found that need X analysis')
+      }
+      
+      // Update progress during analysis
+      setXProgress(50)
+      setXStatus(`Analyzed ${result.analyzed} calls with existing tweets`)
+      
+      // Show results
       setXProgress(100)
-      setXStatus('X analysis complete!')
-      setXResults(result.data)
+      setXStatus('X batch analysis complete!')
+      setXResults(result)
       
       // Refresh analyzed calls
       fetchAnalyzedCalls()
@@ -426,21 +416,21 @@ export default function HomePage() {
         <CardContent className="space-y-6">
           <div className="space-y-4">
             <div>
-              <Label htmlFor="x-count">Number of calls to analyze</Label>
+              <Label htmlFor="x-count">Number of calls to analyze (from oldest)</Label>
               <Input
                 id="x-count"
                 type="number"
                 value={xCount}
                 onChange={(e) => setXCount(e.target.value)}
                 min="1"
-                max="10"
+                max="100"
                 disabled={isXAnalyzing}
               />
               <p className="text-xs text-muted-foreground mt-1">
-                Analyzes 1 token at a time (10-15 tweets per token)
+                Batch analyzes using existing stored tweets (no new fetching)
               </p>
               <p className="text-xs text-muted-foreground">
-                Analyzes oldest calls first • Re-analyzes previously checked calls
+                Starts from oldest calls • Scores 1-10 based on tweet quality
               </p>
             </div>
             
@@ -491,75 +481,65 @@ export default function HomePage() {
           {xResults && (
             <Card>
               <CardHeader>
-                <CardTitle>X Analysis Results</CardTitle>
+                <CardTitle>X Batch Analysis Results</CardTitle>
                 <CardDescription>
-                  {xResults.ticker} • {xResults.tweets_found} tweets analyzed
+                  Analyzed {xResults.analyzed} calls • Model: {xResults.model_used}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                {/* Score Display */}
-                <div className="text-center p-4 bg-muted rounded-lg">
-                  <div className="text-3xl font-bold">{xResults.score}/10</div>
-                  <div className="flex items-center justify-center gap-2 mt-2">
-                    <span className={`inline-block px-3 py-1 rounded text-sm font-semibold ${getTierClass(xResults.tier)}`}>
-                      {xResults.tier}
-                    </span>
+              <CardContent>
+                {xResults.results && xResults.results.length > 0 && (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left py-2 px-2">Token</th>
+                          <th className="text-left py-2 px-2">Score</th>
+                          <th className="text-left py-2 px-2">Tier</th>
+                          <th className="text-left py-2 px-2">Legitimacy</th>
+                          <th className="text-left py-2 px-2">Tweets</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {xResults.results.map((result: any) => {
+                          const tier = result.tier
+                          return (
+                            <tr key={result.krom_id} className="border-b hover:bg-muted/50">
+                              <td className="py-2 px-2 font-mono text-xs">{result.ticker}</td>
+                              <td className="py-2 px-2 font-semibold text-xs">{result.score}/10</td>
+                              <td className="py-2 px-2">
+                                <span className={`inline-block px-1.5 py-0.5 rounded text-xs font-semibold ${getTierClass(tier)}`}>
+                                  {tier}
+                                </span>
+                              </td>
+                              <td className="py-2 px-2 text-xs">{result.legitimacy_factor}</td>
+                              <td className="py-2 px-2 text-xs">{result.tweet_count}</td>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </table>
                   </div>
+                )}
+                
+                {xResults.errors && xResults.errors.length > 0 && (
+                  <div className="mt-4">
+                    <h4 className="text-sm font-semibold text-red-600 mb-2">Errors:</h4>
+                    <ul className="text-xs space-y-1">
+                      {xResults.errors.map((error: any, i: number) => (
+                        <li key={i}>{error.ticker}: {error.error}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                
+                <div className="mt-4 text-xs text-muted-foreground">
+                  Batch ID: {xResults.batch_id}<br/>
+                  Duration: {xResults.total_duration_ms}ms
                 </div>
                 
-                {/* Contract Address */}
-                {xResults.contract_address && (
-                  <div className="flex items-center gap-2 p-2 bg-muted/50 rounded">
-                    <span className="text-xs text-muted-foreground">Contract:</span>
-                    <span className="font-mono text-xs flex-1 truncate">{xResults.contract_address}</span>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="h-6 w-6 p-0"
-                      onClick={() => copyToClipboard(xResults.contract_address)}
-                    >
-                      <Copy className="h-3 w-3" />
-                    </Button>
-                  </div>
-                )}
-                
-                {/* Positive Signals */}
-                {xResults.positive_signals?.length > 0 && (
-                  <div>
-                    <h4 className="font-semibold text-sm mb-2">Positive Signals</h4>
-                    <ul className="space-y-1">
-                      {xResults.positive_signals.map((signal: string, i: number) => (
-                        <li key={i} className="text-sm text-green-600 dark:text-green-400">• {signal}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                
-                {/* Red Flags */}
-                {xResults.red_flags?.length > 0 && xResults.red_flags[0] !== 'None identified' && (
-                  <div>
-                    <h4 className="font-semibold text-sm mb-2">Red Flags</h4>
-                    <ul className="space-y-1">
-                      {xResults.red_flags.map((flag: string, i: number) => (
-                        <li key={i} className="text-sm text-red-600 dark:text-red-400">• {flag}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                
-                {/* Assessment */}
-                {xResults.assessment && (
-                  <div className="p-3 bg-muted/50 rounded">
-                    <p className="text-sm italic">{xResults.assessment}</p>
-                  </div>
-                )}
-                
                 <div className="flex gap-4 mt-4">
-                  <Button onClick={() => startXAnalysis()} variant="outline" className="flex-1">
-                    Analyze Next
-                  </Button>
                   <Button onClick={resetXAnalysis} variant="outline" className="flex-1">
-                    Clear
+                    New Analysis
                   </Button>
                 </div>
               </CardContent>
