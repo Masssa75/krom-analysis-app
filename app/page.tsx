@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Progress } from '@/components/ui/progress'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Download, Copy, ExternalLink, ChevronRight, MessageSquare, RefreshCw } from 'lucide-react'
+import { Download, Copy, ExternalLink, ChevronRight, MessageSquare, RefreshCw, Search, ChevronLeft } from 'lucide-react'
 import { AnalysisDetailPanel } from '@/components/analysis-detail-panel'
 import { TokenTypeBadge } from '@/components/token-type-badge'
 import { getCombinedTokenType } from '@/lib/token-utils'
@@ -41,16 +41,33 @@ export default function HomePage() {
   // Reanalysis states
   const [reanalyzingCalls, setReanalyzingCalls] = useState<Set<string>>(new Set())
   const [reanalyzingXCalls, setReanalyzingXCalls] = useState<Set<string>>(new Set())
+  
+  // Pagination and search states
+  const [currentPage, setCurrentPage] = useState(1)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [isSearching, setIsSearching] = useState(false)
+  const itemsPerPage = 20
 
-  // Fetch analyzed calls on mount
+  // Fetch analyzed calls on mount and when page/search changes
   useEffect(() => {
     fetchAnalyzedCalls()
-  }, [])
+  }, [currentPage, searchQuery])
 
   const fetchAnalyzedCalls = async () => {
     setLoadingAnalyzed(true)
+    setIsSearching(!!searchQuery)
     try {
-      const response = await fetch('/api/analyzed?limit=20')
+      const offset = (currentPage - 1) * itemsPerPage
+      const params = new URLSearchParams({
+        limit: itemsPerPage.toString(),
+        offset: offset.toString()
+      })
+      
+      if (searchQuery) {
+        params.append('search', searchQuery)
+      }
+      
+      const response = await fetch(`/api/analyzed?${params}`)
       const data = await response.json()
       
       if (data.success) {
@@ -61,6 +78,7 @@ export default function HomePage() {
       console.error('Failed to fetch analyzed calls:', err)
     } finally {
       setLoadingAnalyzed(false)
+      setIsSearching(false)
     }
   }
 
@@ -255,6 +273,20 @@ export default function HomePage() {
     setXError('')
     setXAnalyzingCall(null)
   }
+  
+  // Handle search with debouncing
+  const [searchInput, setSearchInput] = useState('')
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchQuery(searchInput)
+      setCurrentPage(1) // Reset to first page on new search
+    }, 300) // 300ms debounce
+    
+    return () => clearTimeout(timer)
+  }, [searchInput])
+  
+  // Calculate total pages
+  const totalPages = Math.ceil(analyzedCount / itemsPerPage)
   
   const reanalyzeCall = async (call: any) => {
     setReanalyzingCalls(prev => new Set(prev).add(call.krom_id))
@@ -645,10 +677,28 @@ export default function HomePage() {
       {analyzedCalls.length > 0 && (
         <Card className="mt-8">
           <CardHeader>
-            <CardTitle>Previously Analyzed Calls</CardTitle>
-            <CardDescription>
-              {analyzedCount} total calls analyzed • Showing most recent {analyzedCalls.length}
-            </CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Previously Analyzed Calls</CardTitle>
+                <CardDescription>
+                  {searchQuery ? (
+                    <>Found {analyzedCount} results for "{searchQuery}"</>
+                  ) : (
+                    <>{analyzedCount} total calls analyzed • Page {currentPage} of {totalPages}</>
+                  )}
+                </CardDescription>
+              </div>
+              <div className="relative w-64">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                <Input
+                  type="text"
+                  placeholder="Search by token name..."
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             {loadingAnalyzed ? (
@@ -796,6 +846,60 @@ export default function HomePage() {
                     })}
                   </tbody>
                 </table>
+              </div>
+            )}
+            
+            {/* Pagination Controls */}
+            {!searchQuery && totalPages > 1 && (
+              <div className="flex items-center justify-between mt-4 pt-4 border-t">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
+                >
+                  <ChevronLeft className="h-4 w-4 mr-1" />
+                  Previous
+                </Button>
+                
+                <div className="flex items-center gap-2">
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNum
+                    if (totalPages <= 5) {
+                      pageNum = i + 1
+                    } else if (currentPage <= 3) {
+                      pageNum = i + 1
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i
+                    } else {
+                      pageNum = currentPage - 2 + i
+                    }
+                    
+                    if (pageNum < 1 || pageNum > totalPages) return null
+                    
+                    return (
+                      <Button
+                        key={pageNum}
+                        variant={currentPage === pageNum ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setCurrentPage(pageNum)}
+                        className="w-10"
+                      >
+                        {pageNum}
+                      </Button>
+                    )
+                  })}
+                </div>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
               </div>
             )}
           </CardContent>

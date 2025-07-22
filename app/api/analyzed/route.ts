@@ -14,16 +14,25 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Get limit from query params, default to 50
+    // Get params from query
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get('limit') || '50', 10);
     const offset = parseInt(searchParams.get('offset') || '0', 10);
+    const search = searchParams.get('search') || '';
 
-    // Fetch analyzed calls ordered by most recent analysis
-    const { data: calls, error, count } = await supabase
+    // Build query
+    let query = supabase
       .from('crypto_calls')
       .select('*', { count: 'exact' })
-      .not('analysis_score', 'is', null)
+      .not('analysis_score', 'is', null);
+    
+    // Add search filter if provided
+    if (search) {
+      query = query.ilike('ticker', `%${search}%`);
+    }
+    
+    // Add ordering and pagination
+    const { data: calls, error, count } = await query
       .order('buy_timestamp', { ascending: false })
       .range(offset, offset + limit - 1);
 
