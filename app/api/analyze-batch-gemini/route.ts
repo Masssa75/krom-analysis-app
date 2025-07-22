@@ -98,19 +98,7 @@ IMPORTANT: Return ONLY the JSON array, no other text.`;
       generationConfig: {
         temperature: 0.1,
         maxOutputTokens: 4000,
-        responseSchema: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              score: { type: 'number' },
-              token_type: { type: 'string' },
-              legitimacy_factor: { type: 'string' },
-              reasoning: { type: 'string' }
-            },
-            required: ['score', 'token_type', 'legitimacy_factor', 'reasoning']
-          }
-        }
+        responseMimeType: 'application/json'
       }
     });
     
