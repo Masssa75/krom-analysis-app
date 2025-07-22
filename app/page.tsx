@@ -14,7 +14,7 @@ import { TokenTypeBadge } from '@/components/token-type-badge'
 
 export default function HomePage() {
   const [count, setCount] = useState('5')
-  const [model, setModel] = useState('claude-3-haiku-20240307')
+  const [model, setModel] = useState('moonshotai/kimi-k2')
   const [useBatchMode, setUseBatchMode] = useState(true)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [progress, setProgress] = useState(0)
