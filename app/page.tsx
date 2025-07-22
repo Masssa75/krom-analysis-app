@@ -291,7 +291,9 @@ export default function HomePage() {
                                 <span className="font-mono text-sm">{result.token}</span>
                               )}
                               {result.has_comment && (
-                                <MessageSquare className="h-3 w-3 text-muted-foreground" title="Has comment" />
+                                <span title="Has comment">
+                                  <MessageSquare className="h-3 w-3 text-muted-foreground" />
+                                </span>
                               )}
                               {result.contract && (
                                 <Button
@@ -392,7 +394,9 @@ export default function HomePage() {
                                 <span className="font-mono text-sm">{call.token}</span>
                               )}
                               {call.has_comment && (
-                                <MessageSquare className="h-3 w-3 text-muted-foreground" title="Has comment" />
+                                <span title="Has comment">
+                                  <MessageSquare className="h-3 w-3 text-muted-foreground" />
+                                </span>
                               )}
                               {call.contract && (
                                 <Button
