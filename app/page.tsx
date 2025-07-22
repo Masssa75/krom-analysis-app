@@ -24,6 +24,16 @@ export default function HomePage() {
   const [loadingAnalyzed, setLoadingAnalyzed] = useState(true)
   const [selectedCall, setSelectedCall] = useState<any>(null)
   const [isPanelOpen, setIsPanelOpen] = useState(false)
+  
+  // X Analysis states
+  const [xCount, setXCount] = useState('1')
+  const [xModel, setXModel] = useState('claude-3-haiku-20240307')
+  const [isXAnalyzing, setIsXAnalyzing] = useState(false)
+  const [xProgress, setXProgress] = useState(0)
+  const [xStatus, setXStatus] = useState('')
+  const [xError, setXError] = useState('')
+  const [xResults, setXResults] = useState<any>(null)
+  const [xAnalyzingCall, setXAnalyzingCall] = useState<any>(null)
 
   // Fetch analyzed calls on mount
   useEffect(() => {
@@ -180,6 +190,71 @@ export default function HomePage() {
         call.krom_id === krom_id ? { ...call, has_comment: hasComment } : call
       )
     )
+  }
+  
+  const startXAnalysis = async (callId?: string) => {
+    setIsXAnalyzing(true)
+    setXError('')
+    setXResults(null)
+    setXProgress(0)
+    setXStatus('Fetching X data...')
+    
+    try {
+      // If no specific callId, get the oldest unanalyzed call with X
+      let targetCallId = callId
+      
+      if (!targetCallId) {
+        setXStatus('Finding call to analyze...')
+        const response = await fetch('/api/unanalyzed-x?limit=1')
+        const data = await response.json()
+        
+        if (!data.success || data.results.length === 0) {
+          throw new Error('No calls available for X analysis')
+        }
+        
+        targetCallId = data.results[0].krom_id
+        setXAnalyzingCall(data.results[0])
+      }
+      
+      setXProgress(25)
+      setXStatus('Analyzing X/Twitter data...')
+      
+      const response = await fetch('/api/x-analyze', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          callId: targetCallId
+        })
+      })
+      
+      const result = await response.json()
+      
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'X analysis failed')
+      }
+      
+      setXProgress(100)
+      setXStatus('X analysis complete!')
+      setXResults(result.data)
+      
+      // Refresh analyzed calls
+      fetchAnalyzedCalls()
+      
+    } catch (err: any) {
+      setXError(err.message || 'Failed to analyze X data')
+    } finally {
+      setIsXAnalyzing(false)
+      setXProgress(0)
+      setXStatus('')
+    }
+  }
+  
+  const resetXAnalysis = () => {
+    setXResults(null)
+    setXError('')
+    setXAnalyzingCall(null)
   }
 
   return (
@@ -350,20 +425,28 @@ export default function HomePage() {
         <CardContent className="space-y-6">
           <div className="space-y-4">
             <div>
-              <Label htmlFor="x-count">Number of calls to analyze (from oldest)</Label>
+              <Label htmlFor="x-count">Number of calls to analyze</Label>
               <Input
                 id="x-count"
                 type="number"
-                value="5"
+                value={xCount}
+                onChange={(e) => setXCount(e.target.value)}
                 min="1"
-                max="100"
-                disabled={true}
+                max="10"
+                disabled={isXAnalyzing}
               />
+              <p className="text-xs text-muted-foreground mt-1">
+                Analyzes 1 token at a time (10-15 tweets per token)
+              </p>
             </div>
             
             <div>
               <Label htmlFor="x-model">AI Model</Label>
-              <Select value="claude-3-haiku-20240307" disabled={true}>
+              <Select 
+                value={xModel} 
+                onValueChange={setXModel}
+                disabled={isXAnalyzing}
+              >
                 <SelectTrigger id="x-model">
                   <SelectValue />
                 </SelectTrigger>
@@ -375,33 +458,105 @@ export default function HomePage() {
             
             <div className="pt-4">
               <Button 
-                disabled={true}
+                onClick={() => startXAnalysis()}
+                disabled={isXAnalyzing}
                 className="w-full"
                 size="lg"
               >
-                Start X Analysis
+                {isXAnalyzing ? 'Analyzing...' : 'Start X Analysis'}
               </Button>
             </div>
           </div>
           
-          <div className="text-center text-muted-foreground p-8">
-            <p className="text-sm">X analysis will be available soon</p>
-          </div>
+          {isXAnalyzing && (
+            <div className="space-y-3">
+              <Progress value={xProgress} className="h-2" />
+              <p className="text-sm text-center text-muted-foreground">{xStatus}</p>
+            </div>
+          )}
+          
+          {xError && (
+            <Alert variant="destructive">
+              <AlertDescription>{xError}</AlertDescription>
+            </Alert>
+          )}
             </CardContent>
           </Card>
           
-          {/* X Analysis Results - Placeholder */}
-          {false && (
+          {/* X Analysis Results */}
+          {xResults && (
             <Card>
               <CardHeader>
                 <CardTitle>X Analysis Results</CardTitle>
                 <CardDescription>
-                  Social media sentiment analysis
+                  {xResults.ticker} • {xResults.tweets_found} tweets analyzed
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="text-center text-muted-foreground p-8">
-                  <p className="text-sm">Results will appear here</p>
+              <CardContent className="space-y-4">
+                {/* Score Display */}
+                <div className="text-center p-4 bg-muted rounded-lg">
+                  <div className="text-3xl font-bold">{xResults.score}/10</div>
+                  <div className="flex items-center justify-center gap-2 mt-2">
+                    <span className={`inline-block px-3 py-1 rounded text-sm font-semibold ${getTierClass(xResults.tier)}`}>
+                      {xResults.tier}
+                    </span>
+                  </div>
+                </div>
+                
+                {/* Contract Address */}
+                {xResults.contract_address && (
+                  <div className="flex items-center gap-2 p-2 bg-muted/50 rounded">
+                    <span className="text-xs text-muted-foreground">Contract:</span>
+                    <span className="font-mono text-xs flex-1 truncate">{xResults.contract_address}</span>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-6 w-6 p-0"
+                      onClick={() => copyToClipboard(xResults.contract_address)}
+                    >
+                      <Copy className="h-3 w-3" />
+                    </Button>
+                  </div>
+                )}
+                
+                {/* Positive Signals */}
+                {xResults.positive_signals?.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-sm mb-2">Positive Signals</h4>
+                    <ul className="space-y-1">
+                      {xResults.positive_signals.map((signal: string, i: number) => (
+                        <li key={i} className="text-sm text-green-600 dark:text-green-400">• {signal}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                
+                {/* Red Flags */}
+                {xResults.red_flags?.length > 0 && xResults.red_flags[0] !== 'None identified' && (
+                  <div>
+                    <h4 className="font-semibold text-sm mb-2">Red Flags</h4>
+                    <ul className="space-y-1">
+                      {xResults.red_flags.map((flag: string, i: number) => (
+                        <li key={i} className="text-sm text-red-600 dark:text-red-400">• {flag}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                
+                {/* Assessment */}
+                {xResults.assessment && (
+                  <div className="p-3 bg-muted/50 rounded">
+                    <p className="text-sm italic">{xResults.assessment}</p>
+                  </div>
+                )}
+                
+                <div className="flex gap-4 mt-4">
+                  <Button onClick={() => startXAnalysis()} variant="outline" className="flex-1">
+                    Analyze Next
+                  </Button>
+                  <Button onClick={resetXAnalysis} variant="outline" className="flex-1">
+                    Clear
+                  </Button>
                 </div>
               </CardContent>
             </Card>
