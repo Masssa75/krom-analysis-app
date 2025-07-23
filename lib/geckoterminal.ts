@@ -86,13 +86,19 @@ export class GeckoTerminalAPI {
             // If we have total supply and price, calculate FDV
             if (tokenInfo.total_supply && !tokenInfo.fdv_usd) {
               const supply = parseFloat(tokenInfo.total_supply);
-              tokenInfo.fdv_usd = poolPrice * supply;
+              // Don't calculate FDV if supply seems to include decimals (unrealistically large)
+              if (supply < 1e15) { // Reasonable upper limit for token supply
+                tokenInfo.fdv_usd = poolPrice * supply;
+              }
             }
             
             // If we have circulating supply and price, calculate market cap
             if (tokenInfo.circulating_supply && !tokenInfo.market_cap_usd) {
               const circSupply = parseFloat(tokenInfo.circulating_supply);
-              tokenInfo.market_cap_usd = poolPrice * circSupply;
+              // Don't calculate market cap if supply seems to include decimals
+              if (circSupply < 1e15) {
+                tokenInfo.market_cap_usd = poolPrice * circSupply;
+              }
             }
           }
         }
@@ -426,9 +432,10 @@ export class GeckoTerminalAPI {
       // If no FDV from API but we have total supply, calculate it
       if (!currentFDV && tokenInfo.total_supply && currentPrice) {
         const supply = parseFloat(tokenInfo.total_supply);
-        // Most tokens have 18 decimals, but some have different amounts
-        // GeckoTerminal's total_supply should already be adjusted for decimals
-        currentFDV = currentPrice * supply;
+        // Don't calculate FDV if supply seems to include decimals (unrealistically large)
+        if (supply < 1e15) { // Reasonable upper limit for token supply
+          currentFDV = currentPrice * supply;
+        }
       }
       
       // Calculate historical FDVs based on price ratios
