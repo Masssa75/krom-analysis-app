@@ -354,17 +354,35 @@ export class GeckoTerminalAPI {
       
       const currentPrice = tokenInfo.price_usd;
       
-      // Calculate market caps using circulating supply if available
-      const supply = tokenInfo.circulating_supply || tokenInfo.total_supply || null;
-      const marketCapAtCall = this.calculateMarketCap(priceAtCall, supply);
-      const currentMarketCap = tokenInfo.market_cap_usd || this.calculateMarketCap(currentPrice, supply);
-      const athMarketCap = this.calculateMarketCap(athData?.price || null, supply);
+      // Use market cap from API if available, otherwise calculate proportionally
+      const currentMarketCap = tokenInfo.market_cap_usd;
+      const currentFDV = tokenInfo.fdv_usd;
       
-      // Calculate FDVs using total supply
-      const totalSupply = tokenInfo.total_supply || null;
-      const fdvAtCall = this.calculateMarketCap(priceAtCall, totalSupply);
-      const currentFDV = tokenInfo.fdv_usd || this.calculateMarketCap(currentPrice, totalSupply);
-      const athFDV = this.calculateMarketCap(athData?.price || null, totalSupply);
+      // Calculate historical market caps proportionally based on price ratios
+      let marketCapAtCall = null;
+      let athMarketCap = null;
+      let fdvAtCall = null;
+      let athFDV = null;
+      
+      if (currentMarketCap && currentPrice) {
+        // Calculate market caps based on price ratios
+        if (priceAtCall) {
+          marketCapAtCall = (priceAtCall / currentPrice) * currentMarketCap;
+        }
+        if (athData?.price) {
+          athMarketCap = (athData.price / currentPrice) * currentMarketCap;
+        }
+      }
+      
+      if (currentFDV && currentPrice) {
+        // Calculate FDVs based on price ratios
+        if (priceAtCall) {
+          fdvAtCall = (priceAtCall / currentPrice) * currentFDV;
+        }
+        if (athData?.price) {
+          athFDV = (athData.price / currentPrice) * currentFDV;
+        }
+      }
       
       return {
         tokenInfo,
