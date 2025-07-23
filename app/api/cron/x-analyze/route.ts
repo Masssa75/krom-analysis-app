@@ -44,28 +44,26 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Process each call
+    // Process each call with real AI
     let processed = 0;
-    for (const call of calls) {
-      try {
-        // For now, just give a simple score based on tweet count
-        const tweetCount = call.x_raw_tweets?.length || 0;
-        const score = Math.min(Math.max(Math.floor(tweetCount / 2), 1), 10);
-        
-        await supabase
-          .from('crypto_calls')
-          .update({
-            x_analysis_score: score,
-            x_analysis_token_type: 'meme',
-            x_analysis_reasoning: `Analyzed ${tweetCount} tweets via cron`,
-            x_analysis_model: 'moonshotai/kimi-k2:free'
-          })
-          .eq('krom_id', call.krom_id);
+    const batchId = crypto.randomUUID();
+    
+    // Call the x-batch endpoint with our calls
+    const baseUrl = request.nextUrl.origin;
+    const response = await fetch(`${baseUrl}/api/x-batch`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        limit: limit,
+        model: 'moonshotai/kimi-k2:free'
+      })
+    });
 
-        processed++;
-      } catch (err) {
-        console.error(`Error processing ${call.krom_id}:`, err);
-      }
+    if (response.ok) {
+      const result = await response.json();
+      processed = result.analyzed || 0;
     }
 
     const duration = ((Date.now() - startTime) / 1000).toFixed(1);
