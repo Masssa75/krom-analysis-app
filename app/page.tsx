@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Progress } from '@/components/ui/progress'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Download, Copy, ExternalLink, ChevronRight, MessageSquare, RefreshCw, Search, ChevronLeft, Trash2, Star } from 'lucide-react'
+import { Download, Copy, ExternalLink, ChevronRight, MessageSquare, RefreshCw, Search, ChevronLeft, Trash2, Star, DollarSign } from 'lucide-react'
 import { AnalysisDetailPanel } from '@/components/analysis-detail-panel'
 import { TokenTypeBadge } from '@/components/token-type-badge'
 import { PriceDisplay } from '@/components/price-display'
@@ -48,6 +48,10 @@ export default function HomePage() {
   const [isSearching, setIsSearching] = useState(false)
   const [showOnlyCoinsOfInterest, setShowOnlyCoinsOfInterest] = useState(false)
   const itemsPerPage = 20
+  
+  // Batch price fetching state
+  const [isFetchingPrices, setIsFetchingPrices] = useState(false)
+  const [priceFetchProgress, setPriceFetchProgress] = useState(0)
 
   // Fetch analyzed calls on mount and when page/search/filter changes
   useEffect(() => {
@@ -343,6 +347,52 @@ export default function HomePage() {
     setXResults(null)
     setXError('')
     setXAnalyzingCall(null)
+  }
+  
+  const fetchAllPrices = async () => {
+    // Get all calls on current page that don't have price data
+    const callsNeedingPrices = analyzedCalls.filter(call => 
+      call.contract && !call.price_at_call
+    )
+    
+    if (callsNeedingPrices.length === 0) {
+      alert('All items on this page already have price data!')
+      return
+    }
+    
+    setIsFetchingPrices(true)
+    setPriceFetchProgress(0)
+    
+    try {
+      const response = await fetch('/api/batch-price-fetch', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          count: callsNeedingPrices.length
+        })
+      })
+      
+      const result = await response.json()
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Price fetch failed')
+      }
+      
+      setPriceFetchProgress(100)
+      
+      // Refresh the page to show new prices
+      await fetchAnalyzedCalls()
+      
+      alert(`Successfully fetched prices for ${result.success} out of ${result.processed} items!`)
+      
+    } catch (err: any) {
+      alert(`Error fetching prices: ${err.message}`)
+    } finally {
+      setIsFetchingPrices(false)
+      setPriceFetchProgress(0)
+    }
   }
   
   // Handle search with debouncing
@@ -817,17 +867,36 @@ export default function HomePage() {
                   )}
                 </CardDescription>
               </div>
-              <div className="space-y-2">
-                <div className="relative w-64">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                  <Input
-                    type="text"
-                    placeholder="Search by token name..."
-                    value={searchInput}
-                    onChange={(e) => setSearchInput(e.target.value)}
-                    className="pl-10"
-                  />
+              <div className="flex items-start gap-2">
+                <div className="space-y-2">
+                  <div className="relative w-64">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                    <Input
+                      type="text"
+                      placeholder="Search by token name..."
+                      value={searchInput}
+                      onChange={(e) => setSearchInput(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
                 </div>
+                <Button
+                  onClick={fetchAllPrices}
+                  disabled={isFetchingPrices}
+                  variant="outline"
+                >
+                  {isFetchingPrices ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                      Fetching Prices...
+                    </>
+                  ) : (
+                    <>
+                      <DollarSign className="w-4 h-4 mr-2" />
+                      Fetch All Prices
+                    </>
+                  )}
+                </Button>
                 <div className="flex items-center space-x-2">
                   <input
                     type="checkbox"
