@@ -181,8 +181,10 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, existingP
     return 'text-red-600 font-semibold'
   }
   
-  // Check if all price data is N/A
-  const hasNoData = priceData.priceAtCall === null && priceData.currentPrice === null && priceData.ath === null
+  // Check if all price data is N/A or if we're missing market cap data
+  const hasNoData = (priceData.priceAtCall === null && priceData.currentPrice === null && priceData.ath === null) ||
+    (priceData.marketCapAtCall === null && priceData.currentMarketCap === null && priceData.athMarketCap === null &&
+     priceData.fdvAtCall === null && priceData.currentFDV === null && priceData.athFDV === null)
   
   if (hasNoData) {
     return (
