@@ -355,13 +355,13 @@ export class GeckoTerminalAPI {
       const currentPrice = tokenInfo.price_usd;
       
       // Calculate market caps using circulating supply if available
-      const supply = tokenInfo.circulating_supply || tokenInfo.total_supply;
+      const supply = tokenInfo.circulating_supply || tokenInfo.total_supply || null;
       const marketCapAtCall = this.calculateMarketCap(priceAtCall, supply);
       const currentMarketCap = tokenInfo.market_cap_usd || this.calculateMarketCap(currentPrice, supply);
       const athMarketCap = this.calculateMarketCap(athData?.price || null, supply);
       
       // Calculate FDVs using total supply
-      const totalSupply = tokenInfo.total_supply;
+      const totalSupply = tokenInfo.total_supply || null;
       const fdvAtCall = this.calculateMarketCap(priceAtCall, totalSupply);
       const currentFDV = tokenInfo.fdv_usd || this.calculateMarketCap(currentPrice, totalSupply);
       const athFDV = this.calculateMarketCap(athData?.price || null, totalSupply);
