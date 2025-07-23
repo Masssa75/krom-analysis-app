@@ -41,7 +41,8 @@ export async function GET(request: NextRequest) {
     let query = supabase
       .from('crypto_calls')
       .select('*', { count: 'exact' })
-      .not('analysis_score', 'is', null);
+      .not('analysis_score', 'is', null)
+      .or('is_invalidated.is.null,is_invalidated.eq.false'); // Exclude invalidated tokens
     
     // Add search filter if provided
     if (search) {
@@ -166,15 +167,26 @@ export async function GET(request: NextRequest) {
       fdv_at_call: call.fdv_at_call,
       current_fdv: call.current_fdv,
       ath_fdv: call.ath_fdv,
-      token_supply: call.token_supply
+      token_supply: call.token_supply,
+      is_invalidated: call.is_invalidated || false
     })) || [];
+
+    // Calculate ATH ROI average
+    const validAthRois = results
+      .filter(r => r.ath_roi_percent !== null && r.ath_roi_percent !== undefined)
+      .map(r => r.ath_roi_percent);
+    
+    const athRoiAverage = validAthRois.length > 0 
+      ? validAthRois.reduce((sum, roi) => sum + roi, 0) / validAthRois.length
+      : null;
 
     return NextResponse.json({
       success: true,
       count: count || 0,
       limit,
       offset,
-      results
+      results,
+      athRoiAverage
     });
 
   } catch (error) {

@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Progress } from '@/components/ui/progress'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Download, Copy, ExternalLink, ChevronRight, MessageSquare, RefreshCw, Search, ChevronLeft, Trash2, Star, DollarSign } from 'lucide-react'
+import { Download, Copy, ExternalLink, ChevronRight, MessageSquare, RefreshCw, Search, ChevronLeft, Trash2, Star, DollarSign, Ban } from 'lucide-react'
 import { AnalysisDetailPanel } from '@/components/analysis-detail-panel'
 import { TokenTypeBadge } from '@/components/token-type-badge'
 import { PriceDisplay } from '@/components/price-display'
@@ -28,6 +28,7 @@ export default function HomePage() {
   const [analyzedCalls, setAnalyzedCalls] = useState<any[]>([])
   const [analyzedCount, setAnalyzedCount] = useState(0)
   const [loadingAnalyzed, setLoadingAnalyzed] = useState(true)
+  const [athRoiAverage, setAthRoiAverage] = useState<number | null>(null)
   const [selectedCall, setSelectedCall] = useState<any>(null)
   const [isPanelOpen, setIsPanelOpen] = useState(false)
   const [detailMode, setDetailMode] = useState<'call' | 'x'>('call')
@@ -142,6 +143,7 @@ export default function HomePage() {
       if (data.success) {
         setAnalyzedCalls(data.results)
         setAnalyzedCount(data.count)
+        setAthRoiAverage(data.athRoiAverage)
       }
     } catch (err) {
       console.error('Failed to fetch analyzed calls:', err)
@@ -578,6 +580,40 @@ export default function HomePage() {
     }
   }
 
+  const toggleInvalidate = async (call: any) => {
+    const isInvalidating = !call.is_invalidated
+    const reason = isInvalidating 
+      ? prompt('Reason for invalidating this token? (optional)', 'Incorrect/unrealistic data')
+      : null
+
+    try {
+      const response = await fetch('/api/invalidate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          krom_id: call.krom_id,
+          is_invalidated: isInvalidating,
+          reason: reason
+        })
+      })
+
+      const data = await response.json()
+      
+      if (!response.ok || data.error) {
+        throw new Error(data.error || 'Failed to update invalidation status')
+      }
+      
+      // Refresh the analyzed calls list
+      await fetchAnalyzedCalls()
+      
+    } catch (err: any) {
+      console.error('Failed to toggle invalidation:', err)
+      alert(`Failed to update: ${err.message}`)
+    }
+  }
+
   return (
     <div className="container max-w-7xl mx-auto py-8">
       <Card className="mb-8">
@@ -919,7 +955,7 @@ export default function HomePage() {
         <Card className="mt-8">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <div>
+              <div className="flex-1">
                 <CardTitle>Previously Analyzed Calls</CardTitle>
                 <CardDescription>
                   {searchQuery ? (
@@ -929,6 +965,14 @@ export default function HomePage() {
                   )}
                 </CardDescription>
               </div>
+              {athRoiAverage !== null && (
+                <div className="text-right mr-4">
+                  <div className="text-sm text-muted-foreground">Avg ATH ROI</div>
+                  <div className="text-2xl font-bold text-green-600">
+                    +{athRoiAverage.toFixed(0)}%
+                  </div>
+                </div>
+              )}
               <div className="flex items-start gap-2">
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
@@ -1018,7 +1062,7 @@ export default function HomePage() {
                       const callTier = getTier(call.score)
                       const xTier = call.x_score ? getTier(call.x_score) : null
                       return (
-                        <tr key={call.krom_id} className="border-b hover:bg-muted/50 transition-colors">
+                        <tr key={call.krom_id} className={`border-b hover:bg-muted/50 transition-colors ${call.is_invalidated ? 'opacity-50' : ''}`}>
                           <td className="py-3 px-2">
                             <div className="flex items-center gap-2">
                               {call.contract ? (
@@ -1179,15 +1223,26 @@ export default function HomePage() {
                             />
                           </td>
                           <td className="py-3 px-2">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => deleteAnalysis(call)}
-                              className="text-xs text-destructive hover:text-destructive/90"
-                              title="Delete new analysis (keeps original tier analysis)"
-                            >
-                              <Trash2 className="h-3 w-3" />
-                            </Button>
+                            <div className="flex gap-1">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => toggleInvalidate(call)}
+                                className={`text-xs ${call.is_invalidated ? 'text-orange-600 hover:text-orange-700' : 'text-gray-600 hover:text-gray-700'}`}
+                                title={call.is_invalidated ? 'Restore token (mark as valid)' : 'Invalidate token (bad data)'}
+                              >
+                                <Ban className="h-3 w-3" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => deleteAnalysis(call)}
+                                className="text-xs text-destructive hover:text-destructive/90"
+                                title="Delete new analysis (keeps original tier analysis)"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
+                            </div>
                           </td>
                         </tr>
                       )
