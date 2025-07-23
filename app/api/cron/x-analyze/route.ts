@@ -123,9 +123,11 @@ export async function GET(request: NextRequest) {
         // Extract tweets text
         const tweetsText = call.x_raw_tweets
           .slice(0, 10)
-          .map((tweet: any, idx: number) => 
-            `Tweet ${idx + 1} (@${tweet.username || 'unknown'}): ${tweet.text || tweet.content || 'No content'}`
-          )
+          .map((tweet: any, idx: number) => {
+            // Handle different tweet formats
+            const text = tweet.text || tweet.content || JSON.stringify(tweet);
+            return `Tweet ${idx + 1}: ${text}`;
+          })
           .join('\n\n');
 
         // Prepare analysis prompt
