@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { TrendingUp, TrendingDown, Loader2, DollarSign, Trophy } from 'lucide-react'
+import { TrendingUp, TrendingDown, Loader2, DollarSign, Trophy, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 interface PriceData {
@@ -173,6 +173,26 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, existingP
     if (roi > 0) return 'text-green-500'
     if (roi > -50) return 'text-red-500'
     return 'text-red-600 font-semibold'
+  }
+  
+  // Check if all price data is N/A
+  const hasNoData = priceData.priceAtCall === null && priceData.currentPrice === null && priceData.ath === null
+  
+  if (hasNoData) {
+    return (
+      <div className="space-y-1.5 text-xs">
+        <div className="text-muted-foreground">N/A</div>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={fetchPriceData}
+          className="h-6 text-xs"
+        >
+          <RefreshCw className="h-3 w-3 mr-1" />
+          Refetch
+        </Button>
+      </div>
+    )
   }
   
   return (
