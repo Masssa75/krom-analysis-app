@@ -349,59 +349,43 @@ export default function HomePage() {
     setXAnalyzingCall(null)
   }
   
-  const fetchAllPrices = async () => {
-    setIsFetchingPrices(true)
-    setPriceFetchProgress(0)
-    
-    // Find all "Get Price" buttons on the page
-    const getPriceButtons = document.querySelectorAll('button')
-    const priceButtons = Array.from(getPriceButtons).filter(btn => 
+  const fetchAllPrices = () => {
+    // Find all "Get Price" buttons
+    const buttons = Array.from(document.querySelectorAll('button')).filter(btn => 
       btn.textContent?.includes('Get Price')
     )
     
-    if (priceButtons.length === 0) {
+    if (buttons.length === 0) {
       alert('All items on this page already have price data!')
-      setIsFetchingPrices(false)
       return
     }
     
-    console.log(`Found ${priceButtons.length} items without prices`)
+    setIsFetchingPrices(true)
+    setPriceFetchProgress(0)
     
-    // Click each button with a delay
-    let successCount = 0
-    const totalButtons = priceButtons.length
+    console.log(`Found ${buttons.length} items without prices`)
     
-    for (let i = 0; i < priceButtons.length; i++) {
-      try {
-        const button = priceButtons[i]
+    // Click each button with a delay using the simple approach that works
+    buttons.forEach((button, index) => {
+      setTimeout(() => {
+        button.click()
         
-        // Check if button is still visible and enabled
-        if (button && !button.disabled && button.offsetParent !== null) {
-          console.log(`Fetching price ${i + 1} of ${totalButtons}...`)
-          
-          // Update progress
-          setPriceFetchProgress(Math.round((i + 1) / totalButtons * 100))
-          
-          // Click the button
-          button.click()
-          successCount++
-          
-          // Wait 2.5 seconds between requests to respect rate limits
-          await new Promise(resolve => setTimeout(resolve, 2500))
+        // Update progress
+        const progress = Math.round((index + 1) / buttons.length * 100)
+        setPriceFetchProgress(progress)
+        
+        console.log(`Fetching price ${index + 1} of ${buttons.length}...`)
+        
+        // If this is the last button, clean up
+        if (index === buttons.length - 1) {
+          setTimeout(() => {
+            alert(`Successfully fetched prices for ${buttons.length} items!`)
+            setIsFetchingPrices(false)
+            setPriceFetchProgress(0)
+          }, 2500)
         }
-      } catch (error) {
-        console.error(`Error clicking button ${i + 1}:`, error)
-      }
-    }
-    
-    setPriceFetchProgress(100)
-    
-    // Show completion message
-    setTimeout(() => {
-      alert(`Successfully triggered ${successCount} price fetches!`)
-      setIsFetchingPrices(false)
-      setPriceFetchProgress(0)
-    }, 1000)
+      }, index * 2500)
+    })
   }
   
   // Handle search with debouncing
