@@ -20,6 +20,8 @@ interface TokenInfo {
   fdv_usd?: number;
   market_cap_usd?: number;
   pool_address?: string;
+  total_supply?: string;
+  circulating_supply?: string;
 }
 
 const GECKOTERMINAL_BASE_URL = 'https://api.geckoterminal.com/api/v2';
@@ -59,6 +61,8 @@ export class GeckoTerminalAPI {
         price_usd: parseFloat(token.price_usd || '0'),
         fdv_usd: parseFloat(token.fdv_usd || '0'),
         market_cap_usd: parseFloat(token.market_cap_usd || '0'),
+        total_supply: token.total_supply,
+        circulating_supply: token.circulating_supply,
       };
     } catch (error) {
       console.error('Error fetching token info:', error);
@@ -288,6 +292,106 @@ export class GeckoTerminalAPI {
     } catch (error) {
       console.error('Error getting current price:', error);
       return null;
+    }
+  }
+
+  // Calculate market cap from price and supply
+  calculateMarketCap(price: number | null, supply: string | null): number | null {
+    if (!price || !supply) return null;
+    
+    try {
+      const supplyNum = parseFloat(supply);
+      if (isNaN(supplyNum) || supplyNum <= 0) return null;
+      
+      return price * supplyNum;
+    } catch (error) {
+      console.error('Error calculating market cap:', error);
+      return null;
+    }
+  }
+
+  // Get comprehensive token data with market caps at different price points
+  async getTokenDataWithMarketCaps(
+    network: string,
+    tokenAddress: string,
+    callTimestamp: number
+  ): Promise<{
+    tokenInfo: TokenInfo | null;
+    priceAtCall: number | null;
+    currentPrice: number | null;
+    ath: { price: number; timestamp: number } | null;
+    marketCapAtCall: number | null;
+    currentMarketCap: number | null;
+    athMarketCap: number | null;
+    fdvAtCall: number | null;
+    currentFDV: number | null;
+    athFDV: number | null;
+  }> {
+    try {
+      // Get current token info (includes current price and FDV)
+      const tokenInfo = await this.getTokenInfo(network, tokenAddress);
+      
+      if (!tokenInfo) {
+        return {
+          tokenInfo: null,
+          priceAtCall: null,
+          currentPrice: null,
+          ath: null,
+          marketCapAtCall: null,
+          currentMarketCap: null,
+          athMarketCap: null,
+          fdvAtCall: null,
+          currentFDV: null,
+          athFDV: null
+        };
+      }
+      
+      // Get historical prices
+      const [priceAtCall, athData] = await Promise.all([
+        this.getTokenPriceAtTimestamp(network, tokenAddress, callTimestamp),
+        this.getATHSinceTimestamp(network, tokenAddress, callTimestamp)
+      ]);
+      
+      const currentPrice = tokenInfo.price_usd;
+      
+      // Calculate market caps using circulating supply if available
+      const supply = tokenInfo.circulating_supply || tokenInfo.total_supply;
+      const marketCapAtCall = this.calculateMarketCap(priceAtCall, supply);
+      const currentMarketCap = tokenInfo.market_cap_usd || this.calculateMarketCap(currentPrice, supply);
+      const athMarketCap = this.calculateMarketCap(athData?.price || null, supply);
+      
+      // Calculate FDVs using total supply
+      const totalSupply = tokenInfo.total_supply;
+      const fdvAtCall = this.calculateMarketCap(priceAtCall, totalSupply);
+      const currentFDV = tokenInfo.fdv_usd || this.calculateMarketCap(currentPrice, totalSupply);
+      const athFDV = this.calculateMarketCap(athData?.price || null, totalSupply);
+      
+      return {
+        tokenInfo,
+        priceAtCall,
+        currentPrice,
+        ath: athData,
+        marketCapAtCall,
+        currentMarketCap,
+        athMarketCap,
+        fdvAtCall,
+        currentFDV,
+        athFDV
+      };
+    } catch (error) {
+      console.error('Error getting token data with market caps:', error);
+      return {
+        tokenInfo: null,
+        priceAtCall: null,
+        currentPrice: null,
+        ath: null,
+        marketCapAtCall: null,
+        currentMarketCap: null,
+        athMarketCap: null,
+        fdvAtCall: null,
+        currentFDV: null,
+        athFDV: null
+      };
     }
   }
 

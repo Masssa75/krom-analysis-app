@@ -11,6 +11,12 @@ interface PriceData {
   roi: number | null
   athROI: number | null
   drawdownFromATH: number | null
+  marketCapAtCall: number | null
+  currentMarketCap: number | null
+  athMarketCap: number | null
+  fdvAtCall: number | null
+  currentFDV: number | null
+  athFDV: number | null
 }
 
 interface PriceDisplayProps {
@@ -68,7 +74,14 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, existingP
           athTimestamp: data.athDate,
           roi: data.roi,
           athROI: data.athROI,
-          network: data.network
+          network: data.network,
+          marketCapAtCall: data.marketCapAtCall,
+          currentMarketCap: data.currentMarketCap,
+          athMarketCap: data.athMarketCap,
+          fdvAtCall: data.fdvAtCall,
+          currentFDV: data.currentFDV,
+          athFDV: data.athFDV,
+          tokenSupply: data.tokenSupply
         })
       })
     } catch (err: any) {
@@ -147,6 +160,14 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, existingP
     return `${sign}${percent.toFixed(0)}%`
   }
   
+  const formatMarketCap = (mc: number | null) => {
+    if (mc === null) return 'N/A'
+    if (mc >= 1000000000) return `$${(mc / 1000000000).toFixed(2)}B`
+    if (mc >= 1000000) return `$${(mc / 1000000).toFixed(2)}M`
+    if (mc >= 1000) return `$${(mc / 1000).toFixed(2)}K`
+    return `$${mc.toFixed(0)}`
+  }
+  
   const roiColor = (roi: number | null) => {
     if (roi === null) return ''
     if (roi > 100) return 'text-green-600 font-semibold'
@@ -209,6 +230,34 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, existingP
               )}
             </TooltipContent>
           </Tooltip>
+        </div>
+        
+        <div className="border-t pt-1 mt-2">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+            <Tooltip>
+              <TooltipTrigger className="flex items-center gap-1">
+                <span className="text-muted-foreground">MC:</span>
+                <span className="font-mono">{formatMarketCap(priceData.currentMarketCap)}</span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Entry MC: {formatMarketCap(priceData.marketCapAtCall)}</p>
+                <p>Current MC: {formatMarketCap(priceData.currentMarketCap)}</p>
+                <p>ATH MC: {formatMarketCap(priceData.athMarketCap)}</p>
+              </TooltipContent>
+            </Tooltip>
+            
+            <Tooltip>
+              <TooltipTrigger className="flex items-center gap-1">
+                <span className="text-muted-foreground">FDV:</span>
+                <span className="font-mono">{formatMarketCap(priceData.currentFDV)}</span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Entry FDV: {formatMarketCap(priceData.fdvAtCall)}</p>
+                <p>Current FDV: {formatMarketCap(priceData.currentFDV)}</p>
+                <p>ATH FDV: {formatMarketCap(priceData.athFDV)}</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
         </div>
       </div>
     </TooltipProvider>

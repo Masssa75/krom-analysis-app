@@ -31,39 +31,47 @@ export async function POST(request: Request) {
       callTimestamp: new Date(timestampInSeconds * 1000).toISOString()
     });
     
-    // Fetch all three price points in parallel
-    const [priceAtCall, athData, currentPrice] = await Promise.all([
-      geckoTerminal.getTokenPriceAtTimestamp(tokenNetwork, contractAddress, timestampInSeconds),
-      geckoTerminal.getATHSinceTimestamp(tokenNetwork, contractAddress, timestampInSeconds),
-      geckoTerminal.getCurrentPrice(tokenNetwork, contractAddress)
-    ]);
+    // Fetch comprehensive token data with market caps
+    const tokenData = await geckoTerminal.getTokenDataWithMarketCaps(
+      tokenNetwork,
+      contractAddress,
+      timestampInSeconds
+    );
     
     // Calculate ROI and other metrics
-    const roi = priceAtCall && currentPrice 
-      ? ((currentPrice - priceAtCall) / priceAtCall) * 100 
+    const roi = tokenData.priceAtCall && tokenData.currentPrice 
+      ? ((tokenData.currentPrice - tokenData.priceAtCall) / tokenData.priceAtCall) * 100 
       : null;
     
-    const athROI = priceAtCall && athData?.price 
-      ? ((athData.price - priceAtCall) / priceAtCall) * 100 
+    const athROI = tokenData.priceAtCall && tokenData.ath?.price 
+      ? ((tokenData.ath.price - tokenData.priceAtCall) / tokenData.priceAtCall) * 100 
       : null;
     
-    const drawdownFromATH = athData?.price && currentPrice
-      ? ((athData.price - currentPrice) / athData.price) * 100
+    const drawdownFromATH = tokenData.ath?.price && tokenData.currentPrice
+      ? ((tokenData.ath.price - tokenData.currentPrice) / tokenData.ath.price) * 100
       : null;
     
     const result = {
       contractAddress,
       network: tokenNetwork,
-      priceAtCall,
-      currentPrice,
-      ath: athData?.price || null,
-      athTimestamp: athData?.timestamp || null,
-      athDate: athData?.timestamp ? new Date(athData.timestamp * 1000).toISOString() : null,
+      priceAtCall: tokenData.priceAtCall,
+      currentPrice: tokenData.currentPrice,
+      ath: tokenData.ath?.price || null,
+      athTimestamp: tokenData.ath?.timestamp || null,
+      athDate: tokenData.ath?.timestamp ? new Date(tokenData.ath.timestamp * 1000).toISOString() : null,
       roi,
       athROI,
       drawdownFromATH,
       callDate: new Date(timestampInSeconds * 1000).toISOString(),
-      fetchedAt: new Date().toISOString()
+      fetchedAt: new Date().toISOString(),
+      // Market cap data
+      marketCapAtCall: tokenData.marketCapAtCall,
+      currentMarketCap: tokenData.currentMarketCap,
+      athMarketCap: tokenData.athMarketCap,
+      fdvAtCall: tokenData.fdvAtCall,
+      currentFDV: tokenData.currentFDV,
+      athFDV: tokenData.athFDV,
+      tokenSupply: tokenData.tokenInfo?.total_supply || null
     };
     
     return NextResponse.json(result);

@@ -58,34 +58,41 @@ export async function POST(request: Request) {
         
         console.log(`Processing ${call.ticker} (${contractAddress}) on ${network}`);
         
-        // Fetch all price data
-        const [priceAtCall, athData, currentPrice] = await Promise.all([
-          geckoTerminal.getTokenPriceAtTimestamp(network, contractAddress, timestampInSeconds),
-          geckoTerminal.getATHSinceTimestamp(network, contractAddress, timestampInSeconds),
-          geckoTerminal.getCurrentPrice(network, contractAddress)
-        ]);
+        // Fetch comprehensive token data with market caps
+        const tokenData = await geckoTerminal.getTokenDataWithMarketCaps(
+          network,
+          contractAddress,
+          timestampInSeconds
+        );
         
         // Calculate metrics
-        const roi = priceAtCall && currentPrice 
-          ? ((currentPrice - priceAtCall) / priceAtCall) * 100 
+        const roi = tokenData.priceAtCall && tokenData.currentPrice 
+          ? ((tokenData.currentPrice - tokenData.priceAtCall) / tokenData.priceAtCall) * 100 
           : null;
         
-        const athROI = priceAtCall && athData?.price 
-          ? ((athData.price - priceAtCall) / priceAtCall) * 100 
+        const athROI = tokenData.priceAtCall && tokenData.ath?.price 
+          ? ((tokenData.ath.price - tokenData.priceAtCall) / tokenData.priceAtCall) * 100 
           : null;
         
         // Update database with price data
         const { error: updateError } = await supabase
           .from('crypto_calls')
           .update({
-            price_at_call: priceAtCall,
-            current_price: currentPrice,
-            ath_price: athData?.price || null,
-            ath_timestamp: athData?.timestamp ? new Date(athData.timestamp * 1000).toISOString() : null,
+            price_at_call: tokenData.priceAtCall,
+            current_price: tokenData.currentPrice,
+            ath_price: tokenData.ath?.price || null,
+            ath_timestamp: tokenData.ath?.timestamp ? new Date(tokenData.ath.timestamp * 1000).toISOString() : null,
             roi_percent: roi,
             ath_roi_percent: athROI,
             price_network: network,
-            price_fetched_at: new Date().toISOString()
+            price_fetched_at: new Date().toISOString(),
+            market_cap_at_call: tokenData.marketCapAtCall,
+            current_market_cap: tokenData.currentMarketCap,
+            ath_market_cap: tokenData.athMarketCap,
+            fdv_at_call: tokenData.fdvAtCall,
+            current_fdv: tokenData.currentFDV,
+            ath_fdv: tokenData.athFDV,
+            token_supply: tokenData.tokenInfo?.total_supply || null
           })
           .eq('krom_id', call.krom_id);
         
@@ -94,7 +101,7 @@ export async function POST(request: Request) {
         }
         
         results.successful++;
-        console.log(`✓ ${call.ticker}: Entry $${priceAtCall?.toFixed(6)}, Current $${currentPrice?.toFixed(6)}, ROI ${roi?.toFixed(0)}%`);
+        console.log(`✓ ${call.ticker}: Entry $${tokenData.priceAtCall?.toFixed(6)}, Current $${tokenData.currentPrice?.toFixed(6)}, ROI ${roi?.toFixed(0)}%, MC $${tokenData.currentMarketCap?.toLocaleString() || 'N/A'}`);
         
         // Add delay to respect rate limits (30 calls/minute = 2 seconds between calls)
         await new Promise(resolve => setTimeout(resolve, 2000));

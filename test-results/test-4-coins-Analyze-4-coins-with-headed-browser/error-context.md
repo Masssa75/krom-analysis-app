@@ -1,0 +1,645 @@
+# Page snapshot
+
+```yaml
+- navigation:
+  - heading "KROM Analysis" [level=1]
+- main:
+  - heading "KROM Historical Analysis Tool" [level=3]
+  - paragraph: Analyze cryptocurrency calls with AI-powered scoring
+  - heading "Call Analysis" [level=3]
+  - paragraph: Analyze based on call messages
+  - text: Number of calls to analyze (from oldest)
+  - spinbutton "Number of calls to analyze (from oldest)" [disabled]: "4"
+  - text: AI Model
+  - combobox "AI Model" [disabled]: Kimi K2 (Good Value)
+  - button "Analyzing..." [disabled]
+  - progressbar
+  - paragraph: Connecting to database...
+  - heading "X (Twitter) Analysis" [level=3]
+  - paragraph: Analyze based on social media sentiment
+  - text: Number of calls to analyze (from oldest)
+  - spinbutton "Number of calls to analyze (from oldest)": "5"
+  - paragraph: Batch analyzes using existing stored tweets (no new fetching)
+  - paragraph: Starts from oldest calls • Scores 1-10 based on tweet quality
+  - text: AI Model
+  - combobox "AI Model": Kimi K2 (Good Value)
+  - button "Start X Analysis"
+  - heading "Previously Analyzed Calls" [level=3]
+  - paragraph: 191 total calls analyzed • Page 1 of 10
+  - img
+  - textbox "Search by token name..."
+  - checkbox "Show only coins of interest"
+  - img
+  - text: Show only coins of interest
+  - table:
+    - rowgroup:
+      - row "Token Call Analysis X Analysis Price/ROI":
+        - cell "Token"
+        - cell "Call Analysis"
+        - cell "X Analysis"
+        - cell "Price/ROI"
+        - cell
+      - row "Score Tier Score Tier":
+        - cell
+        - cell "Score"
+        - cell "Tier"
+        - cell
+        - cell "Score"
+        - cell "Tier"
+        - cell
+        - cell
+        - cell
+    - rowgroup:
+      - row "ASINOID 2.0 TRASH 🎪 Meme Details - - Analyze Get Price":
+        - cell "ASINOID":
+          - link "ASINOID":
+            - /url: https://dexscreener.com/solana/3NfNmEHb478FmpdpzcxhRsE2j45xRHXCccBj5ga6pump
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "-"
+        - cell "-"
+        - cell "Analyze":
+          - button "Analyze":
+            - img
+            - text: Analyze
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "KOLT 2.0 TRASH 🎪 Meme Details - - Analyze Get Price":
+        - cell "KOLT":
+          - link "KOLT":
+            - /url: https://dexscreener.com/ethereum/0xe4ad6e3A254d545215089c972056494dfc12406C
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "-"
+        - cell "-"
+        - cell "Analyze":
+          - button "Analyze":
+            - img
+            - text: Analyze
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "BOOCHIE 2.0 TRASH 🎪 Meme Details - - Analyze Get Price":
+        - cell "BOOCHIE":
+          - link "BOOCHIE":
+            - /url: https://dexscreener.com/solana/KKG373b7Cr32JydXMGbqZkuFjVfcJf2FVvsBwobpump
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "-"
+        - cell "-"
+        - cell "Analyze":
+          - button "Analyze":
+            - img
+            - text: Analyze
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "OCT 4.0 BASIC ⚙️ Utility Details - - Analyze Get Price":
+        - cell "OCT":
+          - link "OCT":
+            - /url: https://dexscreener.com/ethereum/0xf7b2e24c53476899357d205C7923958cA85e49B4
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "4.0"
+        - cell "BASIC ⚙️ Utility"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "-"
+        - cell "-"
+        - cell "Analyze":
+          - button "Analyze":
+            - img
+            - text: Analyze
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "EOLN 2.0 TRASH 🎪 Meme Details - - Analyze Get Price":
+        - cell "EOLN":
+          - link "EOLN":
+            - /url: https://dexscreener.com/solana/28SfJQXWXCin26jAgGj9nixwNaPLTnWioXXTBuvfpump
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "-"
+        - cell "-"
+        - cell "Analyze":
+          - button "Analyze":
+            - img
+            - text: Analyze
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "KAIKUN 1.0 TRASH 🎪 Meme Details - - Analyze Get Price":
+        - cell "KAIKUN":
+          - link "KAIKUN":
+            - /url: https://dexscreener.com/ethereum/0x573e3C9B78fA793362c884A4487d945788EA88ed
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "1.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "-"
+        - cell "-"
+        - cell "Analyze":
+          - button "Analyze":
+            - img
+            - text: Analyze
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "UNBOTHERED 2.0 TRASH 🎪 Meme Details - - Analyze Get Price":
+        - cell "UNBOTHERED":
+          - link "UNBOTHERED":
+            - /url: https://dexscreener.com/solana/2foEbauo7SQFjCxiEnLd11AoS3aoc9vXWTY7jGNMpump
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "-"
+        - cell "-"
+        - cell "Analyze":
+          - button "Analyze":
+            - img
+            - text: Analyze
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "EVIE 2.0 TRASH 🎪 Meme Details - - Analyze Get Price":
+        - cell "EVIE":
+          - link "EVIE":
+            - /url: https://dexscreener.com/solana/DYbJHTr4jyvJvFR8a2WUkV8DwjBCFu6NmPmPaTJUpump
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "-"
+        - cell "-"
+        - cell "Analyze":
+          - button "Analyze":
+            - img
+            - text: Analyze
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "ASTR 2.0 TRASH 🎪 Meme Details - - Analyze Get Price":
+        - cell "ASTR":
+          - link "ASTR":
+            - /url: https://dexscreener.com/solana/CbUZBmqscyHUENeb8HViMPt9exnjuxTcCJbio6Topump
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "-"
+        - cell "-"
+        - cell "Analyze":
+          - button "Analyze":
+            - img
+            - text: Analyze
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "JULES 7.0 SOLID 🎪 Meme Details - - Analyze Get Price":
+        - cell "JULES":
+          - link "JULES":
+            - /url: https://dexscreener.com/solana/4WVgmbDdLZHhG5YGNmTtWp8EmycveZCL3ReSVf7Spump
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "7.0"
+        - cell "SOLID 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "-"
+        - cell "-"
+        - cell "Analyze":
+          - button "Analyze":
+            - img
+            - text: Analyze
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "DARK SEND 1.0 TRASH 🎪 Meme Details - - Analyze Get Price":
+        - cell "DARK SEND":
+          - link "DARK SEND":
+            - /url: https://dexscreener.com/solana/DQF4yWUqGV7HfAervZWFDtswowjMNxW3jgmD2F8send
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "1.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "-"
+        - cell "-"
+        - cell "Analyze":
+          - button "Analyze":
+            - img
+            - text: Analyze
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "JULES 7.0 SOLID 🎪 Meme Details - - Analyze Get Price":
+        - cell "JULES":
+          - link "JULES":
+            - /url: https://dexscreener.com/solana/4WVgmbDdLZHhG5YGNmTtWp8EmycveZCL3ReSVf7Spump
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "7.0"
+        - cell "SOLID 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "-"
+        - cell "-"
+        - cell "Analyze":
+          - button "Analyze":
+            - img
+            - text: Analyze
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "DARK SEND 2.0 TRASH 🎪 Meme Details - - Analyze Get Price":
+        - cell "DARK SEND":
+          - link "DARK SEND":
+            - /url: https://dexscreener.com/solana/6QHdT4x1BWmuFKYPixXu5BitzvKPTzALLehi3Cmsend
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "-"
+        - cell "-"
+        - cell "Analyze":
+          - button "Analyze":
+            - img
+            - text: Analyze
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "BOOCHIE 2.0 TRASH 🎪 Meme Details - - Analyze Get Price":
+        - cell "BOOCHIE":
+          - link "BOOCHIE":
+            - /url: https://dexscreener.com/solana/KKG373b7Cr32JydXMGbqZkuFjVfcJf2FVvsBwobpump
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "-"
+        - cell "-"
+        - cell "Analyze":
+          - button "Analyze":
+            - img
+            - text: Analyze
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "UNBOTHERED 2.0 TRASH 🎪 Meme Details - - Analyze Get Price":
+        - cell "UNBOTHERED":
+          - link "UNBOTHERED":
+            - /url: https://dexscreener.com/solana/2foEbauo7SQFjCxiEnLd11AoS3aoc9vXWTY7jGNMpump
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "-"
+        - cell "-"
+        - cell "Analyze":
+          - button "Analyze":
+            - img
+            - text: Analyze
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "TAIKI 2.0 TRASH 🎪 Meme Details - - Analyze Get Price":
+        - cell "TAIKI":
+          - link "TAIKI":
+            - /url: https://dexscreener.com/ethereum/0xA6716448eAa4D55970Ea54b8e8c70F2070BAfF76
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "-"
+        - cell "-"
+        - cell "Analyze":
+          - button "Analyze":
+            - img
+            - text: Analyze
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "TAIKI 1.0 TRASH 🎪 Meme Details - - Analyze Get Price":
+        - cell "TAIKI":
+          - link "TAIKI":
+            - /url: https://dexscreener.com/ethereum/0xA6716448eAa4D55970Ea54b8e8c70F2070BAfF76
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "1.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "-"
+        - cell "-"
+        - cell "Analyze":
+          - button "Analyze":
+            - img
+            - text: Analyze
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "NOTEBOOK 2.0 TRASH 🎪 Meme Details - - Analyze Get Price":
+        - cell "NOTEBOOK":
+          - link "NOTEBOOK":
+            - /url: https://dexscreener.com/solana/VCmDHrLW9FXh9RhAqqvsbFsht3cd2uuZFmaG2KGpGZR
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "-"
+        - cell "-"
+        - cell "Analyze":
+          - button "Analyze":
+            - img
+            - text: Analyze
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "NOTEBOOK 1.0 TRASH 🎪 Meme Details - - Analyze Get Price":
+        - cell "NOTEBOOK":
+          - link "NOTEBOOK":
+            - /url: https://dexscreener.com/solana/VCmDHrLW9FXh9RhAqqvsbFsht3cd2uuZFmaG2KGpGZR
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "1.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "-"
+        - cell "-"
+        - cell "Analyze":
+          - button "Analyze":
+            - img
+            - text: Analyze
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "NOTEBOOK 2.0 TRASH 🎪 Meme Details - - Analyze Get Price":
+        - cell "NOTEBOOK":
+          - link "NOTEBOOK":
+            - /url: https://dexscreener.com/solana/VCmDHrLW9FXh9RhAqqvsbFsht3cd2uuZFmaG2KGpGZR
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "-"
+        - cell "-"
+        - cell "Analyze":
+          - button "Analyze":
+            - img
+            - text: Analyze
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+  - button "Previous" [disabled]:
+    - img
+    - text: Previous
+  - button "1"
+  - button "2"
+  - button "3"
+  - button "4"
+  - button "5"
+  - button "Next":
+    - text: Next
+    - img
+- alert
+```

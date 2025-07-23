@@ -94,7 +94,15 @@ export async function GET(request: NextRequest) {
       roi_percent: call.roi_percent,
       ath_roi_percent: call.ath_roi_percent,
       price_network: call.price_network,
-      price_fetched_at: call.price_fetched_at
+      price_fetched_at: call.price_fetched_at,
+      // Market cap data
+      market_cap_at_call: call.market_cap_at_call,
+      current_market_cap: call.current_market_cap,
+      ath_market_cap: call.ath_market_cap,
+      fdv_at_call: call.fdv_at_call,
+      current_fdv: call.current_fdv,
+      ath_fdv: call.ath_fdv,
+      token_supply: call.token_supply
     })) || [];
 
     return NextResponse.json({

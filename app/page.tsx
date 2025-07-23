@@ -1019,7 +1019,13 @@ export default function HomePage() {
                                 athROI: call.ath_roi_percent,
                                 drawdownFromATH: call.ath_price && call.current_price 
                                   ? ((call.ath_price - call.current_price) / call.ath_price) * 100 
-                                  : null
+                                  : null,
+                                marketCapAtCall: call.market_cap_at_call,
+                                currentMarketCap: call.current_market_cap,
+                                athMarketCap: call.ath_market_cap,
+                                fdvAtCall: call.fdv_at_call,
+                                currentFDV: call.current_fdv,
+                                athFDV: call.ath_fdv
                               } : null}
                             />
                           </td>

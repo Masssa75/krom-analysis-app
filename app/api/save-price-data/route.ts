@@ -16,7 +16,14 @@ export async function POST(request: Request) {
       athTimestamp,
       roi,
       athROI,
-      network
+      network,
+      marketCapAtCall,
+      currentMarketCap,
+      athMarketCap,
+      fdvAtCall,
+      currentFDV,
+      athFDV,
+      tokenSupply
     } = await request.json();
     
     if (!kromId) {
@@ -34,7 +41,14 @@ export async function POST(request: Request) {
         roi_percent: roi,
         ath_roi_percent: athROI,
         price_network: network,
-        price_fetched_at: new Date().toISOString()
+        price_fetched_at: new Date().toISOString(),
+        market_cap_at_call: marketCapAtCall,
+        current_market_cap: currentMarketCap,
+        ath_market_cap: athMarketCap,
+        fdv_at_call: fdvAtCall,
+        current_fdv: currentFDV,
+        ath_fdv: athFDV,
+        token_supply: tokenSupply
       })
       .eq('krom_id', kromId);
     
