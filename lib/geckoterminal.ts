@@ -355,8 +355,8 @@ export class GeckoTerminalAPI {
       const currentPrice = tokenInfo.price_usd;
       
       // Use market cap from API if available, otherwise calculate proportionally
-      const currentMarketCap = tokenInfo.market_cap_usd;
-      const currentFDV = tokenInfo.fdv_usd;
+      const currentMarketCap = tokenInfo.market_cap_usd || null;
+      const currentFDV = tokenInfo.fdv_usd || null;
       
       // Calculate historical market caps proportionally based on price ratios
       let marketCapAtCall = null;
