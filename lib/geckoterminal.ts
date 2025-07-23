@@ -54,7 +54,7 @@ export class GeckoTerminalAPI {
       
       if (!token) return null;
       
-      return {
+      let tokenInfo: TokenInfo = {
         address: address,
         name: token.name,
         symbol: token.symbol,
@@ -64,8 +64,43 @@ export class GeckoTerminalAPI {
         total_supply: token.total_supply,
         circulating_supply: token.circulating_supply,
       };
+      
+      // If price is 0 or not available, try to get it from the pools
+      if (!tokenInfo.price_usd || tokenInfo.price_usd === 0) {
+        const pools = await this.getTokenPools(network, address);
+        if (pools.length > 0) {
+          // Get the most liquid pool
+          const sortedPools = pools.sort((a, b) => {
+            const liquidityA = parseFloat(a.attributes?.reserve_in_usd || '0');
+            const liquidityB = parseFloat(b.attributes?.reserve_in_usd || '0');
+            return liquidityB - liquidityA;
+          });
+          
+          const mainPool = sortedPools[0];
+          const poolPrice = parseFloat(mainPool.attributes?.base_token_price_usd || '0');
+          
+          if (poolPrice > 0) {
+            tokenInfo.price_usd = poolPrice;
+            tokenInfo.pool_address = mainPool.attributes?.address;
+            
+            // If we have total supply and price, calculate FDV
+            if (tokenInfo.total_supply && !tokenInfo.fdv_usd) {
+              const supply = parseFloat(tokenInfo.total_supply);
+              tokenInfo.fdv_usd = poolPrice * supply;
+            }
+            
+            // If we have circulating supply and price, calculate market cap
+            if (tokenInfo.circulating_supply && !tokenInfo.market_cap_usd) {
+              const circSupply = parseFloat(tokenInfo.circulating_supply);
+              tokenInfo.market_cap_usd = poolPrice * circSupply;
+            }
+          }
+        }
+      }
+      
+      return tokenInfo;
     } catch (error) {
-      // Error fetching token info
+      console.error('Error fetching token info:', error);
       return null;
     }
   }
@@ -168,7 +203,7 @@ export class GeckoTerminalAPI {
       await this.delay(100);
       
       // Get OHLCV data around the target timestamp
-      const ohlcvData = await this.getHistoricalOHLCV(
+      let ohlcvData = await this.getHistoricalOHLCV(
         network,
         poolAddress,
         'day',
@@ -177,8 +212,33 @@ export class GeckoTerminalAPI {
         30 // Get 30 days of data
       );
       
+      // If daily data is not available, try hourly data
       if (ohlcvData.length === 0) {
-        // No OHLCV data found
+        ohlcvData = await this.getHistoricalOHLCV(
+          network,
+          poolAddress,
+          'hour',
+          1,
+          targetTimestamp + 3600, // Add 1 hour to get data before this timestamp
+          168 // Get 7 days worth of hourly data
+        );
+      }
+      
+      // If still no data, try minute data for very recent tokens
+      if (ohlcvData.length === 0) {
+        ohlcvData = await this.getHistoricalOHLCV(
+          network,
+          poolAddress,
+          'minute',
+          5, // 5-minute candles
+          targetTimestamp + 300, // Add 5 minutes
+          288 // Get 24 hours worth of 5-minute data
+        );
+      }
+      
+      if (ohlcvData.length === 0) {
+        // No OHLCV data found at any timeframe
+        console.log(`No OHLCV data available for pool ${poolAddress}`);
         return null;
       }
       
@@ -290,7 +350,7 @@ export class GeckoTerminalAPI {
       const tokenInfo = await this.getTokenInfo(network, tokenAddress);
       return tokenInfo?.price_usd || null;
     } catch (error) {
-      // Error getting current price
+      console.error('Error getting current price:', error);
       return null;
     }
   }
@@ -328,10 +388,13 @@ export class GeckoTerminalAPI {
     athFDV: number | null;
   }> {
     try {
+      console.log(`Fetching token data for ${tokenAddress} on ${network}`);
+      
       // Get current token info (includes current price and FDV)
       const tokenInfo = await this.getTokenInfo(network, tokenAddress);
       
       if (!tokenInfo) {
+        console.log(`No token info found for ${tokenAddress}`);
         return {
           tokenInfo: null,
           priceAtCall: null,
@@ -345,6 +408,8 @@ export class GeckoTerminalAPI {
           athFDV: null
         };
       }
+      
+      console.log(`Token info retrieved: ${tokenInfo.symbol} - Current price: $${tokenInfo.price_usd}`)
       
       // Get historical prices
       const [priceAtCall, athData] = await Promise.all([
