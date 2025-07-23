@@ -13,6 +13,7 @@ import { AnalysisDetailPanel } from '@/components/analysis-detail-panel'
 import { TokenTypeBadge } from '@/components/token-type-badge'
 import { PriceDisplay } from '@/components/price-display'
 import { GeckoTerminalPanel } from '@/components/geckoterminal-panel'
+import { FilterPanel, FilterValues } from '@/components/filter-panel'
 
 export default function HomePage() {
   const [count, setCount] = useState('5')
@@ -56,11 +57,22 @@ export default function HomePage() {
   
   // GeckoTerminal panel state
   const [selectedTokenForChart, setSelectedTokenForChart] = useState<any>(null)
+  
+  // Filter state
+  const [filters, setFilters] = useState<FilterValues>({
+    minCallScore: 1,
+    minXScore: 1,
+    tokenTypes: [],
+    networks: [],
+    onlyProfitable: false,
+    minROI: null,
+    minAthROI: null
+  })
 
   // Fetch analyzed calls on mount and when page/search/filter changes
   useEffect(() => {
     fetchAnalyzedCalls()
-  }, [currentPage, searchQuery, showOnlyCoinsOfInterest])
+  }, [currentPage, searchQuery, showOnlyCoinsOfInterest, filters])
 
   const fetchAnalyzedCalls = async () => {
     setLoadingAnalyzed(true)
@@ -78,6 +90,29 @@ export default function HomePage() {
       
       if (showOnlyCoinsOfInterest) {
         params.append('coinsOfInterest', 'true')
+      }
+      
+      // Add filter parameters
+      if (filters.minCallScore > 1) {
+        params.append('minCallScore', filters.minCallScore.toString())
+      }
+      if (filters.minXScore > 1) {
+        params.append('minXScore', filters.minXScore.toString())
+      }
+      if (filters.tokenTypes.length > 0) {
+        params.append('tokenTypes', filters.tokenTypes.join(','))
+      }
+      if (filters.networks.length > 0) {
+        params.append('networks', filters.networks.join(','))
+      }
+      if (filters.onlyProfitable) {
+        params.append('onlyProfitable', 'true')
+      }
+      if (filters.minROI !== null) {
+        params.append('minROI', filters.minROI.toString())
+      }
+      if (filters.minAthROI !== null) {
+        params.append('minAthROI', filters.minAthROI.toString())
       }
       
       const response = await fetch(`/api/analyzed?${params}`)
@@ -851,6 +886,12 @@ export default function HomePage() {
           )}
         </div>
       </div>
+
+      {/* Filter Panel */}
+      <FilterPanel onFiltersChange={(newFilters) => {
+        setFilters(newFilters)
+        setCurrentPage(1) // Reset to first page when filters change
+      }} />
 
       {/* Previously Analyzed Calls */}
       {analyzedCalls.length > 0 && (

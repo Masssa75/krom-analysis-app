@@ -29,7 +29,7 @@ SCORE GUIDE:
 
 For each token, provide:
 1. Score (1-10)
-2. Token Type: "meme", "utility", or "hybrid" based on social media presence
+2. Token Type: "meme" or "utility" based on social media presence
 3. Legitimacy Factor: "Low", "Medium", or "High"
 4. Best Tweet: The single most informative/relevant tweet (copy exact text)
 5. Key Observations: 2-3 bullet points about what you found (max 20 words each)
@@ -234,7 +234,7 @@ export async function POST(request: NextRequest) {
         const scoreMatch = analysisText.match(/score[:\s]+(\d+)/i)
         const score = scoreMatch ? parseInt(scoreMatch[1]) : 1
         
-        const tokenTypeMatch = analysisText.match(/token\s*type[:\s]+(meme|utility|hybrid)/i)
+        const tokenTypeMatch = analysisText.match(/token\s*type[:\s]+(meme|utility)/i)
         const tokenType = tokenTypeMatch ? tokenTypeMatch[1].toLowerCase() : 'meme'
         
         const legitimacyMatch = analysisText.match(/legitimacy\s*factor[:\s]+(low|medium|high)/i)

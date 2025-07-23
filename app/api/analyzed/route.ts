@@ -20,6 +20,15 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0', 10);
     const search = searchParams.get('search') || '';
     const coinsOfInterest = searchParams.get('coinsOfInterest') === 'true';
+    
+    // Get filter params
+    const minCallScore = searchParams.get('minCallScore') ? parseInt(searchParams.get('minCallScore')!, 10) : null;
+    const minXScore = searchParams.get('minXScore') ? parseInt(searchParams.get('minXScore')!, 10) : null;
+    const tokenTypes = searchParams.get('tokenTypes') ? searchParams.get('tokenTypes')!.split(',') : [];
+    const networks = searchParams.get('networks') ? searchParams.get('networks')!.split(',') : [];
+    const onlyProfitable = searchParams.get('onlyProfitable') === 'true';
+    const minROI = searchParams.get('minROI') ? parseFloat(searchParams.get('minROI')!) : null;
+    const minAthROI = searchParams.get('minAthROI') ? parseFloat(searchParams.get('minAthROI')!) : null;
 
     // Build query
     let query = supabase
@@ -35,6 +44,44 @@ export async function GET(request: NextRequest) {
     // Add coins of interest filter if requested
     if (coinsOfInterest) {
       query = query.eq('is_coin_of_interest', true);
+    }
+    
+    // Add score filters
+    if (minCallScore && minCallScore > 1) {
+      query = query.gte('analysis_score', minCallScore);
+    }
+    if (minXScore && minXScore > 1) {
+      query = query.gte('x_analysis_score', minXScore);
+    }
+    
+    // Add token type filter
+    if (tokenTypes.length > 0) {
+      query = query.in('analysis_token_type', tokenTypes);
+    }
+    
+    // Add network filter
+    if (networks.length > 0) {
+      // Map filter values to actual network names in database
+      const networkMap: { [key: string]: string[] } = {
+        'ethereum': ['ethereum', 'eth', 'ETH'],
+        'solana': ['solana', 'sol', 'SOL']
+      };
+      
+      const actualNetworks = networks.flatMap(n => networkMap[n] || [n]);
+      // Use proper JSONB filtering syntax
+      const networkConditions = actualNetworks.map(n => `raw_data->token->>network.ilike.%${n}%`).join(',');
+      query = query.or(networkConditions);
+    }
+    
+    // Add ROI filters
+    if (onlyProfitable) {
+      query = query.gt('roi_percent', 0);
+    }
+    if (minROI !== null) {
+      query = query.gte('roi_percent', minROI);
+    }
+    if (minAthROI !== null) {
+      query = query.gte('ath_roi_percent', minAthROI);
     }
     
     // Add ordering and pagination

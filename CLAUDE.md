@@ -57,7 +57,7 @@ The app adds these columns to the `crypto_calls` table:
 -- Call Analysis Fields
 analysis_score INTEGER (1-10)
 analysis_tier TEXT (ALPHA/SOLID/BASIC/TRASH)
-analysis_token_type TEXT (meme/utility/hybrid)
+analysis_token_type TEXT (meme/utility)
 analysis_legitimacy_factor TEXT (High/Medium/Low)
 analysis_model TEXT
 analysis_reasoning TEXT
