@@ -178,35 +178,52 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, existingP
   
   return (
     <TooltipProvider>
-      <div className="space-y-2 text-xs">
-        <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-          <div className="flex items-center gap-1">
-            <span className="text-muted-foreground">Entry:</span>
-            <span className="font-mono">{formatPrice(priceData.priceAtCall)}</span>
-          </div>
+      <div className="space-y-1.5 text-xs">
+        {/* Market Cap Column */}
+        <div className="space-y-1">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-1 cursor-default">
+                <span className="text-muted-foreground">Entry:</span>
+                <span className="font-mono font-medium">{formatMarketCap(priceData.marketCapAtCall)}</span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Price: {formatPrice(priceData.priceAtCall)}</p>
+            </TooltipContent>
+          </Tooltip>
           
-          <div className="flex items-center gap-1">
-            <span className="text-muted-foreground">Now:</span>
-            <span className="font-mono">{formatPrice(priceData.currentPrice)}</span>
-          </div>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-1 cursor-default">
+                <span className="text-muted-foreground">Now:</span>
+                <span className="font-mono font-medium">{formatMarketCap(priceData.currentMarketCap)}</span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Price: {formatPrice(priceData.currentPrice)}</p>
+            </TooltipContent>
+          </Tooltip>
           
-          <div className="flex items-center gap-1">
-            <Tooltip>
-              <TooltipTrigger className="flex items-center gap-1">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-1 cursor-default">
                 <Trophy className="h-3 w-3 text-yellow-500" />
                 <span className="text-muted-foreground">ATH:</span>
-                <span className="font-mono">{formatPrice(priceData.ath)}</span>
-              </TooltipTrigger>
-              <TooltipContent>
-                {priceData.athDate && (
-                  <p>Reached on {new Date(priceData.athDate).toLocaleDateString()}</p>
-                )}
-              </TooltipContent>
-            </Tooltip>
-          </div>
+                <span className="font-mono font-medium">{formatMarketCap(priceData.athMarketCap)}</span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Price: {formatPrice(priceData.ath)}</p>
+              {priceData.athDate && (
+                <p>Date: {new Date(priceData.athDate).toLocaleDateString()}</p>
+              )}
+            </TooltipContent>
+          </Tooltip>
         </div>
         
-        <div className="flex items-center gap-3">
+        {/* ROI Display */}
+        <div className="flex items-center gap-3 pt-1 border-t">
           <div className={`flex items-center gap-1 ${roiColor(priceData.roi)}`}>
             {priceData.roi !== null && priceData.roi > 0 ? (
               <TrendingUp className="h-3 w-3" />
@@ -216,47 +233,9 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, existingP
             <span>{formatPercent(priceData.roi)}</span>
           </div>
           
-          <Tooltip>
-            <TooltipTrigger>
-              <div className={`flex items-center gap-1 ${roiColor(priceData.athROI)}`}>
-                <Trophy className="h-3 w-3" />
-                <span>{formatPercent(priceData.athROI)}</span>
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Peak ROI: {formatPercent(priceData.athROI)}</p>
-              {priceData.drawdownFromATH !== null && (
-                <p>Current drawdown: -{priceData.drawdownFromATH.toFixed(0)}%</p>
-              )}
-            </TooltipContent>
-          </Tooltip>
-        </div>
-        
-        <div className="border-t pt-1 mt-2">
-          <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-            <Tooltip>
-              <TooltipTrigger className="flex items-center gap-1">
-                <span className="text-muted-foreground">MC:</span>
-                <span className="font-mono">{formatMarketCap(priceData.currentMarketCap)}</span>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Entry MC: {formatMarketCap(priceData.marketCapAtCall)}</p>
-                <p>Current MC: {formatMarketCap(priceData.currentMarketCap)}</p>
-                <p>ATH MC: {formatMarketCap(priceData.athMarketCap)}</p>
-              </TooltipContent>
-            </Tooltip>
-            
-            <Tooltip>
-              <TooltipTrigger className="flex items-center gap-1">
-                <span className="text-muted-foreground">FDV:</span>
-                <span className="font-mono">{formatMarketCap(priceData.currentFDV)}</span>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Entry FDV: {formatMarketCap(priceData.fdvAtCall)}</p>
-                <p>Current FDV: {formatMarketCap(priceData.currentFDV)}</p>
-                <p>ATH FDV: {formatMarketCap(priceData.athFDV)}</p>
-              </TooltipContent>
-            </Tooltip>
+          <div className={`flex items-center gap-1 ${roiColor(priceData.athROI)}`}>
+            <Trophy className="h-3 w-3" />
+            <span>{formatPercent(priceData.athROI)}</span>
           </div>
         </div>
       </div>
