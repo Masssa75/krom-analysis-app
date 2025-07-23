@@ -85,7 +85,16 @@ export async function GET(request: NextRequest) {
       has_comment: call.user_comment ? true : false,
       // Coin of interest indicator
       is_coin_of_interest: call.is_coin_of_interest || false,
-      coin_of_interest_notes: call.coin_of_interest_notes || null
+      coin_of_interest_notes: call.coin_of_interest_notes || null,
+      // Price data
+      price_at_call: call.price_at_call,
+      current_price: call.current_price,
+      ath_price: call.ath_price,
+      ath_timestamp: call.ath_timestamp,
+      roi_percent: call.roi_percent,
+      ath_roi_percent: call.ath_roi_percent,
+      price_network: call.price_network,
+      price_fetched_at: call.price_fetched_at
     })) || [];
 
     return NextResponse.json({

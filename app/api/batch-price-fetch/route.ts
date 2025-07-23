@@ -1,0 +1,126 @@
+import { NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
+import { GeckoTerminalAPI } from '@/lib/geckoterminal';
+
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
+
+const geckoTerminal = new GeckoTerminalAPI(process.env.GECKO_TERMINAL_API_KEY!);
+
+export async function POST(request: Request) {
+  try {
+    const { count = 10 } = await request.json();
+    
+    console.log(`Starting batch price fetch for ${count} calls`);
+    
+    // Get calls that have contracts but no price data
+    const { data: calls, error } = await supabase
+      .from('crypto_calls')
+      .select('krom_id, ticker, raw_data, buy_timestamp, created_at')
+      .not('raw_data->token->ca', 'is', null)
+      .is('price_at_call', null)
+      .not('analysis_score', 'is', null) // Only fetch prices for analyzed calls
+      .order('created_at', { ascending: false })
+      .limit(count);
+    
+    if (error) {
+      console.error('Database error:', error);
+      return NextResponse.json({ error: 'Failed to fetch calls' }, { status: 500 });
+    }
+    
+    if (!calls || calls.length === 0) {
+      return NextResponse.json({ 
+        message: 'No calls found that need price data',
+        processed: 0 
+      });
+    }
+    
+    console.log(`Found ${calls.length} calls to process`);
+    
+    const results = {
+      processed: 0,
+      successful: 0,
+      failed: 0,
+      errors: [] as any[]
+    };
+    
+    // Process calls sequentially to avoid rate limits
+    for (const call of calls) {
+      try {
+        const contractAddress = call.raw_data?.token?.ca;
+        const network = call.raw_data?.token?.network || GeckoTerminalAPI.guessNetwork(contractAddress);
+        
+        // Use buy_timestamp if available, otherwise use created_at
+        const callTimestamp = call.buy_timestamp || call.created_at;
+        const timestampInSeconds = new Date(callTimestamp).getTime() / 1000;
+        
+        console.log(`Processing ${call.ticker} (${contractAddress}) on ${network}`);
+        
+        // Fetch all price data
+        const [priceAtCall, athData, currentPrice] = await Promise.all([
+          geckoTerminal.getTokenPriceAtTimestamp(network, contractAddress, timestampInSeconds),
+          geckoTerminal.getATHSinceTimestamp(network, contractAddress, timestampInSeconds),
+          geckoTerminal.getCurrentPrice(network, contractAddress)
+        ]);
+        
+        // Calculate metrics
+        const roi = priceAtCall && currentPrice 
+          ? ((currentPrice - priceAtCall) / priceAtCall) * 100 
+          : null;
+        
+        const athROI = priceAtCall && athData?.price 
+          ? ((athData.price - priceAtCall) / priceAtCall) * 100 
+          : null;
+        
+        // Update database with price data
+        const { error: updateError } = await supabase
+          .from('crypto_calls')
+          .update({
+            price_at_call: priceAtCall,
+            current_price: currentPrice,
+            ath_price: athData?.price || null,
+            ath_timestamp: athData?.timestamp ? new Date(athData.timestamp * 1000).toISOString() : null,
+            roi_percent: roi,
+            ath_roi_percent: athROI,
+            price_network: network,
+            price_fetched_at: new Date().toISOString()
+          })
+          .eq('krom_id', call.krom_id);
+        
+        if (updateError) {
+          throw updateError;
+        }
+        
+        results.successful++;
+        console.log(`✓ ${call.ticker}: Entry $${priceAtCall?.toFixed(6)}, Current $${currentPrice?.toFixed(6)}, ROI ${roi?.toFixed(0)}%`);
+        
+        // Add delay to respect rate limits (30 calls/minute = 2 seconds between calls)
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+      } catch (error) {
+        console.error(`Failed to process ${call.ticker}:`, error);
+        results.failed++;
+        results.errors.push({
+          ticker: call.ticker,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        });
+      }
+      
+      results.processed++;
+    }
+    
+    return NextResponse.json({
+      message: `Batch price fetch completed`,
+      ...results
+    });
+    
+  } catch (error) {
+    console.error('Batch price fetch error:', error);
+    return NextResponse.json(
+      { error: 'Failed to process batch price fetch' },
+      { status: 500 }
+    );
+  }
+}

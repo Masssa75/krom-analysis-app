@@ -11,6 +11,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Download, Copy, ExternalLink, ChevronRight, MessageSquare, RefreshCw, Search, ChevronLeft, Trash2, Star } from 'lucide-react'
 import { AnalysisDetailPanel } from '@/components/analysis-detail-panel'
 import { TokenTypeBadge } from '@/components/token-type-badge'
+import { PriceDisplay } from '@/components/price-display'
 
 export default function HomePage() {
   const [count, setCount] = useState('5')
@@ -857,6 +858,7 @@ export default function HomePage() {
                       <th className="py-3 px-2 font-medium text-muted-foreground">Token</th>
                       <th className="py-3 px-2 font-medium text-muted-foreground" colSpan={3}>Call Analysis</th>
                       <th className="py-3 px-2 font-medium text-muted-foreground" colSpan={3}>X Analysis</th>
+                      <th className="py-3 px-2 font-medium text-muted-foreground">Price/ROI</th>
                       <th className="py-3 px-2"></th>
                     </tr>
                     <tr className="border-b text-left text-xs">
@@ -866,7 +868,8 @@ export default function HomePage() {
                       <th className="py-2 px-2 font-normal text-muted-foreground border-r"></th>
                       <th className="py-2 px-2 font-normal text-muted-foreground">Score</th>
                       <th className="py-2 px-2 font-normal text-muted-foreground">Tier</th>
-                      <th className="py-2 px-2 font-normal text-muted-foreground"></th>
+                      <th className="py-2 px-2 font-normal text-muted-foreground border-r"></th>
+                      <th className="py-2 px-2"></th>
                       <th className="py-2 px-2"></th>
                     </tr>
                   </thead>
@@ -1001,6 +1004,24 @@ export default function HomePage() {
                                 Analyze
                               </Button>
                             )}
+                          </td>
+                          <td className="py-3 px-2">
+                            <PriceDisplay 
+                              contractAddress={call.contract}
+                              callTimestamp={call.call_timestamp || call.buy_timestamp}
+                              kromId={call.krom_id}
+                              existingPriceData={call.price_at_call ? {
+                                priceAtCall: call.price_at_call,
+                                currentPrice: call.current_price,
+                                ath: call.ath_price,
+                                athDate: call.ath_timestamp,
+                                roi: call.roi_percent,
+                                athROI: call.ath_roi_percent,
+                                drawdownFromATH: call.ath_price && call.current_price 
+                                  ? ((call.ath_price - call.current_price) / call.ath_price) * 100 
+                                  : null
+                              } : null}
+                            />
                           </td>
                           <td className="py-3 px-2">
                             <Button
