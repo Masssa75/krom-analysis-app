@@ -91,8 +91,14 @@ export async function POST(request: NextRequest) {
     const results = []
     const errors = []
     
-    for (const call of callsToAnalyze) {
+    for (let i = 0; i < callsToAnalyze.length; i++) {
+      const call = callsToAnalyze[i]
       const callStartTime = Date.now()
+      
+      // Add delay between API calls to respect rate limits (100ms between calls)
+      if (i > 0) {
+        await new Promise(resolve => setTimeout(resolve, 100))
+      }
       
       try {
         // Handle empty tweet arrays - still analyze but with appropriate score

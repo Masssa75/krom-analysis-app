@@ -75,7 +75,14 @@ export async function POST(request: NextRequest) {
     // Analyze each call
     const results = [];
     
-    for (const call of calls) {
+    for (let i = 0; i < calls.length; i++) {
+      const call = calls[i];
+      
+      // Add delay between API calls to respect rate limits (100ms between calls)
+      if (i > 0) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+      
       try {
         // Extract contract address from raw_data
         const contract = call.raw_data?.token?.ca || null;
