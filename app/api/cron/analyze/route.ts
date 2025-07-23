@@ -25,8 +25,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
     }
 
-    // Process 20 calls per minute with Kimi K2
-    const limit = 20;
+    // Process 5 calls for testing (will change to 20 later)
+    const limit = 5;
     const model = 'moonshotai/kimi-k2:free';
 
     // Fetch oldest unanalyzed calls
