@@ -354,27 +354,23 @@ export class GeckoTerminalAPI {
       
       const currentPrice = tokenInfo.price_usd;
       
-      // Use market cap from API if available, otherwise calculate proportionally
-      const currentMarketCap = tokenInfo.market_cap_usd || null;
-      const currentFDV = tokenInfo.fdv_usd || null;
+      // For simplicity, we'll focus on FDV which we can calculate from total supply
+      // First try to get FDV from API, otherwise calculate it
+      let currentFDV = tokenInfo.fdv_usd || null;
       
-      // Calculate historical market caps proportionally based on price ratios
-      let marketCapAtCall = null;
-      let athMarketCap = null;
+      // If no FDV from API but we have total supply, calculate it
+      if (!currentFDV && tokenInfo.total_supply && currentPrice) {
+        const supply = parseFloat(tokenInfo.total_supply);
+        // Most tokens have 18 decimals, but some have different amounts
+        // GeckoTerminal's total_supply should already be adjusted for decimals
+        currentFDV = currentPrice * supply;
+      }
+      
+      // Calculate historical FDVs based on price ratios
       let fdvAtCall = null;
       let athFDV = null;
       
-      if (currentMarketCap && currentPrice) {
-        // Calculate market caps based on price ratios
-        if (priceAtCall) {
-          marketCapAtCall = (priceAtCall / currentPrice) * currentMarketCap;
-        }
-        if (athData?.price) {
-          athMarketCap = (athData.price / currentPrice) * currentMarketCap;
-        }
-      }
-      
-      if (currentFDV && currentPrice) {
+      if (currentFDV && currentPrice && currentPrice > 0) {
         // Calculate FDVs based on price ratios
         if (priceAtCall) {
           fdvAtCall = (priceAtCall / currentPrice) * currentFDV;
@@ -383,6 +379,11 @@ export class GeckoTerminalAPI {
           athFDV = (athData.price / currentPrice) * currentFDV;
         }
       }
+      
+      // For now, set market caps to same as FDV (can be refined later)
+      const currentMarketCap = currentFDV;
+      const marketCapAtCall = fdvAtCall;
+      const athMarketCap = athFDV;
       
       return {
         tokenInfo,

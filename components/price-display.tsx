@@ -184,7 +184,7 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, existingP
           title={`Price: ${formatPrice(priceData.priceAtCall)}`}
         >
           <span className="text-muted-foreground">Entry:</span>
-          <span className="font-mono font-medium">{formatMarketCap(priceData.marketCapAtCall)}</span>
+          <span className="font-mono font-medium">{formatMarketCap(priceData.fdvAtCall || priceData.marketCapAtCall)}</span>
         </div>
         
         <div 
@@ -192,7 +192,7 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, existingP
           title={`Price: ${formatPrice(priceData.currentPrice)}`}
         >
           <span className="text-muted-foreground">Now:</span>
-          <span className="font-mono font-medium">{formatMarketCap(priceData.currentMarketCap)}</span>
+          <span className="font-mono font-medium">{formatMarketCap(priceData.currentFDV || priceData.currentMarketCap)}</span>
         </div>
         
         <div 
@@ -201,7 +201,7 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, existingP
         >
           <Trophy className="h-3 w-3 text-yellow-500" />
           <span className="text-muted-foreground">ATH:</span>
-          <span className="font-mono font-medium">{formatMarketCap(priceData.athMarketCap)}</span>
+          <span className="font-mono font-medium">{formatMarketCap(priceData.athFDV || priceData.athMarketCap)}</span>
         </div>
       </div>
         
