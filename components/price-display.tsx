@@ -93,8 +93,14 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, existingP
   
   useEffect(() => {
     // If we have existing price data, use it
+    // But check if it's actually valid data (not all nulls)
     if (existingPriceData) {
-      setPriceData(existingPriceData)
+      const hasValidData = existingPriceData.priceAtCall !== null || 
+                          existingPriceData.currentPrice !== null || 
+                          existingPriceData.ath !== null
+      if (hasValidData) {
+        setPriceData(existingPriceData)
+      }
     }
   }, [existingPriceData])
   
