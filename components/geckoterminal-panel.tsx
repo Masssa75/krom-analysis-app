@@ -6,6 +6,13 @@ interface GeckoTerminalPanelProps {
     ticker: string
     contract: string | null
     network: string | null
+    priceData?: {
+      currentPrice?: number | null
+      priceAtCall?: number | null
+      roi?: number | null
+      currentMcap?: number | null
+      currentFdv?: number | null
+    }
   }
   onClose: () => void
 }
@@ -60,13 +67,53 @@ export function GeckoTerminalPanel({ token, onClose }: GeckoTerminalPanelProps) 
               Contract: {token.contract} ({networkSlug})
             </p>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-          >
-            <X className="h-4 w-4" />
-          </Button>
+          
+          <div className="flex items-center gap-6">
+            {token.priceData && (
+              <div className="text-right space-y-1">
+                {token.priceData.currentPrice !== null && token.priceData.currentPrice !== undefined && (
+                  <div className="text-sm">
+                    <span className="text-muted-foreground">Price: </span>
+                    <span className="font-mono font-medium">
+                      ${token.priceData.currentPrice < 0.00001 
+                        ? token.priceData.currentPrice.toExponential(2) 
+                        : token.priceData.currentPrice.toFixed(6)}
+                    </span>
+                  </div>
+                )}
+                {token.priceData.currentMcap !== null && token.priceData.currentMcap !== undefined && (
+                  <div className="text-sm">
+                    <span className="text-muted-foreground">MCap: </span>
+                    <span className="font-mono font-medium">
+                      ${token.priceData.currentMcap >= 1000000 
+                        ? (token.priceData.currentMcap / 1000000).toFixed(2) + 'M'
+                        : token.priceData.currentMcap >= 1000
+                        ? (token.priceData.currentMcap / 1000).toFixed(2) + 'K'
+                        : token.priceData.currentMcap.toFixed(0)}
+                    </span>
+                  </div>
+                )}
+                {token.priceData.roi !== null && token.priceData.roi !== undefined && (
+                  <div className="text-sm">
+                    <span className="text-muted-foreground">ROI: </span>
+                    <span className={`font-mono font-medium ${
+                      token.priceData.roi > 0 ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {token.priceData.roi > 0 ? '+' : ''}{token.priceData.roi.toFixed(0)}%
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+            
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
         
         <div className="flex-1 p-4">

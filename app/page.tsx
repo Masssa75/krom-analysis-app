@@ -955,7 +955,14 @@ export default function HomePage() {
                                   onClick={() => setSelectedTokenForChart({
                                     ticker: call.token,
                                     contract: call.contract,
-                                    network: call.network
+                                    network: call.network,
+                                    priceData: {
+                                      currentPrice: call.current_price,
+                                      priceAtCall: call.price_at_call,
+                                      roi: call.roi_percent,
+                                      currentMcap: call.current_mcap,
+                                      currentFdv: call.current_fdv
+                                    }
                                   })}
                                   className="font-mono text-sm hover:underline text-left"
                                 >
