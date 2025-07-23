@@ -65,7 +65,7 @@ export class GeckoTerminalAPI {
         circulating_supply: token.circulating_supply,
       };
     } catch (error) {
-      console.error('Error fetching token info:', error);
+      // Error fetching token info
       return null;
     }
   }
@@ -83,7 +83,7 @@ export class GeckoTerminalAPI {
       const data = await response.json();
       return data.data || [];
     } catch (error) {
-      console.error('Error fetching token pools:', error);
+      // Error fetching token pools
       return [];
     }
   }
@@ -129,7 +129,7 @@ export class GeckoTerminalAPI {
         volume: item[5]
       }));
     } catch (error) {
-      console.error('Error fetching OHLCV data:', error);
+      // Error fetching OHLCV data
       return [];
     }
   }
@@ -145,7 +145,7 @@ export class GeckoTerminalAPI {
       const pools = await this.getTokenPools(network, tokenAddress);
       
       if (pools.length === 0) {
-        console.log('No pools found for token');
+        // No pools found for token
         return null;
       }
       
@@ -160,7 +160,7 @@ export class GeckoTerminalAPI {
       const poolAddress = mainPool.attributes?.address;
       
       if (!poolAddress) {
-        console.log('No valid pool address found');
+        // No valid pool address found
         return null;
       }
       
@@ -178,7 +178,7 @@ export class GeckoTerminalAPI {
       );
       
       if (ohlcvData.length === 0) {
-        console.log('No OHLCV data found');
+        // No OHLCV data found
         return null;
       }
       
@@ -196,7 +196,7 @@ export class GeckoTerminalAPI {
       
       return closestPrice;
     } catch (error) {
-      console.error('Error getting token price at timestamp:', error);
+      // Error getting token price at timestamp
       return null;
     }
   }
@@ -279,7 +279,7 @@ export class GeckoTerminalAPI {
         timestamp: maxPriceTimestamp
       };
     } catch (error) {
-      console.error('Error getting ATH:', error);
+      // Error getting ATH
       return null;
     }
   }
@@ -290,7 +290,7 @@ export class GeckoTerminalAPI {
       const tokenInfo = await this.getTokenInfo(network, tokenAddress);
       return tokenInfo?.price_usd || null;
     } catch (error) {
-      console.error('Error getting current price:', error);
+      // Error getting current price
       return null;
     }
   }
@@ -305,7 +305,7 @@ export class GeckoTerminalAPI {
       
       return price * supplyNum;
     } catch (error) {
-      console.error('Error calculating market cap:', error);
+      // Error calculating market cap
       return null;
     }
   }
@@ -398,7 +398,7 @@ export class GeckoTerminalAPI {
         athFDV
       };
     } catch (error) {
-      console.error('Error getting token data with market caps:', error);
+      // Error getting token data with market caps
       return {
         tokenInfo: null,
         priceAtCall: null,

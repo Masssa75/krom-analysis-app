@@ -13,8 +13,6 @@ export async function POST(request: Request) {
   try {
     const { count = 10 } = await request.json();
     
-    console.log(`Starting batch price fetch for ${count} calls`);
-    
     // Get calls that have contracts but no price data
     const { data: calls, error } = await supabase
       .from('crypto_calls')
@@ -26,7 +24,6 @@ export async function POST(request: Request) {
       .limit(count);
     
     if (error) {
-      console.error('Database error:', error);
       return NextResponse.json({ error: 'Failed to fetch calls' }, { status: 500 });
     }
     
@@ -36,8 +33,6 @@ export async function POST(request: Request) {
         processed: 0 
       });
     }
-    
-    console.log(`Found ${calls.length} calls to process`);
     
     const results = {
       processed: 0,
@@ -55,8 +50,6 @@ export async function POST(request: Request) {
         // Use buy_timestamp if available, otherwise use created_at
         const callTimestamp = call.buy_timestamp || call.created_at;
         const timestampInSeconds = new Date(callTimestamp).getTime() / 1000;
-        
-        console.log(`Processing ${call.ticker} (${contractAddress}) on ${network}`);
         
         // Fetch comprehensive token data with market caps
         const tokenData = await geckoTerminal.getTokenDataWithMarketCaps(
@@ -101,13 +94,11 @@ export async function POST(request: Request) {
         }
         
         results.successful++;
-        console.log(`✓ ${call.ticker}: Entry $${tokenData.priceAtCall?.toFixed(6)}, Current $${tokenData.currentPrice?.toFixed(6)}, ROI ${roi?.toFixed(0)}%, MC $${tokenData.currentMarketCap?.toLocaleString() || 'N/A'}`);
         
         // Add delay to respect rate limits (30 calls/minute = 2 seconds between calls)
         await new Promise(resolve => setTimeout(resolve, 2000));
         
       } catch (error) {
-        console.error(`Failed to process ${call.ticker}:`, error);
         results.failed++;
         results.errors.push({
           ticker: call.ticker,
@@ -124,7 +115,6 @@ export async function POST(request: Request) {
     });
     
   } catch (error) {
-    console.error('Batch price fetch error:', error);
     return NextResponse.json(
       { error: 'Failed to process batch price fetch' },
       { status: 500 }
