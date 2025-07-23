@@ -366,6 +366,9 @@ export default function HomePage() {
     console.log(`Found ${buttons.length} items without prices`)
     
     // Click each button with a delay using the simple approach that works
+    // Increased delay to 4 seconds to avoid rate limiting
+    const delayBetweenFetches = 4000 // 4 seconds instead of 2.5
+    
     buttons.forEach((button, index) => {
       setTimeout(() => {
         button.click()
@@ -382,9 +385,9 @@ export default function HomePage() {
             alert(`Successfully fetched prices for ${buttons.length} items!`)
             setIsFetchingPrices(false)
             setPriceFetchProgress(0)
-          }, 2500)
+          }, delayBetweenFetches)
         }
-      }, index * 2500)
+      }, index * delayBetweenFetches)
     })
   }
   
