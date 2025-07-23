@@ -20,6 +20,9 @@ export interface FilterValues {
   onlyProfitable: boolean
   minROI: number | null
   minAthROI: number | null
+  minCurrentMcap: number | null
+  minBuyMcap: number | null
+  maxBuyMcap: number | null
 }
 
 export function FilterPanel({ onFiltersChange }: FilterPanelProps) {
@@ -31,7 +34,10 @@ export function FilterPanel({ onFiltersChange }: FilterPanelProps) {
     networks: [],
     onlyProfitable: false,
     minROI: null,
-    minAthROI: null
+    minAthROI: null,
+    minCurrentMcap: null,
+    minBuyMcap: null,
+    maxBuyMcap: null
   })
 
   const updateFilter = (key: keyof FilterValues, value: any) => {
@@ -48,7 +54,10 @@ export function FilterPanel({ onFiltersChange }: FilterPanelProps) {
       networks: [],
       onlyProfitable: false,
       minROI: null,
-      minAthROI: null
+      minAthROI: null,
+      minCurrentMcap: null,
+      minBuyMcap: null,
+      maxBuyMcap: null
     }
     setFilters(defaultFilters)
     onFiltersChange(defaultFilters)
@@ -61,7 +70,10 @@ export function FilterPanel({ onFiltersChange }: FilterPanelProps) {
     filters.networks.length > 0 ||
     filters.onlyProfitable ||
     filters.minROI !== null ||
-    filters.minAthROI !== null
+    filters.minAthROI !== null ||
+    filters.minCurrentMcap !== null ||
+    filters.minBuyMcap !== null ||
+    filters.maxBuyMcap !== null
 
   return (
     <Card className="mb-4">
@@ -245,6 +257,51 @@ export function FilterPanel({ onFiltersChange }: FilterPanelProps) {
                   onChange={(e) => updateFilter('minAthROI', e.target.value ? Number(e.target.value) : null)}
                 />
               </div>
+            </div>
+          </div>
+
+          {/* Market Cap Filters */}
+          <div className="space-y-4">
+            <Label className="text-sm font-semibold">Market Cap Filters</Label>
+            
+            <div className="space-y-2">
+              <Label htmlFor="min-current-mcap">Minimum Current Market Cap</Label>
+              <input
+                id="min-current-mcap"
+                type="number"
+                placeholder="e.g., 1000000"
+                className="w-full px-3 py-1 text-sm border rounded-md"
+                value={filters.minCurrentMcap || ''}
+                onChange={(e) => updateFilter('minCurrentMcap', e.target.value ? Number(e.target.value) : null)}
+              />
+              <p className="text-xs text-muted-foreground">Filter by current market cap in USD</p>
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Market Cap at Call Range</Label>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <input
+                    id="min-buy-mcap"
+                    type="number"
+                    placeholder="Min (e.g., 50000)"
+                    className="w-full px-3 py-1 text-sm border rounded-md"
+                    value={filters.minBuyMcap || ''}
+                    onChange={(e) => updateFilter('minBuyMcap', e.target.value ? Number(e.target.value) : null)}
+                  />
+                </div>
+                <div>
+                  <input
+                    id="max-buy-mcap"
+                    type="number"
+                    placeholder="Max (e.g., 5000000)"
+                    className="w-full px-3 py-1 text-sm border rounded-md"
+                    value={filters.maxBuyMcap || ''}
+                    onChange={(e) => updateFilter('maxBuyMcap', e.target.value ? Number(e.target.value) : null)}
+                  />
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground">Filter by market cap when the call was made</p>
             </div>
           </div>
         </CardContent>

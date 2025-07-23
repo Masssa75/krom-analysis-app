@@ -1,0 +1,661 @@
+# Page snapshot
+
+```yaml
+- navigation:
+  - heading "KROM Analysis" [level=1]
+- main:
+  - heading "KROM Historical Analysis Tool" [level=3]
+  - paragraph: Analyze cryptocurrency calls with AI-powered scoring
+  - heading "Call Analysis" [level=3]
+  - paragraph: Analyze based on call messages
+  - text: Number of calls to analyze (from oldest)
+  - spinbutton "Number of calls to analyze (from oldest)": "5"
+  - text: AI Model
+  - combobox "AI Model": Kimi K2 (Good Value)
+  - button "Start Analysis"
+  - heading "X (Twitter) Analysis" [level=3]
+  - paragraph: Analyze based on social media sentiment
+  - text: Number of calls to analyze (from oldest)
+  - spinbutton "Number of calls to analyze (from oldest)": "5"
+  - paragraph: Batch analyzes using existing stored tweets (no new fetching)
+  - paragraph: Starts from oldest calls • Scores 1-10 based on tweet quality
+  - text: AI Model
+  - combobox "AI Model": Kimi K2 (Good Value)
+  - button "Start X Analysis"
+  - heading "Filters" [level=3]
+  - button:
+    - img
+  - heading "Previously Analyzed Calls" [level=3]
+  - paragraph: 277 total calls analyzed • Page 1 of 14
+  - img
+  - textbox "Search by token name..."
+  - button "Fetch All Prices":
+    - img
+    - text: Fetch All Prices
+  - checkbox "Show only coins of interest"
+  - img
+  - text: Show only coins of interest
+  - table:
+    - rowgroup:
+      - row "Token Call Analysis X Analysis Price/ROI":
+        - cell "Token"
+        - cell "Call Analysis"
+        - cell "X Analysis"
+        - cell "Price/ROI"
+        - cell
+      - row "Score Tier Score Tier":
+        - cell
+        - cell "Score"
+        - cell "Tier"
+        - cell
+        - cell "Score"
+        - cell "Tier"
+        - cell
+        - cell
+        - cell
+    - rowgroup:
+      - row "TIMECHAIN 2.0 TRASH 🎪 Meme Details - - Analyze Get Price":
+        - cell "TIMECHAIN":
+          - button "TIMECHAIN"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "-"
+        - cell "-"
+        - cell "Analyze":
+          - button "Analyze":
+            - img
+            - text: Analyze
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "BELIEVEAPI 3.0 TRASH ⚙️ Utility Details - - Analyze Get Price":
+        - cell "BELIEVEAPI":
+          - button "BELIEVEAPI"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "3.0"
+        - cell "TRASH ⚙️ Utility"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "-"
+        - cell "-"
+        - cell "Analyze":
+          - button "Analyze":
+            - img
+            - text: Analyze
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "PLANKTON 2.0 TRASH 🎪 Meme Details - - Analyze Get Price":
+        - cell "PLANKTON":
+          - button "PLANKTON"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "-"
+        - cell "-"
+        - cell "Analyze":
+          - button "Analyze":
+            - img
+            - text: Analyze
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "QUID 2.0 TRASH 🎪 Meme Details - - Analyze Get Price":
+        - cell "QUID":
+          - button "QUID"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "-"
+        - cell "-"
+        - cell "Analyze":
+          - button "Analyze":
+            - img
+            - text: Analyze
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "WIZ 1.0 TRASH 🎪 Meme Details - - Analyze Get Price":
+        - cell "WIZ":
+          - button "WIZ"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "1.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "-"
+        - cell "-"
+        - cell "Analyze":
+          - button "Analyze":
+            - img
+            - text: Analyze
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "BEAST 3.0 TRASH 🎪 Meme Details - - Analyze Get Price":
+        - cell "BEAST":
+          - button "BEAST"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "3.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "-"
+        - cell "-"
+        - cell "Analyze":
+          - button "Analyze":
+            - img
+            - text: Analyze
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "HASHCASH 2.0 TRASH 🎪 Meme Details - - Analyze Get Price":
+        - cell "HASHCASH":
+          - button "HASHCASH"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "-"
+        - cell "-"
+        - cell "Analyze":
+          - button "Analyze":
+            - img
+            - text: Analyze
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "HASHCASH 3.0 TRASH 🎪 Meme Details - - Analyze Get Price":
+        - cell "HASHCASH":
+          - button "HASHCASH"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "3.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "-"
+        - cell "-"
+        - cell "Analyze":
+          - button "Analyze":
+            - img
+            - text: Analyze
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "TOPNYAN 2.0 TRASH 🎪 Meme Details - - Analyze Get Price":
+        - cell "TOPNYAN":
+          - button "TOPNYAN"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "-"
+        - cell "-"
+        - cell "Analyze":
+          - button "Analyze":
+            - img
+            - text: Analyze
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "GORKGAME 2.0 TRASH 🎪 Meme Details - - Analyze Get Price":
+        - cell "GORKGAME":
+          - button "GORKGAME"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "-"
+        - cell "-"
+        - cell "Analyze":
+          - button "Analyze":
+            - img
+            - text: Analyze
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "GORKGAME 2.0 TRASH 🎪 Meme Details 2/10 TRASH 🎪 Meme Details Get Price":
+        - cell "GORKGAME":
+          - button "GORKGAME"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "2/10"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze X":
+            - img
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "C.C. 2.0 TRASH 🎪 Meme Details 2/10 TRASH 🎪 Meme Details Get Price":
+        - cell "C.C.":
+          - button "C.C."
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "2/10"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze X":
+            - img
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "1% 2.0 TRASH 🎪 Meme Details 2/10 TRASH 🎪 Meme Details Get Price":
+        - cell "1%":
+          - button "1%"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "2/10"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze X":
+            - img
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "TRUMPIZZA 1.0 TRASH 🎪 Meme Details 2/10 TRASH 🎪 Meme Details Get Price":
+        - cell "TRUMPIZZA":
+          - button "TRUMPIZZA"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "1.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "2/10"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze X":
+            - img
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "NANI 3.0 TRASH 🎪 Meme Details 4/10 BASIC 🎪 Meme Details Get Price":
+        - cell "NANI":
+          - button "NANI"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "3.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "4/10"
+        - cell "BASIC 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze X":
+            - img
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "HOODRAT 2.0 TRASH 🎪 Meme Details 2/10 TRASH 🎪 Meme Details Get Price":
+        - cell "HOODRAT":
+          - button "HOODRAT"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "2/10"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze X":
+            - img
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "ETHCHAN 2.0 TRASH 🎪 Meme Details 2/10 TRASH 🎪 Meme Details Get Price":
+        - cell "ETHCHAN":
+          - button "ETHCHAN"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "2/10"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze X":
+            - img
+        - cell "Get Price":
+          - button "Get Price":
+            - img
+            - text: Get Price
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - 'row "GENE 3.0 TRASH 🎪 Meme Details 2/10 TRASH 🎪 Meme Details Entry: $338.40K Now: $227.69K ATH: $2.36M -33% +599%"':
+        - cell "GENE":
+          - button "GENE"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "3.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "2/10"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze X":
+            - img
+        - 'cell "Entry: $338.40K Now: $227.69K ATH: $2.36M -33% +599%"':
+          - text: "Entry: $338.40K Now: $227.69K"
+          - img
+          - text: "ATH: $2.36M"
+          - img
+          - text: "-33%"
+          - img
+          - text: +599%
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - 'row "VEO3 2.0 TRASH 🎪 Meme Details 2/10 TRASH 🎪 Meme Details Entry: $76.74K Now: $36.89K ATH: $890.77K -52% +1061%"':
+        - cell "VEO3":
+          - button "VEO3"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "2/10"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze X":
+            - img
+        - 'cell "Entry: $76.74K Now: $36.89K ATH: $890.77K -52% +1061%"':
+          - text: "Entry: $76.74K Now: $36.89K"
+          - img
+          - text: "ATH: $890.77K"
+          - img
+          - text: "-52%"
+          - img
+          - text: +1061%
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - 'row "KING 2.0 TRASH 🎪 Meme Details 2/10 TRASH 🎪 Meme Details Entry: $356.83K Now: $358.49K ATH: $19.82M +0% +5456%"':
+        - cell "KING":
+          - button "KING"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "2/10"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze X":
+            - img
+        - 'cell "Entry: $356.83K Now: $358.49K ATH: $19.82M +0% +5456%"':
+          - text: "Entry: $356.83K Now: $358.49K"
+          - img
+          - text: "ATH: $19.82M"
+          - img
+          - text: +0%
+          - img
+          - text: +5456%
+        - cell:
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+  - button "Previous" [disabled]:
+    - img
+    - text: Previous
+  - button "1"
+  - button "2"
+  - button "3"
+  - button "4"
+  - button "5"
+  - button "Next":
+    - text: Next
+    - img
+- alert
+```

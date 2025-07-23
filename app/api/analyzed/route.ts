@@ -29,6 +29,13 @@ export async function GET(request: NextRequest) {
     const onlyProfitable = searchParams.get('onlyProfitable') === 'true';
     const minROI = searchParams.get('minROI') ? parseFloat(searchParams.get('minROI')!) : null;
     const minAthROI = searchParams.get('minAthROI') ? parseFloat(searchParams.get('minAthROI')!) : null;
+    const minCurrentMcap = searchParams.get('minCurrentMcap') ? parseFloat(searchParams.get('minCurrentMcap')!) : null;
+    const minBuyMcap = searchParams.get('minBuyMcap') ? parseFloat(searchParams.get('minBuyMcap')!) : null;
+    const maxBuyMcap = searchParams.get('maxBuyMcap') ? parseFloat(searchParams.get('maxBuyMcap')!) : null;
+    
+    // Get sort params
+    const sortBy = searchParams.get('sortBy') || 'created_at';
+    const sortOrder = searchParams.get('sortOrder') || 'desc';
 
     // Build query
     let query = supabase
@@ -84,10 +91,20 @@ export async function GET(request: NextRequest) {
       query = query.gte('ath_roi_percent', minAthROI);
     }
     
+    // Add market cap filters
+    if (minCurrentMcap !== null) {
+      query = query.gte('current_market_cap', minCurrentMcap);
+    }
+    if (minBuyMcap !== null) {
+      query = query.gte('market_cap_at_call', minBuyMcap);
+    }
+    if (maxBuyMcap !== null) {
+      query = query.lte('market_cap_at_call', maxBuyMcap);
+    }
+    
     // Add ordering and pagination
-    // Using created_at for chronological ordering
     const { data: calls, error, count } = await query
-      .order('created_at', { ascending: false })
+      .order(sortBy, { ascending: sortOrder === 'asc' })
       .range(offset, offset + limit - 1);
 
     if (error) {

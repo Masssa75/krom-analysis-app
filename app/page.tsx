@@ -14,6 +14,7 @@ import { TokenTypeBadge } from '@/components/token-type-badge'
 import { PriceDisplay } from '@/components/price-display'
 import { GeckoTerminalPanel } from '@/components/geckoterminal-panel'
 import { FilterPanel, FilterValues } from '@/components/filter-panel'
+import { SortDropdown } from '@/components/sort-dropdown'
 
 export default function HomePage() {
   const [count, setCount] = useState('5')
@@ -66,13 +67,20 @@ export default function HomePage() {
     networks: [],
     onlyProfitable: false,
     minROI: null,
-    minAthROI: null
+    minAthROI: null,
+    minCurrentMcap: null,
+    minBuyMcap: null,
+    maxBuyMcap: null
   })
+  
+  // Sort state
+  const [sortBy, setSortBy] = useState('created_at')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
 
-  // Fetch analyzed calls on mount and when page/search/filter changes
+  // Fetch analyzed calls on mount and when page/search/filter/sort changes
   useEffect(() => {
     fetchAnalyzedCalls()
-  }, [currentPage, searchQuery, showOnlyCoinsOfInterest, filters])
+  }, [currentPage, searchQuery, showOnlyCoinsOfInterest, filters, sortBy, sortOrder])
 
   const fetchAnalyzedCalls = async () => {
     setLoadingAnalyzed(true)
@@ -114,6 +122,19 @@ export default function HomePage() {
       if (filters.minAthROI !== null) {
         params.append('minAthROI', filters.minAthROI.toString())
       }
+      if (filters.minCurrentMcap !== null) {
+        params.append('minCurrentMcap', filters.minCurrentMcap.toString())
+      }
+      if (filters.minBuyMcap !== null) {
+        params.append('minBuyMcap', filters.minBuyMcap.toString())
+      }
+      if (filters.maxBuyMcap !== null) {
+        params.append('maxBuyMcap', filters.maxBuyMcap.toString())
+      }
+      
+      // Add sort parameters
+      params.append('sortBy', sortBy)
+      params.append('sortOrder', sortOrder)
       
       const response = await fetch(`/api/analyzed?${params}`)
       const data = await response.json()
@@ -910,14 +931,23 @@ export default function HomePage() {
               </div>
               <div className="flex items-start gap-2">
                 <div className="space-y-2">
-                  <div className="relative w-64">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                    <Input
-                      type="text"
-                      placeholder="Search by token name..."
-                      value={searchInput}
-                      onChange={(e) => setSearchInput(e.target.value)}
-                      className="pl-10"
+                  <div className="flex items-center gap-2">
+                    <div className="relative w-64">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                      <Input
+                        type="text"
+                        placeholder="Search by token name..."
+                        value={searchInput}
+                        onChange={(e) => setSearchInput(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                    <SortDropdown 
+                      onSortChange={(newSortBy, newSortOrder) => {
+                        setSortBy(newSortBy)
+                        setSortOrder(newSortOrder)
+                        setCurrentPage(1) // Reset to first page when sort changes
+                      }}
                     />
                   </div>
                 </div>
