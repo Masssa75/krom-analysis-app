@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { krom_id, model = 'moonshotai/kimi-k2:free' } = await request.json();
+    const { krom_id, model = 'moonshotai/kimi-k2' } = await request.json();
     
     if (!krom_id) {
       return NextResponse.json({ error: 'krom_id is required' }, { status: 400 });

@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
 
     // Process 5 calls for testing (will change to 20 later)
     const limit = 5;
-    const model = 'moonshotai/kimi-k2:free';
+    const model = 'moonshotai/kimi-k2';
 
     // Fetch oldest unanalyzed calls
     const { data: calls, error: fetchError } = await supabase

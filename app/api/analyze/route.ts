@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     : null;
     
   try {
-    const { limit = 5, model = 'moonshotai/kimi-k2:free' } = await request.json();
+    const { limit = 5, model = 'moonshotai/kimi-k2' } = await request.json();
 
     if (!supabase) {
       return NextResponse.json({ error: 'Database not configured' }, { status: 500 });

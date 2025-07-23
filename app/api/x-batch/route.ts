@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
   const startTime = Date.now()
   
   try {
-    const { limit = 10, model = 'moonshotai/kimi-k2:free' } = await request.json()
+    const { limit = 10, model = 'moonshotai/kimi-k2' } = await request.json()
     
     // Generate batch ID
     const batchId = crypto.randomUUID()

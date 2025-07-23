@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
       },
       body: JSON.stringify({
         limit: limit,
-        model: 'moonshotai/kimi-k2:free'
+        model: 'moonshotai/kimi-k2'
       })
     });
 
