@@ -19,7 +19,7 @@ export async function POST(request: Request) {
       .select('krom_id, ticker, raw_data, buy_timestamp, created_at')
       .not('raw_data->token->ca', 'is', null)
       .is('price_at_call', null)
-      .not('analysis_score', 'is', null) // Only fetch prices for analyzed calls
+      .or('call_ai_analysis_score.not.is.null,x_ai_analysis_score.not.is.null') // Only fetch prices for analyzed calls
       .order('created_at', { ascending: false })
       .limit(count);
     
