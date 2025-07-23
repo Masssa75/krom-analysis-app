@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { TrendingUp, TrendingDown, Loader2, DollarSign, Trophy } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 interface PriceData {
   priceAtCall: number | null
@@ -177,59 +176,34 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, existingP
   }
   
   return (
-    <TooltipProvider delayDuration={0}>
-      <div className="space-y-1.5 text-xs">
-        {/* Market Cap Column */}
-        <div className="space-y-1">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div 
-                className="flex items-center gap-1 cursor-help hover:opacity-80 transition-opacity"
-                title={`Price: ${formatPrice(priceData.priceAtCall)}`}
-              >
-                <span className="text-muted-foreground">Entry:</span>
-                <span className="font-mono font-medium">{formatMarketCap(priceData.marketCapAtCall)}</span>
-              </div>
-            </TooltipTrigger>
-            <TooltipContent side="left" align="center">
-              <p>Price: {formatPrice(priceData.priceAtCall)}</p>
-            </TooltipContent>
-          </Tooltip>
-          
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div 
-                className="flex items-center gap-1 cursor-help hover:opacity-80 transition-opacity"
-                title={`Price: ${formatPrice(priceData.currentPrice)}`}
-              >
-                <span className="text-muted-foreground">Now:</span>
-                <span className="font-mono font-medium">{formatMarketCap(priceData.currentMarketCap)}</span>
-              </div>
-            </TooltipTrigger>
-            <TooltipContent side="left" align="center">
-              <p>Price: {formatPrice(priceData.currentPrice)}</p>
-            </TooltipContent>
-          </Tooltip>
-          
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div 
-                className="flex items-center gap-1 cursor-help hover:opacity-80 transition-opacity"
-                title={`Price: ${formatPrice(priceData.ath)}${priceData.athDate ? ` | Date: ${new Date(priceData.athDate).toLocaleDateString()}` : ''}`}
-              >
-                <Trophy className="h-3 w-3 text-yellow-500" />
-                <span className="text-muted-foreground">ATH:</span>
-                <span className="font-mono font-medium">{formatMarketCap(priceData.athMarketCap)}</span>
-              </div>
-            </TooltipTrigger>
-            <TooltipContent side="left" align="center">
-              <p>Price: {formatPrice(priceData.ath)}</p>
-              {priceData.athDate && (
-                <p>Date: {new Date(priceData.athDate).toLocaleDateString()}</p>
-              )}
-            </TooltipContent>
-          </Tooltip>
+    <div className="space-y-1.5 text-xs">
+      {/* Market Cap Column */}
+      <div className="space-y-1">
+        <div 
+          className="flex items-center gap-1 cursor-help hover:opacity-80 transition-opacity"
+          title={`Price: ${formatPrice(priceData.priceAtCall)}`}
+        >
+          <span className="text-muted-foreground">Entry:</span>
+          <span className="font-mono font-medium">{formatMarketCap(priceData.marketCapAtCall)}</span>
         </div>
+        
+        <div 
+          className="flex items-center gap-1 cursor-help hover:opacity-80 transition-opacity"
+          title={`Price: ${formatPrice(priceData.currentPrice)}`}
+        >
+          <span className="text-muted-foreground">Now:</span>
+          <span className="font-mono font-medium">{formatMarketCap(priceData.currentMarketCap)}</span>
+        </div>
+        
+        <div 
+          className="flex items-center gap-1 cursor-help hover:opacity-80 transition-opacity"
+          title={`Price: ${formatPrice(priceData.ath)}${priceData.athDate ? ` | Date: ${new Date(priceData.athDate).toLocaleDateString()}` : ''}`}
+        >
+          <Trophy className="h-3 w-3 text-yellow-500" />
+          <span className="text-muted-foreground">ATH:</span>
+          <span className="font-mono font-medium">{formatMarketCap(priceData.athMarketCap)}</span>
+        </div>
+      </div>
         
         {/* ROI Display */}
         <div className="flex items-center gap-3 pt-1 border-t">
@@ -248,6 +222,5 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, existingP
           </div>
         </div>
       </div>
-    </TooltipProvider>
   )
 }
