@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { fetchTokenPrice } from '@/lib/geckoterminal';
+import { GeckoTerminalAPI } from '@/lib/geckoterminal';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
+const geckoTerminal = new GeckoTerminalAPI(process.env.GECKO_TERMINAL_API_KEY!);
 const DELAY_BETWEEN_CALLS = 2000; // 2 seconds to respect rate limits
 
 export async function GET(request: Request) {
@@ -69,23 +70,32 @@ export async function GET(request: Request) {
 
         // Fetch price data
         console.log(`Fetching price for ${call.ticker} (${i + 1}/${calls.length})...`);
-        const priceData = await fetchTokenPrice(contractAddress, network, call.buy_timestamp);
+        const timestampInSeconds = Math.floor(new Date(call.buy_timestamp).getTime() / 1000);
+        const tokenData = await geckoTerminal.getTokenDataWithMarketCaps(
+          network,
+          contractAddress,
+          timestampInSeconds
+        );
 
-        if (priceData) {
+        if (tokenData && tokenData.priceAtCall) {
           // Update database with price data
           const { error: updateError } = await supabase
             .from('crypto_calls')
             .update({
-              price_at_call: priceData.priceAtCall,
-              current_price: priceData.currentPrice,
-              price_change_percent: priceData.priceChangePercent,
-              ath_price: priceData.athPrice,
-              ath_date: priceData.athDate,
-              ath_roi: priceData.athROI,
-              mcap_at_call: priceData.mcapAtCall,
-              current_mcap: priceData.currentMcap,
-              fdv_at_call: priceData.fdvAtCall,
-              current_fdv: priceData.currentFdv,
+              price_at_call: tokenData.priceAtCall,
+              current_price: tokenData.currentPrice,
+              price_change_percent: tokenData.priceAtCall && tokenData.currentPrice
+                ? ((tokenData.currentPrice - tokenData.priceAtCall) / tokenData.priceAtCall) * 100
+                : null,
+              ath_price: tokenData.ath?.price || null,
+              ath_date: tokenData.ath?.timestamp ? new Date(tokenData.ath.timestamp * 1000).toISOString() : null,
+              ath_roi: tokenData.priceAtCall && tokenData.ath?.price
+                ? ((tokenData.ath.price - tokenData.priceAtCall) / tokenData.priceAtCall) * 100
+                : null,
+              mcap_at_call: tokenData.marketCapAtCall,
+              current_mcap: tokenData.currentMarketCap,
+              fdv_at_call: tokenData.fdvAtCall,
+              current_fdv: tokenData.currentFDV,
               price_updated_at: new Date().toISOString()
             })
             .eq('krom_id', call.krom_id);
@@ -98,9 +108,11 @@ export async function GET(request: Request) {
             krom_id: call.krom_id,
             ticker: call.ticker,
             status: 'success',
-            priceAtCall: priceData.priceAtCall,
-            currentPrice: priceData.currentPrice,
-            roi: priceData.priceChangePercent
+            priceAtCall: tokenData.priceAtCall,
+            currentPrice: tokenData.currentPrice,
+            roi: tokenData.priceAtCall && tokenData.currentPrice
+              ? ((tokenData.currentPrice - tokenData.priceAtCall) / tokenData.priceAtCall) * 100
+              : null
           });
           successCount++;
         } else {
