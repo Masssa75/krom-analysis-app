@@ -12,6 +12,7 @@ import { Download, Copy, ExternalLink, ChevronRight, MessageSquare, RefreshCw, S
 import { AnalysisDetailPanel } from '@/components/analysis-detail-panel'
 import { TokenTypeBadge } from '@/components/token-type-badge'
 import { PriceDisplay } from '@/components/price-display'
+import { GeckoTerminalPanel } from '@/components/geckoterminal-panel'
 
 export default function HomePage() {
   const [count, setCount] = useState('5')
@@ -52,6 +53,9 @@ export default function HomePage() {
   // Batch price fetching state
   const [isFetchingPrices, setIsFetchingPrices] = useState(false)
   const [priceFetchProgress, setPriceFetchProgress] = useState(0)
+  
+  // GeckoTerminal panel state
+  const [selectedTokenForChart, setSelectedTokenForChart] = useState<any>(null)
 
   // Fetch analyzed calls on mount and when page/search/filter changes
   useEffect(() => {
@@ -947,14 +951,16 @@ export default function HomePage() {
                           <td className="py-3 px-2">
                             <div className="flex items-center gap-2">
                               {call.contract ? (
-                                <a
-                                  href={`https://dexscreener.com/${call.network === 'solana' ? 'solana' : 'ethereum'}/${call.contract}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="font-mono text-sm hover:underline"
+                                <button
+                                  onClick={() => setSelectedTokenForChart({
+                                    ticker: call.token,
+                                    contract: call.contract,
+                                    network: call.network
+                                  })}
+                                  className="font-mono text-sm hover:underline text-left"
                                 >
                                   {call.token}
-                                </a>
+                                </button>
                               ) : (
                                 <span className="font-mono text-sm">{call.token}</span>
                               )}
@@ -1178,6 +1184,14 @@ export default function HomePage() {
         onClose={closeDetailPanel}
         onCommentSaved={onCommentSaved}
       />
+      
+      {/* GeckoTerminal Chart Panel */}
+      {selectedTokenForChart && (
+        <GeckoTerminalPanel
+          token={selectedTokenForChart}
+          onClose={() => setSelectedTokenForChart(null)}
+        />
+      )}
     </div>
   )
 }
