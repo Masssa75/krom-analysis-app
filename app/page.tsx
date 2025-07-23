@@ -350,49 +350,58 @@ export default function HomePage() {
   }
   
   const fetchAllPrices = async () => {
-    // Get all calls on current page that don't have price data
-    const callsNeedingPrices = analyzedCalls.filter(call => 
-      call.contract && !call.price_at_call
-    )
-    
-    if (callsNeedingPrices.length === 0) {
-      alert('All items on this page already have price data!')
-      return
-    }
-    
     setIsFetchingPrices(true)
     setPriceFetchProgress(0)
     
-    try {
-      const response = await fetch('/api/batch-price-fetch', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          count: callsNeedingPrices.length
-        })
-      })
-      
-      const result = await response.json()
-      
-      if (!response.ok) {
-        throw new Error(result.error || 'Price fetch failed')
+    // Find all "Get Price" buttons on the page
+    const getPriceButtons = document.querySelectorAll('button')
+    const priceButtons = Array.from(getPriceButtons).filter(btn => 
+      btn.textContent?.includes('Get Price')
+    )
+    
+    if (priceButtons.length === 0) {
+      alert('All items on this page already have price data!')
+      setIsFetchingPrices(false)
+      return
+    }
+    
+    console.log(`Found ${priceButtons.length} items without prices`)
+    
+    // Click each button with a delay
+    let successCount = 0
+    const totalButtons = priceButtons.length
+    
+    for (let i = 0; i < priceButtons.length; i++) {
+      try {
+        const button = priceButtons[i]
+        
+        // Check if button is still visible and enabled
+        if (button && !button.disabled && button.offsetParent !== null) {
+          console.log(`Fetching price ${i + 1} of ${totalButtons}...`)
+          
+          // Update progress
+          setPriceFetchProgress(Math.round((i + 1) / totalButtons * 100))
+          
+          // Click the button
+          button.click()
+          successCount++
+          
+          // Wait 2.5 seconds between requests to respect rate limits
+          await new Promise(resolve => setTimeout(resolve, 2500))
+        }
+      } catch (error) {
+        console.error(`Error clicking button ${i + 1}:`, error)
       }
-      
-      setPriceFetchProgress(100)
-      
-      // Refresh the page to show new prices
-      await fetchAnalyzedCalls()
-      
-      alert(`Successfully fetched prices for ${result.success} out of ${result.processed} items!`)
-      
-    } catch (err: any) {
-      alert(`Error fetching prices: ${err.message}`)
-    } finally {
+    }
+    
+    setPriceFetchProgress(100)
+    
+    // Show completion message
+    setTimeout(() => {
+      alert(`Successfully triggered ${successCount} price fetches!`)
       setIsFetchingPrices(false)
       setPriceFetchProgress(0)
-    }
+    }, 1000)
   }
   
   // Handle search with debouncing
@@ -888,7 +897,7 @@ export default function HomePage() {
                   {isFetchingPrices ? (
                     <>
                       <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                      Fetching Prices...
+                      {priceFetchProgress > 0 ? `Fetching... ${priceFetchProgress}%` : 'Starting...'}
                     </>
                   ) : (
                     <>
