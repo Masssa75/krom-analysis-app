@@ -3,11 +3,11 @@ import { createClient } from '@supabase/supabase-js';
 import { GeckoTerminalAPI } from '@/lib/geckoterminal';
 
 const supabase = createClient(
-  process.env.SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-const geckoTerminal = new GeckoTerminalAPI(process.env.GECKO_TERMINAL_API_KEY!);
+const geckoTerminal = new GeckoTerminalAPI(process.env.GECKO_TERMINAL_API_KEY || 'not-required');
 
 export async function POST(request: Request) {
   try {
@@ -19,7 +19,7 @@ export async function POST(request: Request) {
       .select('krom_id, ticker, raw_data, buy_timestamp, created_at')
       .not('raw_data->token->ca', 'is', null)
       .is('price_at_call', null)
-      .or('call_ai_analysis_score.not.is.null,x_ai_analysis_score.not.is.null') // Only fetch prices for analyzed calls
+      .or('analysis_score.not.is.null,x_analysis_score.not.is.null') // Only fetch prices for analyzed calls
       .order('created_at', { ascending: false })
       .limit(count);
     
