@@ -44,10 +44,35 @@ export async function GET() {
       throw xError;
     }
 
+    // Get count of calls with contract addresses
+    const { count: withContracts, error: contractError } = await supabase
+      .from('crypto_calls')
+      .select('*', { count: 'exact', head: true })
+      .not('raw_data->token->ca', 'is', null);
+
+    if (contractError) {
+      console.error('Error getting contract count:', contractError);
+      throw contractError;
+    }
+
+    // Get count of calls with price data
+    const { count: pricesFetched, error: priceError } = await supabase
+      .from('crypto_calls')
+      .select('*', { count: 'exact', head: true })
+      .not('raw_data->token->ca', 'is', null)
+      .not('price_at_call', 'is', null);
+
+    if (priceError) {
+      console.error('Error getting price count:', priceError);
+      throw priceError;
+    }
+
     return NextResponse.json({
       total: totalCount || 0,
       callAnalysis: callAnalysisCount || 0,
-      xAnalysis: xAnalysisCount || 0
+      xAnalysis: xAnalysisCount || 0,
+      withContracts: withContracts || 0,
+      pricesFetched: pricesFetched || 0
     });
   } catch (error: any) {
     console.error('Error fetching analysis counts:', error);

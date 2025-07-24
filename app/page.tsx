@@ -83,7 +83,9 @@ export default function HomePage() {
     total: number
     callAnalysis: number
     xAnalysis: number
-  }>({ total: 0, callAnalysis: 0, xAnalysis: 0 })
+    withContracts: number
+    pricesFetched: number
+  }>({ total: 0, callAnalysis: 0, xAnalysis: 0, withContracts: 0, pricesFetched: 0 })
 
   // Fetch analyzed calls on mount and when page/search/filter/sort changes
   useEffect(() => {
@@ -658,14 +660,21 @@ export default function HomePage() {
                   ({((analysisCounts.callAnalysis / analysisCounts.total) * 100).toFixed(1)}%)
                 </div>
               </div>
-              <div className="text-center border-l border-r px-6">
+              <div className="text-center border-l px-6">
                 <div className="font-semibold text-2xl">{analysisCounts.xAnalysis.toLocaleString()}</div>
                 <div className="text-muted-foreground">X Analysis</div>
                 <div className="text-xs text-muted-foreground">
                   ({((analysisCounts.xAnalysis / analysisCounts.total) * 100).toFixed(1)}%)
                 </div>
               </div>
-              <div className="text-center">
+              <div className="text-center border-l px-6">
+                <div className="font-semibold text-2xl">{analysisCounts.pricesFetched.toLocaleString()}</div>
+                <div className="text-muted-foreground">Prices Fetched</div>
+                <div className="text-xs text-muted-foreground">
+                  ({analysisCounts.withContracts > 0 ? ((analysisCounts.pricesFetched / analysisCounts.withContracts) * 100).toFixed(1) : 0}%)
+                </div>
+              </div>
+              <div className="text-center border-l px-6">
                 <div className="font-semibold text-2xl">{analysisCounts.total.toLocaleString()}</div>
                 <div className="text-muted-foreground">Total Calls</div>
               </div>
