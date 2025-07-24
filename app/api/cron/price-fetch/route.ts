@@ -11,7 +11,7 @@ export async function GET(request: Request) {
     }
     
     // Configuration
-    const BATCH_SIZE = 4; // Reduced to 4 tokens to fit within Netlify's 10-second timeout
+    const BATCH_SIZE = 10; // Process 10 tokens per minute (15s total time fits in 60s cron timeout)
     
     console.log(`[CRON] Starting price fetch for up to ${BATCH_SIZE} tokens`);
     
