@@ -95,8 +95,8 @@ export async function POST(request: Request) {
         
         results.successful++;
         
-        // Add delay to respect rate limits (30 calls/minute = 2 seconds between calls)
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // Add delay to respect rate limits (reduced for Netlify timeout constraints)
+        await new Promise(resolve => setTimeout(resolve, 1500));
         
       } catch (error) {
         results.failed++;
