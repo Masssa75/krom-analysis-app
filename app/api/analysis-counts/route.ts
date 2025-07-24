@@ -60,7 +60,7 @@ export async function GET() {
       .from('crypto_calls')
       .select('*', { count: 'exact', head: true })
       .not('raw_data->token->ca', 'is', null)
-      .not('price_at_call', 'is', null);
+      .not('current_price', 'is', null);
 
     if (priceError) {
       console.error('Error getting price count:', priceError);
