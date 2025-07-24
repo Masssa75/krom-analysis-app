@@ -78,10 +78,30 @@ export default function HomePage() {
   const [sortBy, setSortBy] = useState('created_at')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
 
+  // Analysis counts state
+  const [analysisCounts, setAnalysisCounts] = useState<{
+    total: number
+    callAnalysis: number
+    xAnalysis: number
+  }>({ total: 0, callAnalysis: 0, xAnalysis: 0 })
+
   // Fetch analyzed calls on mount and when page/search/filter/sort changes
   useEffect(() => {
     fetchAnalyzedCalls()
+    fetchAnalysisCounts()
   }, [currentPage, searchQuery, showOnlyCoinsOfInterest, filters, sortBy, sortOrder])
+
+  const fetchAnalysisCounts = async () => {
+    try {
+      const response = await fetch('/api/analysis-counts')
+      const data = await response.json()
+      if (response.ok) {
+        setAnalysisCounts(data)
+      }
+    } catch (err) {
+      console.error('Failed to fetch analysis counts:', err)
+    }
+  }
 
   const fetchAnalyzedCalls = async () => {
     setLoadingAnalyzed(true)
@@ -188,6 +208,7 @@ export default function HomePage() {
         if (response.ok) {
           // Refresh the page data to see if analysis was saved
           await fetchAnalyzedCalls()
+          await fetchAnalysisCounts()
           setIsAnalyzing(false)
           setProgress(0)
           setStatus('')
@@ -211,6 +232,7 @@ export default function HomePage() {
         setResults(data)
         // Refresh analyzed calls list
         fetchAnalyzedCalls()
+        fetchAnalysisCounts()
       }, 500)
       
     } catch (err: any) {
@@ -395,6 +417,7 @@ export default function HomePage() {
       
       // Refresh analyzed calls
       fetchAnalyzedCalls()
+      fetchAnalysisCounts()
       
     } catch (err: any) {
       setXError(err.message || 'Failed to analyze X data')
@@ -490,6 +513,7 @@ export default function HomePage() {
       
       // Refresh the analyzed calls list
       await fetchAnalyzedCalls()
+      await fetchAnalysisCounts()
       
       // Update results if it's in the current results
       if (results) {
@@ -536,6 +560,7 @@ export default function HomePage() {
       
       // Refresh the analyzed calls list
       await fetchAnalyzedCalls()
+      await fetchAnalysisCounts()
       
     } catch (err: any) {
       console.error('Failed to reanalyze X:', err)
@@ -573,6 +598,7 @@ export default function HomePage() {
       
       // Refresh the analyzed calls list
       await fetchAnalyzedCalls()
+      await fetchAnalysisCounts()
       
     } catch (err: any) {
       console.error('Failed to delete analysis:', err)
@@ -607,6 +633,7 @@ export default function HomePage() {
       
       // Refresh the analyzed calls list
       await fetchAnalyzedCalls()
+      await fetchAnalysisCounts()
       
     } catch (err: any) {
       console.error('Failed to toggle invalidation:', err)
@@ -622,6 +649,28 @@ export default function HomePage() {
           <CardDescription>
             Analyze cryptocurrency calls with AI-powered scoring
           </CardDescription>
+          {analysisCounts.total > 0 && (
+            <div className="mt-4 flex justify-center gap-6 text-sm">
+              <div className="text-center">
+                <div className="font-semibold text-2xl">{analysisCounts.callAnalysis.toLocaleString()}</div>
+                <div className="text-muted-foreground">Call Analysis</div>
+                <div className="text-xs text-muted-foreground">
+                  ({((analysisCounts.callAnalysis / analysisCounts.total) * 100).toFixed(1)}%)
+                </div>
+              </div>
+              <div className="text-center border-l border-r px-6">
+                <div className="font-semibold text-2xl">{analysisCounts.xAnalysis.toLocaleString()}</div>
+                <div className="text-muted-foreground">X Analysis</div>
+                <div className="text-xs text-muted-foreground">
+                  ({((analysisCounts.xAnalysis / analysisCounts.total) * 100).toFixed(1)}%)
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="font-semibold text-2xl">{analysisCounts.total.toLocaleString()}</div>
+                <div className="text-muted-foreground">Total Calls</div>
+              </div>
+            </div>
+          )}
         </CardHeader>
       </Card>
 
