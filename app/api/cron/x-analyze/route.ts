@@ -17,8 +17,8 @@ export async function GET(request: NextRequest) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // Process 5 calls at a time
-    const limit = 5;
+    // Process 3 calls at a time (reduced for better reliability)
+    const limit = 3;
     
     // Fetch calls with tweets that need X analysis
     const { data: calls, error: fetchError } = await supabase
