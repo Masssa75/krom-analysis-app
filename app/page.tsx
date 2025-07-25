@@ -544,7 +544,7 @@ export default function HomePage() {
       alert(`Edge Function: Processed ${result.processed} calls. ${result.successful} successful, ${result.failed} failed.`)
     } catch (error) {
       console.error('Error calling edge function:', error)
-      alert(`Failed to fetch prices via edge function: ${error.message}`)
+      alert(`Failed to fetch prices via edge function: ${error instanceof Error ? error.message : 'Unknown error'}`)
     } finally {
       setIsFetchingPrices(false)
       setPriceFetchProgress(0)
