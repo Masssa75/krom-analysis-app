@@ -480,7 +480,7 @@ export default function HomePage() {
   
   const clearPrices = async () => {
     // Get all krom_ids from the current page
-    const kromIds = paginatedCalls.map(call => call.krom_id)
+    const kromIds = analyzedCalls.map(call => call.krom_id)
     
     if (kromIds.length === 0) {
       alert('No calls on this page to clear prices for!')
