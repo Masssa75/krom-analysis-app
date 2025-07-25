@@ -516,6 +516,41 @@ export default function HomePage() {
     }
   }
   
+  const fetchPricesViaEdgeFunction = async () => {
+    setIsFetchingPrices(true)
+    setPriceFetchProgress(0)
+    
+    try {
+      // Call the Supabase Edge Function directly
+      const response = await fetch('https://eucfoommxxvqmmwdbkdv.supabase.co/functions/v1/crypto-price-fetcher', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({})
+      })
+      
+      if (!response.ok) {
+        const error = await response.text()
+        throw new Error(`Edge function error: ${error}`)
+      }
+      
+      const result = await response.json()
+      
+      // Refresh the analyzed calls to show updated data
+      await fetchAnalyzedCalls()
+      
+      alert(`Edge Function: Processed ${result.processed} calls. ${result.successful} successful, ${result.failed} failed.`)
+    } catch (error) {
+      console.error('Error calling edge function:', error)
+      alert(`Failed to fetch prices via edge function: ${error.message}`)
+    } finally {
+      setIsFetchingPrices(false)
+      setPriceFetchProgress(0)
+    }
+  }
+  
   // Handle search with debouncing
   const [searchInput, setSearchInput] = useState('')
   useEffect(() => {
@@ -1115,6 +1150,24 @@ export default function HomePage() {
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
                   Clear Prices
+                </Button>
+                <Button
+                  onClick={fetchPricesViaEdgeFunction}
+                  variant="outline"
+                  className="text-blue-600 hover:text-blue-700"
+                  disabled={isFetchingPrices}
+                >
+                  {isFetchingPrices ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                      Fetching...
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw className="w-4 h-4 mr-2" />
+                      Edge Function Test
+                    </>
+                  )}
                 </Button>
                 <div className="flex items-center space-x-2">
                   <input
