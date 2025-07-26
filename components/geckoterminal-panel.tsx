@@ -1,6 +1,22 @@
 import { X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
+// Helper functions for formatting
+const formatPrice = (price: number | null | undefined) => {
+  if (price === null || price === undefined) return 'N/A'
+  if (price < 0.00001) return price.toExponential(2)
+  if (price < 0.01) return price.toFixed(6)
+  if (price < 1) return price.toFixed(4)
+  return price.toFixed(2)
+}
+
+const formatMarketCap = (mcap: number | null | undefined) => {
+  if (!mcap) return ''
+  if (mcap >= 1000000) return `$${(mcap / 1000000).toFixed(2)}M`
+  if (mcap >= 1000) return `$${(mcap / 1000).toFixed(2)}K`
+  return `$${mcap.toFixed(0)}`
+}
+
 interface GeckoTerminalPanelProps {
   token: {
     ticker: string
@@ -12,7 +28,13 @@ interface GeckoTerminalPanelProps {
       roi?: number | null
       currentMcap?: number | null
       currentFdv?: number | null
+      ath?: number | null
+      athROI?: number | null
+      marketCapAtCall?: number | null
+      athMarketCap?: number | null
+      athFdv?: number | null
     }
+    callTimestamp?: string | null
   }
   onClose: () => void
 }
@@ -54,55 +76,88 @@ export function GeckoTerminalPanel({ token, onClose }: GeckoTerminalPanelProps) 
 
   const networkSlug = getNetworkSlug(token.network)
   
-  // GeckoTerminal embed URL
-  const embedUrl = `https://www.geckoterminal.com/${networkSlug}/pools/${token.contract}?embed=1&info=0&swaps=1`
+  // GeckoTerminal embed URL - hide transactions section to maximize chart space
+  const embedUrl = `https://www.geckoterminal.com/${networkSlug}/pools/${token.contract}?embed=1&info=0&swaps=0`
   
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-white dark:bg-gray-900 rounded-lg w-full max-w-6xl h-[80vh] flex flex-col" onClick={e => e.stopPropagation()}>
+      <div className="bg-white dark:bg-gray-900 rounded-lg w-full max-w-7xl h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
         <div className="flex justify-between items-center p-4 border-b">
           <div>
             <h3 className="text-lg font-semibold">{token.ticker} - GeckoTerminal Chart</h3>
-            <p className="text-sm text-muted-foreground">
-              Contract: {token.contract} ({networkSlug})
-            </p>
+            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+              <span>Contract: {token.contract} ({networkSlug})</span>
+              {token.callTimestamp && (
+                <span className="border-l pl-4">
+                  Call: {new Date(token.callTimestamp).toLocaleString('en-US', {
+                    timeZone: 'Asia/Bangkok',
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                  })} (Thai Time)
+                </span>
+              )}
+            </div>
           </div>
           
           <div className="flex items-center gap-6">
             {token.priceData && (
-              <div className="text-right space-y-1">
-                {token.priceData.currentPrice !== null && token.priceData.currentPrice !== undefined && (
-                  <div className="text-sm">
-                    <span className="text-muted-foreground">Price: </span>
-                    <span className="font-mono font-medium">
-                      ${token.priceData.currentPrice < 0.00001 
-                        ? token.priceData.currentPrice.toExponential(2) 
-                        : token.priceData.currentPrice.toFixed(6)}
-                    </span>
+              <div className="text-right grid grid-cols-3 gap-4">
+                {/* Entry Price */}
+                <div>
+                  <div className="text-xs text-muted-foreground">Entry</div>
+                  <div className="text-sm font-mono font-medium">
+                    ${formatPrice(token.priceData.priceAtCall)}
                   </div>
-                )}
-                {token.priceData.currentMcap !== null && token.priceData.currentMcap !== undefined && (
-                  <div className="text-sm">
-                    <span className="text-muted-foreground">MCap: </span>
-                    <span className="font-mono font-medium">
-                      ${token.priceData.currentMcap >= 1000000 
-                        ? (token.priceData.currentMcap / 1000000).toFixed(2) + 'M'
-                        : token.priceData.currentMcap >= 1000
-                        ? (token.priceData.currentMcap / 1000).toFixed(2) + 'K'
-                        : token.priceData.currentMcap.toFixed(0)}
-                    </span>
+                  {token.priceData.marketCapAtCall && (
+                    <div className="text-xs text-muted-foreground">
+                      {formatMarketCap(token.priceData.marketCapAtCall)}
+                    </div>
+                  )}
+                </div>
+                
+                {/* ATH */}
+                <div>
+                  <div className="text-xs text-muted-foreground">ATH</div>
+                  <div className="text-sm font-mono font-medium">
+                    ${formatPrice(token.priceData.ath)}
                   </div>
-                )}
-                {token.priceData.roi !== null && token.priceData.roi !== undefined && (
-                  <div className="text-sm">
-                    <span className="text-muted-foreground">ROI: </span>
-                    <span className={`font-mono font-medium ${
+                  {token.priceData.athMarketCap && (
+                    <div className="text-xs text-muted-foreground">
+                      {formatMarketCap(token.priceData.athFdv || token.priceData.athMarketCap)}
+                    </div>
+                  )}
+                  {token.priceData.athROI !== null && token.priceData.athROI !== undefined && (
+                    <div className={`text-xs font-medium ${
+                      token.priceData.athROI > 0 ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {token.priceData.athROI > 0 ? '+' : ''}{token.priceData.athROI.toFixed(0)}%
+                    </div>
+                  )}
+                </div>
+                
+                {/* Now */}
+                <div>
+                  <div className="text-xs text-muted-foreground">Now</div>
+                  <div className="text-sm font-mono font-medium">
+                    ${formatPrice(token.priceData.currentPrice)}
+                  </div>
+                  {token.priceData.currentMcap && (
+                    <div className="text-xs text-muted-foreground">
+                      {formatMarketCap(token.priceData.currentFdv || token.priceData.currentMcap)}
+                    </div>
+                  )}
+                  {token.priceData.roi !== null && token.priceData.roi !== undefined && (
+                    <div className={`text-xs font-medium ${
                       token.priceData.roi > 0 ? 'text-green-600' : 'text-red-600'
                     }`}>
                       {token.priceData.roi > 0 ? '+' : ''}{token.priceData.roi.toFixed(0)}%
-                    </span>
-                  </div>
-                )}
+                    </div>
+                  )}
+                </div>
               </div>
             )}
             
@@ -116,26 +171,12 @@ export function GeckoTerminalPanel({ token, onClose }: GeckoTerminalPanelProps) 
           </div>
         </div>
         
-        <div className="flex-1 p-4">
+        <div className="flex-1 p-2">
           <iframe
             src={embedUrl}
-            className="w-full h-full rounded-lg border"
+            className="w-full h-full rounded-lg"
             title={`GeckoTerminal chart for ${token.ticker}`}
           />
-        </div>
-        
-        <div className="p-4 border-t">
-          <div className="flex justify-between items-center">
-            <p className="text-sm text-muted-foreground">
-              If the chart doesn't load, the token might not be listed on GeckoTerminal
-            </p>
-            <Button
-              variant="outline"
-              onClick={() => window.open(`https://www.geckoterminal.com/${networkSlug}/pools/${token.contract}`, '_blank')}
-            >
-              Open in GeckoTerminal
-            </Button>
-          </div>
         </div>
       </div>
     </div>

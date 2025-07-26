@@ -1235,8 +1235,14 @@ export default function HomePage() {
                                       priceAtCall: call.price_at_call,
                                       roi: call.roi_percent,
                                       currentMcap: call.current_mcap,
-                                      currentFdv: call.current_fdv
-                                    }
+                                      currentFdv: call.current_fdv,
+                                      ath: call.ath_price,
+                                      athROI: call.ath_roi_percent,
+                                      marketCapAtCall: call.market_cap_at_call,
+                                      athMarketCap: call.ath_market_cap,
+                                      athFdv: call.ath_fdv
+                                    },
+                                    callTimestamp: call.call_timestamp || call.buy_timestamp
                                   })}
                                   className="font-mono text-sm hover:underline text-left"
                                 >
