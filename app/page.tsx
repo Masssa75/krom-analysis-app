@@ -1277,26 +1277,17 @@ export default function HomePage() {
                               )}
                             </div>
                           </td>
-                          <td className="py-3 px-2 text-xs font-mono text-muted-foreground">
+                          <td className="py-3 px-2">
                             {call.contract_address ? (
-                              <div className="flex items-center gap-1">
-                                <span 
-                                  className="truncate max-w-[120px] cursor-pointer hover:text-foreground transition-colors" 
-                                  title={call.contract_address}
-                                  onClick={() => navigator.clipboard.writeText(call.contract_address)}
-                                >
-                                  {call.contract_address.slice(0, 6)}...{call.contract_address.slice(-4)}
-                                </span>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  className="h-5 w-5 p-0"
-                                  onClick={() => navigator.clipboard.writeText(call.contract_address)}
-                                  title="Copy contract address"
-                                >
-                                  <Copy className="h-3 w-3" />
-                                </Button>
-                              </div>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-6 w-6 p-0"
+                                onClick={() => navigator.clipboard.writeText(call.contract_address)}
+                                title={`Copy contract address: ${call.contract_address}`}
+                              >
+                                <Copy className="h-3.5 w-3.5" />
+                              </Button>
                             ) : (
                               <span className="text-muted-foreground">-</span>
                             )}
