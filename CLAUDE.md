@@ -205,6 +205,43 @@ curl -X POST "https://api.supabase.com/v1/projects/PROJECT_ID/database/query" \
 - [ ] Real-time analysis dashboard
 - [ ] Webhook notifications for high-score tokens
 
+## Recent Updates (July 26, 2025)
+
+### UI Enhancements
+1. **Date Column Added** - Shows call date in table (format: "Jul 26")
+   - Thai timezone on hover (e.g., "Jul 26, 2025, 09:10 AM (Thai Time)")
+   - Dotted underline indicates hoverable
+
+2. **GeckoTerminal Chart Improvements**
+   - Removed transactions section (`swaps=0`)
+   - Maximized chart space (90vh height, 7xl width)
+   - Added price info grid: Entry, ATH, Now with market caps
+   - Shows call date/time in Thai timezone in header
+   - Removed redundant bottom bar and external link button
+
+### Price Fetching Migration (CRITICAL)
+Successfully migrated from Netlify API to Supabase Edge Function:
+
+**Current State:**
+- ✅ `crypto-price-single` edge function deployed and working
+- ✅ PriceDisplay component now uses Supabase by default
+- ✅ ATH calculation implemented and deployed
+- ✅ Fixed .env parsing issues (uncommented headers)
+
+**Edge Function Details:**
+- URL: `https://eucfoommxxvqmmwdbkdv.supabase.co/functions/v1/crypto-price-single`
+- Timeout: 150 seconds (vs Netlify's 10 seconds)
+- Features: Current price, historical price, ATH since call, market caps, ROI
+
+**Known Issues:**
+- Historical prices may be null for older timestamps (expected - limited OHLCV data)
+- Some tokens may not have pool data on GeckoTerminal
+
+**Next Steps:**
+1. Monitor edge function performance
+2. Consider batch price fetching migration to edge function
+3. Add fallback for tokens without GeckoTerminal data
+
 ---
-**Last Updated**: July 23, 2025
-**Version**: 1.0.0
+**Last Updated**: July 26, 2025
+**Version**: 1.1.0
