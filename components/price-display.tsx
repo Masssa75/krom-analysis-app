@@ -22,10 +22,11 @@ interface PriceDisplayProps {
   contractAddress: string | null
   callTimestamp: string
   kromId: string
+  network?: string
   existingPriceData?: PriceData | null
 }
 
-export function PriceDisplay({ contractAddress, callTimestamp, kromId, existingPriceData }: PriceDisplayProps) {
+export function PriceDisplay({ contractAddress, callTimestamp, kromId, network, existingPriceData }: PriceDisplayProps) {
   const [loading, setLoading] = useState(false)
   const [priceData, setPriceData] = useState<PriceData | null>(existingPriceData || null)
   const [error, setError] = useState<string | null>(null)
@@ -50,7 +51,8 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, existingP
         },
         body: JSON.stringify({
           contractAddress,
-          callTimestamp: new Date(callTimestamp).getTime()
+          callTimestamp: new Date(callTimestamp).getTime(),
+          network: network
         })
       })
       

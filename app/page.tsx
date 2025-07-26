@@ -1388,6 +1388,7 @@ export default function HomePage() {
                               contractAddress={call.contract}
                               callTimestamp={call.call_timestamp || call.buy_timestamp}
                               kromId={call.krom_id}
+                              network={call.network}
                               existingPriceData={call.price_at_call ? {
                                 priceAtCall: call.price_at_call,
                                 currentPrice: call.current_price,
