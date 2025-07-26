@@ -146,21 +146,12 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, existingP
         <Button
           size="sm"
           variant="outline"
-          onClick={() => fetchPriceData(false)}
+          onClick={() => fetchPriceData()}
           className="h-6 text-xs"
-          title="Fetch using Netlify function"
+          title="Fetch price data"
         >
           <DollarSign className="h-3 w-3 mr-1" />
-          Get Price
-        </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => fetchPriceData(true)}
-          className="h-6 text-xs border-blue-500 text-blue-600 hover:bg-blue-50"
-          title="Fetch using Supabase Edge Function"
-        >
-          Edge
+          Fetch
         </Button>
       </div>
     )
