@@ -1197,6 +1197,7 @@ export default function HomePage() {
                   <thead>
                     <tr className="border-b text-left">
                       <th className="py-3 px-2 font-medium text-muted-foreground">Token</th>
+                      <th className="py-3 px-2 font-medium text-muted-foreground">Contract</th>
                       <th className="py-3 px-4 font-medium text-muted-foreground">Date</th>
                       <th className="py-3 px-2 font-medium text-muted-foreground" colSpan={3}>Call Analysis</th>
                       <th className="py-3 px-2 font-medium text-muted-foreground" colSpan={3}>X Analysis</th>
@@ -1204,6 +1205,7 @@ export default function HomePage() {
                       <th className="py-3 px-2"></th>
                     </tr>
                     <tr className="border-b text-left text-xs">
+                      <th className="py-2 px-2"></th>
                       <th className="py-2 px-2"></th>
                       <th className="py-2 px-2"></th>
                       <th className="py-2 px-2 font-normal text-muted-foreground">Score</th>
@@ -1274,6 +1276,30 @@ export default function HomePage() {
                                 </Button>
                               )}
                             </div>
+                          </td>
+                          <td className="py-3 px-2 text-xs font-mono text-muted-foreground">
+                            {call.contract_address ? (
+                              <div className="flex items-center gap-1">
+                                <span 
+                                  className="truncate max-w-[120px] cursor-pointer hover:text-foreground transition-colors" 
+                                  title={call.contract_address}
+                                  onClick={() => navigator.clipboard.writeText(call.contract_address)}
+                                >
+                                  {call.contract_address.slice(0, 6)}...{call.contract_address.slice(-4)}
+                                </span>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="h-5 w-5 p-0"
+                                  onClick={() => navigator.clipboard.writeText(call.contract_address)}
+                                  title="Copy contract address"
+                                >
+                                  <Copy className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            ) : (
+                              <span className="text-muted-foreground">-</span>
+                            )}
                           </td>
                           <td className="py-3 px-4 text-sm text-muted-foreground whitespace-nowrap">
                             {call.call_timestamp || call.buy_timestamp ? (
