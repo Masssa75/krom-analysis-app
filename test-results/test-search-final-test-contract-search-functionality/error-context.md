@@ -6,7 +6,7 @@
 - main:
   - heading "KROM Historical Analysis Tool" [level=3]
   - paragraph: Analyze cryptocurrency calls with AI-powered scoring
-  - text: 5,557 Call Analysis (100.0%) 5,557 X Analysis (100.0%) 474 Prices Fetched (8.5%) 5,557 Total Calls
+  - text: 5,559 Call Analysis (100.0%) 5,559 X Analysis (100.0%) 473 Prices Fetched (8.5%) 5,559 Total Calls
   - heading "Call Analysis" [level=3]
   - paragraph: Analyze based on call messages
   - text: Number of calls to analyze (from oldest)

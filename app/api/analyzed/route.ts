@@ -48,8 +48,8 @@ export async function GET(request: NextRequest) {
     if (search) {
       // Check if search looks like a contract address (starts with 0x and has 42 chars)
       if (search.toLowerCase().startsWith('0x') && search.length === 42) {
-        // Exact match for contract addresses
-        query = query.eq('contract_address', search.toLowerCase());
+        // Case-insensitive match for contract addresses
+        query = query.ilike('contract_address', search);
       } else {
         // For other searches, check both ticker and contract address
         query = query.or(`ticker.ilike.%${search}%,contract_address.ilike.%${search}%`);
