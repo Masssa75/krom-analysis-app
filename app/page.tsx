@@ -1270,13 +1270,25 @@ export default function HomePage() {
                             </div>
                           </td>
                           <td className="py-3 px-4 text-sm text-muted-foreground whitespace-nowrap">
-                            {call.call_timestamp || call.buy_timestamp ? 
-                              new Date(call.call_timestamp || call.buy_timestamp).toLocaleDateString('en-US', { 
-                                month: 'short', 
-                                day: 'numeric'
-                              }) 
-                              : '-'
-                            }
+                            {call.call_timestamp || call.buy_timestamp ? (
+                              <span 
+                                title={new Date(call.call_timestamp || call.buy_timestamp).toLocaleString('en-US', {
+                                  timeZone: 'Asia/Bangkok',
+                                  year: 'numeric',
+                                  month: 'short',
+                                  day: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                  hour12: true
+                                })}
+                                className="cursor-help"
+                              >
+                                {new Date(call.call_timestamp || call.buy_timestamp).toLocaleDateString('en-US', { 
+                                  month: 'short', 
+                                  day: 'numeric'
+                                })}
+                              </span>
+                            ) : '-'}
                           </td>
                           <td className="py-3 px-2 font-semibold">{call.score.toFixed(1)}</td>
                           <td className="py-3 px-2">
