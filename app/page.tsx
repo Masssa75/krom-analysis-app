@@ -1197,7 +1197,7 @@ export default function HomePage() {
                   <thead>
                     <tr className="border-b text-left">
                       <th className="py-3 px-2 font-medium text-muted-foreground">Token</th>
-                      <th className="py-3 px-2 font-medium text-muted-foreground">Date</th>
+                      <th className="py-3 px-4 font-medium text-muted-foreground">Date</th>
                       <th className="py-3 px-2 font-medium text-muted-foreground" colSpan={3}>Call Analysis</th>
                       <th className="py-3 px-2 font-medium text-muted-foreground" colSpan={3}>X Analysis</th>
                       <th className="py-3 px-2 font-medium text-muted-foreground">Price/ROI</th>
@@ -1269,12 +1269,11 @@ export default function HomePage() {
                               )}
                             </div>
                           </td>
-                          <td className="py-3 px-2 text-sm text-muted-foreground">
+                          <td className="py-3 px-4 text-sm text-muted-foreground whitespace-nowrap">
                             {call.call_timestamp || call.buy_timestamp ? 
                               new Date(call.call_timestamp || call.buy_timestamp).toLocaleDateString('en-US', { 
                                 month: 'short', 
-                                day: 'numeric',
-                                year: '2-digit'
+                                day: 'numeric'
                               }) 
                               : '-'
                             }
