@@ -236,22 +236,11 @@ Successfully migrated from Netlify API to Supabase Edge Function:
 **Known Issues:**
 - Historical prices may be null for older timestamps (expected - limited OHLCV data)
 - Some tokens may not have pool data on GeckoTerminal
-- Edge function may not detect correct network (defaults to ETH instead of Arbitrum)
-
-**TEST TOKEN FOR PRICE FETCHING (DELETE AFTER TESTING):**
-- **Token**: T
-- **Contract**: 0x30a538eFFD91ACeFb1b12CE9Bc0074eD18c9dFc9
-- **Network**: Arbitrum
-- **Call Date**: July 15, 2025 at 17:24:36 UTC
-- **Expected Call Price**: $0.0029
-- **Expected Current Price**: ~$0.2319 (as of July 26, 2025)
-- **Expected ROI**: +7,897% (79.97x)
-- **Pool**: 0xdaae914e4bae2aae4f536006c353117b90fb37e3
 
 **Next Steps:**
-1. Fix edge function to properly detect Arbitrum network
-2. Test price fetching button with T token
-3. Remove this test data section once confirmed working
+1. Monitor edge function performance
+2. Consider batch price fetching migration to edge function
+3. Add fallback for tokens without GeckoTerminal data
 
 ---
 **Last Updated**: July 26, 2025
