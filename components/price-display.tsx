@@ -148,7 +148,7 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, existingP
         <Button
           size="sm"
           variant="outline"
-          onClick={fetchPriceData}
+          onClick={() => fetchPriceData()}
           className="h-6 text-xs"
         >
           Retry
