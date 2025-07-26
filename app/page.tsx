@@ -1197,12 +1197,14 @@ export default function HomePage() {
                   <thead>
                     <tr className="border-b text-left">
                       <th className="py-3 px-2 font-medium text-muted-foreground">Token</th>
+                      <th className="py-3 px-2 font-medium text-muted-foreground">Date</th>
                       <th className="py-3 px-2 font-medium text-muted-foreground" colSpan={3}>Call Analysis</th>
                       <th className="py-3 px-2 font-medium text-muted-foreground" colSpan={3}>X Analysis</th>
                       <th className="py-3 px-2 font-medium text-muted-foreground">Price/ROI</th>
                       <th className="py-3 px-2"></th>
                     </tr>
                     <tr className="border-b text-left text-xs">
+                      <th className="py-2 px-2"></th>
                       <th className="py-2 px-2"></th>
                       <th className="py-2 px-2 font-normal text-muted-foreground">Score</th>
                       <th className="py-2 px-2 font-normal text-muted-foreground">Tier</th>
@@ -1266,6 +1268,16 @@ export default function HomePage() {
                                 </Button>
                               )}
                             </div>
+                          </td>
+                          <td className="py-3 px-2 text-sm text-muted-foreground">
+                            {call.call_timestamp || call.buy_timestamp ? 
+                              new Date(call.call_timestamp || call.buy_timestamp).toLocaleDateString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric',
+                                year: '2-digit'
+                              }) 
+                              : '-'
+                            }
                           </td>
                           <td className="py-3 px-2 font-semibold">{call.score.toFixed(1)}</td>
                           <td className="py-3 px-2">

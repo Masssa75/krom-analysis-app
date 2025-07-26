@@ -30,7 +30,7 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, existingP
   const [priceData, setPriceData] = useState<PriceData | null>(existingPriceData || null)
   const [error, setError] = useState<string | null>(null)
   
-  const fetchPriceData = async () => {
+  const fetchPriceData = async (viaEdgeFunction = false) => {
     if (!contractAddress) {
       setError('No contract address')
       return
@@ -40,16 +40,36 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, existingP
     setError(null)
     
     try {
-      const response = await fetch('/api/token-price', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contractAddress,
-          callTimestamp: new Date(callTimestamp).getTime()
+      let response;
+      
+      if (viaEdgeFunction) {
+        // Call Supabase Edge Function
+        console.log('Fetching via Edge Function for:', contractAddress)
+        response = await fetch('https://eucfoommxxvqmmwdbkdv.supabase.co/functions/v1/crypto-price-single', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            contractAddress,
+            callTimestamp: new Date(callTimestamp).getTime()
+          })
         })
-      })
+      } else {
+        // Call Netlify function
+        console.log('Fetching via Netlify function for:', contractAddress)
+        response = await fetch('/api/token-price', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contractAddress,
+            callTimestamp: new Date(callTimestamp).getTime()
+          })
+        })
+      }
       
       const data = await response.json()
       
@@ -139,15 +159,27 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, existingP
   
   if (!priceData) {
     return (
-      <Button
-        size="sm"
-        variant="outline"
-        onClick={fetchPriceData}
-        className="h-6 text-xs"
-      >
-        <DollarSign className="h-3 w-3 mr-1" />
-        Get Price
-      </Button>
+      <div className="flex gap-1">
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => fetchPriceData(false)}
+          className="h-6 text-xs"
+          title="Fetch using Netlify function"
+        >
+          <DollarSign className="h-3 w-3 mr-1" />
+          Get Price
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => fetchPriceData(true)}
+          className="h-6 text-xs border-blue-500 text-blue-600 hover:bg-blue-50"
+          title="Fetch using Supabase Edge Function"
+        >
+          Edge
+        </Button>
+      </div>
     )
   }
   
@@ -190,15 +222,27 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, existingP
     return (
       <div className="space-y-1.5 text-xs">
         <div className="text-muted-foreground">N/A</div>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={fetchPriceData}
-          className="h-6 text-xs"
-        >
-          <RefreshCw className="h-3 w-3 mr-1" />
-          Refetch
-        </Button>
+        <div className="flex gap-1">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => fetchPriceData(false)}
+            className="h-6 text-xs"
+            title="Refetch using Netlify function"
+          >
+            <RefreshCw className="h-3 w-3 mr-1" />
+            Refetch
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => fetchPriceData(true)}
+            className="h-6 text-xs border-blue-500 text-blue-600 hover:bg-blue-50"
+            title="Refetch using Supabase Edge Function"
+          >
+            Edge
+          </Button>
+        </div>
       </div>
     )
   }
