@@ -1272,7 +1272,7 @@ export default function HomePage() {
                           <td className="py-3 px-4 text-sm text-muted-foreground whitespace-nowrap">
                             {call.call_timestamp || call.buy_timestamp ? (
                               <span 
-                                title={new Date(call.call_timestamp || call.buy_timestamp).toLocaleString('en-US', {
+                                title={`${new Date(call.call_timestamp || call.buy_timestamp).toLocaleString('en-US', {
                                   timeZone: 'Asia/Bangkok',
                                   year: 'numeric',
                                   month: 'short',
@@ -1280,8 +1280,8 @@ export default function HomePage() {
                                   hour: '2-digit',
                                   minute: '2-digit',
                                   hour12: true
-                                })}
-                                className="cursor-help"
+                                })} (Thai Time)`}
+                                className="cursor-help border-b border-dotted border-muted-foreground/30"
                               >
                                 {new Date(call.call_timestamp || call.buy_timestamp).toLocaleDateString('en-US', { 
                                   month: 'short', 
