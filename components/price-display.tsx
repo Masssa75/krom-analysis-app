@@ -30,7 +30,7 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, existingP
   const [priceData, setPriceData] = useState<PriceData | null>(existingPriceData || null)
   const [error, setError] = useState<string | null>(null)
   
-  const fetchPriceData = async (viaEdgeFunction = false) => {
+  const fetchPriceData = async () => {
     if (!contractAddress) {
       setError('No contract address')
       return
@@ -40,36 +40,19 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, existingP
     setError(null)
     
     try {
-      let response;
-      
-      if (viaEdgeFunction) {
-        // Call Supabase Edge Function
-        console.log('Fetching via Edge Function for:', contractAddress)
-        response = await fetch('https://eucfoommxxvqmmwdbkdv.supabase.co/functions/v1/crypto-price-single', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
-          },
-          body: JSON.stringify({
-            contractAddress,
-            callTimestamp: new Date(callTimestamp).getTime()
-          })
+      // Always use Supabase Edge Function by default
+      console.log('Fetching via Supabase Edge Function for:', contractAddress)
+      const response = await fetch('https://eucfoommxxvqmmwdbkdv.supabase.co/functions/v1/crypto-price-single', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({
+          contractAddress,
+          callTimestamp: new Date(callTimestamp).getTime()
         })
-      } else {
-        // Call Netlify function
-        console.log('Fetching via Netlify function for:', contractAddress)
-        response = await fetch('/api/token-price', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            contractAddress,
-            callTimestamp: new Date(callTimestamp).getTime()
-          })
-        })
-      }
+      })
       
       const data = await response.json()
       
