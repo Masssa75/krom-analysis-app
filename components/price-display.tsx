@@ -200,7 +200,7 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, existingP
           <Button
             size="sm"
             variant="outline"
-            onClick={() => fetchPriceData(false)}
+            onClick={() => fetchPriceData()}
             className="h-6 text-xs"
             title="Refetch using Netlify function"
           >
@@ -210,7 +210,7 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, existingP
           <Button
             size="sm"
             variant="outline"
-            onClick={() => fetchPriceData(true)}
+            onClick={() => fetchPriceData()}
             className="h-6 text-xs border-blue-500 text-blue-600 hover:bg-blue-50"
             title="Refetch using Supabase Edge Function"
           >
