@@ -7,6 +7,8 @@ interface PriceData {
   currentPrice: number | null
   ath: number | null
   athDate: string | null
+  athDateFormatted?: string | null
+  callDateFormatted?: string | null
   roi: number | null
   athROI: number | null
   drawdownFromATH: number | null
@@ -229,7 +231,7 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, network, 
       <div className="space-y-1">
         <div 
           className="flex items-center gap-1 cursor-help hover:opacity-80 transition-opacity"
-          title={`Price: ${formatPrice(priceData.priceAtCall)}`}
+          title={`Price: ${formatPrice(priceData.priceAtCall)}${priceData.callDateFormatted ? `\nDate: ${priceData.callDateFormatted}` : ''}`}
         >
           <span className="text-muted-foreground">Entry:</span>
           <span className="font-mono font-medium">{formatMarketCap(priceData.fdvAtCall || priceData.marketCapAtCall)}</span>
@@ -245,7 +247,7 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, network, 
         
         <div 
           className="flex items-center gap-1 cursor-help hover:opacity-80 transition-opacity"
-          title={`Price: ${formatPrice(priceData.ath)}${priceData.athDate ? ` | Date: ${new Date(priceData.athDate).toLocaleDateString()}` : ''}`}
+          title={`Price: ${formatPrice(priceData.ath)}${priceData.athDateFormatted ? `\nDate: ${priceData.athDateFormatted}` : priceData.athDate ? `\nDate: ${new Date(priceData.athDate).toLocaleDateString()}` : ''}`}
         >
           <Trophy className="h-3 w-3 text-yellow-500" />
           <span className="text-muted-foreground">ATH:</span>

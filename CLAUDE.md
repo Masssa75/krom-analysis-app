@@ -242,6 +242,127 @@ Successfully migrated from Netlify API to Supabase Edge Function:
 2. Consider batch price fetching migration to edge function
 3. Add fallback for tokens without GeckoTerminal data
 
+## 🚧 PRICE FETCHING DEVELOPMENT (REMOVE WHEN COMPLETE) 🚧
+
+### Overview
+The price fetching feature is complex to verify due to:
+- Difficulty visually confirming correct entry/ATH prices
+- Context window limitations during debugging sessions
+- Multiple edge cases (different networks, missing data, etc.)
+
+### Current State of Edge Functions
+
+#### crypto-price-single (v3 - Last updated: July 26, 2025)
+**What's Fixed:**
+- ✅ Network parameter now passed from frontend (was defaulting to ETH)
+- ✅ Historical price calculation fixed - removed `beforeOffset` that was fetching future prices
+  - Was: `before_timestamp=${timestamp + beforeOffset}` (getting prices AFTER the call)
+  - Now: `before_timestamp=${timestamp}` (getting prices AT/BEFORE the call)
+- ✅ Deployment successful and working
+
+**Known Issues:**
+- Historical prices may be null for very old timestamps (limited OHLCV data)
+- Some tokens may not have pool data on GeckoTerminal
+- Need to add date information to response for hover tooltips
+
+**Test Results:**
+- T token (Arbitrum): Was returning $0.0737, now correctly returns $0.0152
+- BUNKER token (Solana): Correctly identified entry at $0.00230 on June 24, 2025
+
+### Development Plan
+
+#### Phase 1: Visual Verification Tools
+**Goal**: Add visual markers to charts to easily verify entry/ATH prices
+
+**Chart Provider Research Needed:**
+1. **GeckoTerminal** (current)
+   - Check if URL params support markers/annotations
+   - Investigate embed options for customization
+   - API capabilities for overlay data
+
+2. **DexScreener**
+   - Research URL parameter options
+   - Check for annotation/marker support
+   - Compare embed capabilities
+
+3. **DexTools**
+   - Explore API/URL customization
+   - Check marker injection possibilities
+   - Evaluate as alternative provider
+
+4. **Other Options**
+   - TradingView widgets (if they support crypto)
+   - Custom chart libraries (Chart.js, Recharts)
+   - Other DEX aggregators
+
+**Implementation Ideas:**
+- URL parameters to highlight specific timestamps
+- Overlay div with absolute positioning over iframe
+- Custom chart component if no provider supports markers
+- Side panel showing entry/ATH points with visual indicators
+
+#### Phase 2: Enhanced Tooltips
+**Requirements:**
+- Add entry date/time to price display hover
+- Add ATH date/time to price display hover
+- Show timezone (Thai time preferred by user)
+- Format: "Entry: Jul 15, 2025 17:24 (Thai Time)"
+
+#### Phase 3: Edge Function Improvements
+**Planned Updates:**
+1. Add date fields to response:
+   ```json
+   {
+     "priceAtCall": 0.0152,
+     "priceAtCallDate": "2025-07-15T17:24:36Z",
+     "athPrice": 0.3301,
+     "athDate": "2025-07-24T19:04:00Z",
+     "athDateFormatted": "Jul 24, 2025 at 02:04 AM (Thai Time)"
+   }
+   ```
+
+2. Add validation for edge cases:
+   - Handle pre-pool creation calls
+   - Better error messages for missing data
+   - Network detection improvements
+
+### Testing Checklist
+- [ ] Test token with known entry/ATH (T token on Arbitrum)
+- [ ] Test token with different timezone considerations
+- [ ] Test token with missing historical data
+- [ ] Test cross-chain tokens
+- [ ] Verify visual markers match database values
+- [ ] Confirm tooltip dates are accurate
+
+### Session Progress Tracking
+
+#### Session: July 26, 2025
+- Fixed edge function historical price calculation
+- Discovered T token was returning wrong price ($0.0737 instead of ~$0.0029)
+- Fixed by removing timestamp offset in OHLCV queries
+- Tested BUNKER token - correctly identified June 24 entry at $0.00230
+- Identified need for visual verification tools
+- Created this development plan
+
+#### Next Session TODO:
+1. Research chart provider URL parameters for markers
+2. Test GeckoTerminal embed customization options
+3. Implement entry/ATH date tooltips
+4. Create simple test page with visual price verification
+
+### Important Test Tokens
+1. **T Token** (Arbitrum)
+   - Contract: `0x30a538eFFD91ACeFb1b12CE9Bc0074eD18c9dFc9`
+   - Call: July 15, 2025 17:24 UTC
+   - Entry: ~$0.0029-0.0152
+   - ATH: $0.3301 on July 24
+
+2. **BUNKER Token** (Solana)
+   - Contract: `8NCievmJCg2d9Vc2TWgz2HkE6ANeSX7kwvdq5AL7pump`
+   - Call: June 24, 2025 01:00 Thai (June 23 18:00 UTC)
+   - Entry: $0.00230
+   - ATH: $0.009786 on June 27
+
 ---
 **Last Updated**: July 26, 2025
 **Version**: 1.1.0
