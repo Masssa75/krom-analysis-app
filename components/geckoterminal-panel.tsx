@@ -1,6 +1,6 @@
 'use client'
 
-import { X } from 'lucide-react'
+import { X, ChevronDown, ChevronUp, Globe, MessageCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useState, useEffect } from 'react'
 
@@ -42,9 +42,18 @@ interface GeckoTerminalPanelProps {
   onClose: () => void
 }
 
+interface DexScreenerData {
+  website?: string
+  twitter?: string
+  telegram?: string
+}
+
 export function GeckoTerminalPanel({ token, onClose }: GeckoTerminalPanelProps) {
   const [priceData, setPriceData] = useState(token.priceData || null)
   const [loading, setLoading] = useState(false)
+  const [isInfoExpanded, setIsInfoExpanded] = useState(false)
+  const [dexScreenerData, setDexScreenerData] = useState<DexScreenerData | null>(null)
+  const [dexLoading, setDexLoading] = useState(false)
   
   useEffect(() => {
     // Fetch fresh price data from database when panel opens
@@ -75,6 +84,46 @@ export function GeckoTerminalPanel({ token, onClose }: GeckoTerminalPanelProps) 
     
     fetchPriceData()
   }, [token.contract, token.ticker])
+  
+  // Fetch DexScreener data when info is expanded
+  useEffect(() => {
+    if (!isInfoExpanded || !token.contract || dexScreenerData) return
+    
+    const fetchDexScreenerData = async () => {
+      setDexLoading(true)
+      try {
+        const response = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${token.contract}`)
+        const data = await response.json()
+        
+        if (data.pairs && data.pairs.length > 0) {
+          const pair = data.pairs[0]
+          const socialLinks: DexScreenerData = {}
+          
+          // Extract website
+          if (pair.info?.websites && pair.info.websites.length > 0) {
+            socialLinks.website = pair.info.websites[0].url
+          }
+          
+          // Extract social links
+          if (pair.info?.socials) {
+            const twitterLink = pair.info.socials.find((s: any) => s.type === 'twitter')
+            const telegramLink = pair.info.socials.find((s: any) => s.type === 'telegram')
+            
+            if (twitterLink) socialLinks.twitter = twitterLink.url
+            if (telegramLink) socialLinks.telegram = telegramLink.url
+          }
+          
+          setDexScreenerData(socialLinks)
+        }
+      } catch (error) {
+        console.error('Failed to fetch DexScreener data:', error)
+      } finally {
+        setDexLoading(false)
+      }
+    }
+    
+    fetchDexScreenerData()
+  }, [isInfoExpanded, token.contract, dexScreenerData])
   
   if (!token.contract) {
     return (
@@ -119,7 +168,7 @@ export function GeckoTerminalPanel({ token, onClose }: GeckoTerminalPanelProps) 
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="bg-white dark:bg-gray-900 rounded-lg w-full max-w-7xl h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
         <div className="flex justify-between items-center p-4 border-b">
-          <div>
+          <div className="flex-1">
             <h3 className="text-lg font-semibold">{token.ticker} - GeckoTerminal Chart</h3>
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <span>Contract: {token.contract} ({networkSlug})</span>
@@ -205,6 +254,70 @@ export function GeckoTerminalPanel({ token, onClose }: GeckoTerminalPanelProps) 
               <X className="h-4 w-4" />
             </Button>
           </div>
+        </div>
+        
+        {/* Collapsible Token Info Section */}
+        <div className="border-b">
+          <button
+            onClick={() => setIsInfoExpanded(!isInfoExpanded)}
+            className="w-full px-4 py-2 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+          >
+            <span className="text-sm font-medium">Token Info & Links</span>
+            {isInfoExpanded ? (
+              <ChevronUp className="h-4 w-4 text-muted-foreground" />
+            ) : (
+              <ChevronDown className="h-4 w-4 text-muted-foreground" />
+            )}
+          </button>
+          
+          {isInfoExpanded && (
+            <div className="px-4 pb-3">
+              {dexLoading ? (
+                <div className="text-sm text-muted-foreground py-2">Loading token information...</div>
+              ) : (
+                <div className="flex items-center gap-4 text-sm">
+                  {dexScreenerData?.website && (
+                    <a
+                      href={dexScreenerData.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"
+                    >
+                      <Globe className="h-4 w-4" />
+                      Website
+                    </a>
+                  )}
+                  {dexScreenerData?.twitter && (
+                    <a
+                      href={dexScreenerData.twitter}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"
+                    >
+                      <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                      </svg>
+                      X/Twitter
+                    </a>
+                  )}
+                  {dexScreenerData?.telegram && (
+                    <a
+                      href={dexScreenerData.telegram}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"
+                    >
+                      <MessageCircle className="h-4 w-4" />
+                      Telegram
+                    </a>
+                  )}
+                  {!dexScreenerData?.website && !dexScreenerData?.twitter && !dexScreenerData?.telegram && (
+                    <span className="text-muted-foreground">No social links available</span>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
         </div>
         
         <div className="flex-1 p-2">
