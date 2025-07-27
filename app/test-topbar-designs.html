@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeckoTerminal Top Bar Designs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #1a1a1a; color: white; }
+        .design-container { border: 2px solid #333; margin: 20px; border-radius: 8px; }
+    </style>
+</head>
+<body class="p-8">
+    <h1 class="text-3xl font-bold mb-8 text-center">5 Top Bar Design Options for GeckoTerminal Chart</h1>
+
+    <!-- Design 1: Compact Three Column -->
+    <div class="design-container">
+        <div class="bg-gray-900 p-4 rounded-t-lg">
+            <h2 class="text-xl font-semibold mb-4">Design 1: Compact Three Column</h2>
+            <div class="flex justify-between items-center">
+                <div>
+                    <h3 class="text-lg font-semibold">FROGE - GeckoTerminal Chart</h3>
+                    <div class="flex items-center gap-4 text-sm text-gray-400">
+                        <span>Contract: BXcUQvXhGkHJT2FN7VP2VhonKjxx6vwJyREAKxejbonk (solana)</span>
+                        <span class="border-l pl-4">Call: Jul 25, 2025, 05:00 AM (Thai Time)</span>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-6">
+                    <div class="text-right">
+                        <div class="text-xs text-gray-400">Entry</div>
+                        <div class="text-sm font-mono font-medium">$0.000109</div>
+                        <div class="text-xs text-gray-400">$108,902.53M</div>
+                    </div>
+                    
+                    <div class="text-right">
+                        <div class="text-xs text-gray-400">ATH</div>
+                        <div class="text-sm font-mono font-medium">$0.000164</div>
+                        <div class="text-xs text-gray-400">Jul 27 • $163.80K</div>
+                        <div class="text-xs font-medium text-green-600">+50%</div>
+                    </div>
+                    
+                    <div class="text-right">
+                        <div class="text-xs text-gray-400">Now</div>
+                        <div class="text-sm font-mono font-medium">$0.000059</div>
+                        <div class="text-xs text-gray-400">$58.9K</div>
+                        <div class="text-xs font-medium text-red-600">-46%</div>
+                    </div>
+                    
+                    <button class="p-2 hover:bg-gray-800 rounded">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Design 2: Two Row Layout -->
+    <div class="design-container">
+        <div class="bg-gray-900 p-4 rounded-t-lg">
+            <h2 class="text-xl font-semibold mb-4">Design 2: Two Row Layout</h2>
+            <div class="flex justify-between items-start mb-3">
+                <div>
+                    <h3 class="text-lg font-semibold">FROGE - GeckoTerminal Chart</h3>
+                    <div class="text-sm text-gray-400">BXcUQvXhGkHJT2FN7VP2VhonKjxx6vwJyREAKxejbonk (solana)</div>
+                </div>
+                <button class="p-2 hover:bg-gray-800 rounded">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="border-t border-gray-700 pt-3 flex items-center justify-between">
+                <div class="text-sm text-gray-400">
+                    Called: Jul 25, 2025 at 05:00 AM (Thai Time)
+                </div>
+                
+                <div class="flex gap-8">
+                    <div class="text-center">
+                        <div class="text-xs text-gray-500 mb-1">Entry Price</div>
+                        <div class="text-green-400 font-mono">$0.000109</div>
+                        <div class="text-xs text-gray-500">$108.9M cap</div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="text-xs text-gray-500 mb-1">All-Time High</div>
+                        <div class="text-red-400 font-mono">$0.000164</div>
+                        <div class="text-xs text-gray-500">Jul 27, 2025</div>
+                        <div class="text-xs text-green-500">+50% from entry</div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="text-xs text-gray-500 mb-1">Current Price</div>
+                        <div class="text-blue-400 font-mono">$0.000059</div>
+                        <div class="text-xs text-gray-500">$58.9K cap</div>
+                        <div class="text-xs text-red-500">-46% from entry</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Design 3: Minimalist with Tooltips -->
+    <div class="design-container">
+        <div class="bg-gray-900 p-4 rounded-t-lg">
+            <h2 class="text-xl font-semibold mb-4">Design 3: Minimalist with Icons</h2>
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <h3 class="text-lg font-semibold">FROGE</h3>
+                    <span class="text-sm text-gray-500">Solana</span>
+                    <span class="text-xs text-gray-600">Called Jul 25</span>
+                </div>
+                
+                <div class="flex items-center gap-6">
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span class="font-mono text-sm">$0.000109</span>
+                    </div>
+                    
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 bg-red-500 rounded-full"></div>
+                        <span class="font-mono text-sm">$0.000164</span>
+                        <span class="text-xs text-gray-500">(Jul 27)</span>
+                        <span class="text-xs text-green-500">+50%</span>
+                    </div>
+                    
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        <span class="font-mono text-sm">$0.000059</span>
+                        <span class="text-xs text-red-500">-46%</span>
+                    </div>
+                    
+                    <button class="p-1 hover:bg-gray-800 rounded">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Design 4: Card Style -->
+    <div class="design-container">
+        <div class="bg-gray-900 p-4 rounded-t-lg">
+            <h2 class="text-xl font-semibold mb-4">Design 4: Card Style</h2>
+            <div class="flex justify-between items-start">
+                <div class="flex-1">
+                    <h3 class="text-lg font-semibold mb-1">FROGE - GeckoTerminal Chart</h3>
+                    <div class="text-xs text-gray-500 mb-3">Solana • Jul 25, 2025 05:00 AM Call</div>
+                </div>
+                
+                <div class="flex gap-3">
+                    <div class="bg-gray-800 rounded-lg p-3 min-w-[120px]">
+                        <div class="text-xs text-green-400 mb-1">ENTRY</div>
+                        <div class="font-mono text-sm font-semibold">$0.000109</div>
+                        <div class="text-xs text-gray-500">$108.9M</div>
+                    </div>
+                    
+                    <div class="bg-gray-800 rounded-lg p-3 min-w-[120px]">
+                        <div class="text-xs text-red-400 mb-1">ATH • Jul 27</div>
+                        <div class="font-mono text-sm font-semibold">$0.000164</div>
+                        <div class="text-xs text-green-500">↑ 50%</div>
+                    </div>
+                    
+                    <div class="bg-gray-800 rounded-lg p-3 min-w-[120px]">
+                        <div class="text-xs text-blue-400 mb-1">CURRENT</div>
+                        <div class="font-mono text-sm font-semibold">$0.000059</div>
+                        <div class="text-xs text-red-500">↓ 46%</div>
+                    </div>
+                </div>
+                
+                <button class="ml-3 p-2 hover:bg-gray-800 rounded">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Design 5: Timeline Style -->
+    <div class="design-container">
+        <div class="bg-gray-900 p-4 rounded-t-lg">
+            <h2 class="text-xl font-semibold mb-4">Design 5: Timeline Style</h2>
+            <div class="flex justify-between items-center">
+                <div>
+                    <h3 class="text-lg font-semibold">FROGE - GeckoTerminal Chart</h3>
+                    <div class="text-sm text-gray-500">Solana Network</div>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                    <!-- Entry -->
+                    <div class="text-center px-4">
+                        <div class="text-xs text-gray-500">Jul 25</div>
+                        <div class="text-xs text-gray-400 mb-1">Entry</div>
+                        <div class="font-mono text-green-400">$0.000109</div>
+                    </div>
+                    
+                    <!-- Timeline -->
+                    <div class="relative w-32 h-1 bg-gray-700">
+                        <div class="absolute left-0 w-3 h-3 bg-green-500 rounded-full -top-1"></div>
+                        <div class="absolute right-0 w-3 h-3 bg-red-500 rounded-full -top-1"></div>
+                        <div class="absolute left-1/2 w-3 h-3 bg-blue-500 rounded-full -top-1"></div>
+                    </div>
+                    
+                    <!-- ATH -->
+                    <div class="text-center px-4">
+                        <div class="text-xs text-gray-500">Jul 27</div>
+                        <div class="text-xs text-gray-400 mb-1">ATH</div>
+                        <div class="font-mono text-red-400">$0.000164</div>
+                        <div class="text-xs text-green-500">+50%</div>
+                    </div>
+                    
+                    <!-- Current -->
+                    <div class="text-center px-4 border-l border-gray-700">
+                        <div class="text-xs text-gray-500">Now</div>
+                        <div class="text-xs text-gray-400 mb-1">Current</div>
+                        <div class="font-mono text-blue-400">$0.000059</div>
+                        <div class="text-xs text-red-500">-46%</div>
+                    </div>
+                    
+                    <button class="ml-4 p-2 hover:bg-gray-800 rounded">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-12 p-6 bg-gray-800 rounded-lg">
+        <h3 class="text-lg font-semibold mb-4">Design Comparison</h3>
+        <ul class="space-y-2 text-sm">
+            <li><strong>Design 1:</strong> Most similar to current, adds ATH date inline</li>
+            <li><strong>Design 2:</strong> Two rows for better spacing, clear sections</li>
+            <li><strong>Design 3:</strong> Ultra minimal with color dots, saves space</li>
+            <li><strong>Design 4:</strong> Card-based, easy to scan, modern look</li>
+            <li><strong>Design 5:</strong> Timeline visualization shows price journey</li>
+        </ul>
+    </div>
+</body>
+</html>

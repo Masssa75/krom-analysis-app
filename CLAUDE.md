@@ -301,38 +301,39 @@ The price fetching feature is complex to verify due to:
 - Custom chart component if no provider supports markers
 - Side panel showing entry/ATH points with visual indicators
 
-#### Phase 2: Enhanced Tooltips
+#### Phase 2: Enhanced Tooltips ✅ COMPLETED
 **Requirements:**
-- Add entry date/time to price display hover
-- Add ATH date/time to price display hover
-- Show timezone (Thai time preferred by user)
-- Format: "Entry: Jul 15, 2025 17:24 (Thai Time)"
+- ✅ Add entry date/time to price display hover
+- ✅ Add ATH date/time to price display hover
+- ✅ Show timezone (Thai time preferred by user)
+- ✅ Format: "Jun 24, 2025, 01:00 AM (Thai Time)"
+
+**Implementation Details:**
+- Added `formatThaiDate()` helper function in edge function
+- Edge function returns `callDateFormatted` and `athDateFormatted` fields
+- PriceDisplay component updated to show dates in tooltips
+- **Note**: Only works for newly fetched prices (existing data lacks formatted dates)
 
 #### Phase 3: Edge Function Improvements
-**Planned Updates:**
-1. Add date fields to response:
-   ```json
-   {
-     "priceAtCall": 0.0152,
-     "priceAtCallDate": "2025-07-15T17:24:36Z",
-     "athPrice": 0.3301,
-     "athDate": "2025-07-24T19:04:00Z",
-     "athDateFormatted": "Jul 24, 2025 at 02:04 AM (Thai Time)"
-   }
-   ```
+**Completed Updates:**
+1. ✅ Add date fields to response - Now returns:
+   - `callDateFormatted`: "Jun 24, 2025, 01:00 AM (Thai Time)"
+   - `athDateFormatted`: "Jun 27, 2025, 07:00 AM (Thai Time)"
 
+**Still Planned:**
 2. Add validation for edge cases:
    - Handle pre-pool creation calls
    - Better error messages for missing data
    - Network detection improvements
+3. Consider batch update for existing price data to add formatted dates
 
 ### Testing Checklist
 - [ ] Test token with known entry/ATH (T token on Arbitrum)
-- [ ] Test token with different timezone considerations
+- [x] Test token with different timezone considerations (BUNKER - Thai time)
 - [ ] Test token with missing historical data
 - [ ] Test cross-chain tokens
 - [ ] Verify visual markers match database values
-- [ ] Confirm tooltip dates are accurate
+- [x] Confirm tooltip dates are accurate (verified with BUNKER token)
 
 ### Session Progress Tracking
 
@@ -343,12 +344,18 @@ The price fetching feature is complex to verify due to:
 - Tested BUNKER token - correctly identified June 24 entry at $0.00230
 - Identified need for visual verification tools
 - Created this development plan
+- ✅ Implemented entry/ATH date tooltips with Thai timezone
+  - Added `formatThaiDate()` helper to edge function
+  - Edge function now returns `callDateFormatted` and `athDateFormatted`
+  - Updated PriceDisplay component to show dates on hover
+  - Format: "Jun 24, 2025, 01:00 AM (Thai Time)"
+  - NOTE: Only works for newly fetched prices (existing data won't have formatted dates)
 
 #### Next Session TODO:
 1. Research chart provider URL parameters for markers
-2. Test GeckoTerminal embed customization options
-3. Implement entry/ATH date tooltips
-4. Create simple test page with visual price verification
+2. Test GeckoTerminal embed customization options  
+3. Create simple test page with visual price verification
+4. Consider adding migration to update existing price data with formatted dates
 
 ### Important Test Tokens
 1. **T Token** (Arbitrum)
