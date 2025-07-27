@@ -12,7 +12,7 @@ import { Download, Copy, ExternalLink, ChevronRight, MessageSquare, RefreshCw, S
 import { AnalysisDetailPanel } from '@/components/analysis-detail-panel'
 import { TokenTypeBadge } from '@/components/token-type-badge'
 import { PriceDisplay } from '@/components/price-display'
-import { GeckoTerminalPanelEnhanced } from '@/components/geckoterminal-panel-enhanced'
+import { GeckoTerminalPanel } from '@/components/geckoterminal-panel'
 import { FilterPanel, FilterValues } from '@/components/filter-panel'
 import { SortDropdown } from '@/components/sort-dropdown'
 
@@ -1506,7 +1506,7 @@ export default function HomePage() {
       
       {/* GeckoTerminal Chart Panel */}
       {selectedTokenForChart && (
-        <GeckoTerminalPanelEnhanced
+        <GeckoTerminalPanel
           token={selectedTokenForChart}
           onClose={() => setSelectedTokenForChart(null)}
         />

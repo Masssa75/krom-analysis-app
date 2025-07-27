@@ -1,0 +1,745 @@
+# Page snapshot
+
+```yaml
+- navigation:
+  - heading "KROM Analysis" [level=1]
+- main:
+  - heading "KROM Historical Analysis Tool" [level=3]
+  - paragraph: Analyze cryptocurrency calls with AI-powered scoring
+  - text: 5,585 Call Analysis (100.0%) 5,585 X Analysis (100.0%) 468 Prices Fetched (8.4%) 5,585 Total Calls
+  - heading "Call Analysis" [level=3]
+  - paragraph: Analyze based on call messages
+  - text: Number of calls to analyze (from oldest)
+  - spinbutton "Number of calls to analyze (from oldest)": "5"
+  - text: AI Model
+  - combobox "AI Model": Kimi K2 (Good Value)
+  - button "Start Analysis"
+  - heading "X (Twitter) Analysis" [level=3]
+  - paragraph: Analyze based on social media sentiment
+  - text: Number of calls to analyze (from oldest)
+  - spinbutton "Number of calls to analyze (from oldest)": "5"
+  - paragraph: Batch analyzes using existing stored tweets (no new fetching)
+  - paragraph: Starts from oldest calls • Scores 1-10 based on tweet quality
+  - text: AI Model
+  - combobox "AI Model": Kimi K2 (Good Value)
+  - button "Start X Analysis"
+  - heading "Filters" [level=3]
+  - button:
+    - img
+  - heading "Previously Analyzed Calls" [level=3]
+  - paragraph: 5585 total calls analyzed • Page 1 of 280
+  - img
+  - textbox "Search by token name..."
+  - text: "Sort by:"
+  - combobox: Date Called
+  - button "Sort descending":
+    - img
+  - button "Fetch All Prices":
+    - img
+    - text: Fetch All Prices
+  - button "Clear Prices":
+    - img
+    - text: Clear Prices
+  - button "Edge Function Test":
+    - img
+    - text: Edge Function Test
+  - checkbox "Show only coins of interest"
+  - img
+  - text: Show only coins of interest
+  - table:
+    - rowgroup:
+      - row "Token Date Call Analysis X Analysis Price/ROI":
+        - cell "Token"
+        - cell "Date"
+        - cell "Call Analysis"
+        - cell "X Analysis"
+        - cell "Price/ROI"
+        - cell
+      - row "Score Tier Score Tier":
+        - cell
+        - cell "Score"
+        - cell "Tier"
+        - cell
+        - cell "Score"
+        - cell "Tier"
+        - cell
+        - cell
+        - cell
+    - rowgroup:
+      - row "P9 Jul 27 2.0 TRASH 🎪 Meme Details 2/10 TRASH 🎪 Meme Details Fetch":
+        - cell "P9":
+          - button "P9"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "Jul 27"
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "2/10"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze X":
+            - img
+        - cell "Fetch":
+          - button "Fetch":
+            - img
+            - text: Fetch
+        - cell:
+          - button "Invalidate token (bad data)":
+            - img
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "BABYTOTAKEKE Jul 27 1.0 TRASH 🎪 Meme Details 2/10 TRASH 🎪 Meme Details Fetch":
+        - cell "BABYTOTAKEKE":
+          - button "BABYTOTAKEKE"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "Jul 27"
+        - cell "1.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "2/10"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze X":
+            - img
+        - cell "Fetch":
+          - button "Fetch":
+            - img
+            - text: Fetch
+        - cell:
+          - button "Invalidate token (bad data)":
+            - img
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "KTL Jul 27 1.0 TRASH 🎪 Meme Details 3/10 TRASH 🎪 Meme Details Fetch":
+        - cell "KTL":
+          - button "KTL"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "Jul 27"
+        - cell "1.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "3/10"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze X":
+            - img
+        - cell "Fetch":
+          - button "Fetch":
+            - img
+            - text: Fetch
+        - cell:
+          - button "Invalidate token (bad data)":
+            - img
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "MOMO Jul 27 2.0 TRASH 🎪 Meme Details 2/10 TRASH 🎪 Meme Details Fetch":
+        - cell "MOMO":
+          - button "MOMO"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "Jul 27"
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "2/10"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze X":
+            - img
+        - cell "Fetch":
+          - button "Fetch":
+            - img
+            - text: Fetch
+        - cell:
+          - button "Invalidate token (bad data)":
+            - img
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "ROB Jul 27 2.0 TRASH 🎪 Meme Details 2/10 TRASH 🎪 Meme Details Fetch":
+        - cell "ROB":
+          - button "ROB"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "Jul 27"
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "2/10"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze X":
+            - img
+        - cell "Fetch":
+          - button "Fetch":
+            - img
+            - text: Fetch
+        - cell:
+          - button "Invalidate token (bad data)":
+            - img
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "PIANO Jul 27 2.0 TRASH 🎪 Meme Details 2/10 TRASH 🎪 Meme Details Fetch":
+        - cell "PIANO":
+          - button "PIANO"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "Jul 27"
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "2/10"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze X":
+            - img
+        - cell "Fetch":
+          - button "Fetch":
+            - img
+            - text: Fetch
+        - cell:
+          - button "Invalidate token (bad data)":
+            - img
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "URANUS Jul 27 1.0 TRASH 🎪 Meme Details 2/10 TRASH 🎪 Meme Details Fetch":
+        - cell "URANUS":
+          - button "URANUS"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "Jul 27"
+        - cell "1.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "2/10"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze X":
+            - img
+        - cell "Fetch":
+          - button "Fetch":
+            - img
+            - text: Fetch
+        - cell:
+          - button "Invalidate token (bad data)":
+            - img
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "AUDREY Jul 27 2.0 TRASH 🎪 Meme Details 1/10 TRASH 🎪 Meme Details Fetch":
+        - cell "AUDREY":
+          - button "AUDREY"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "Jul 27"
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "1/10"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze X":
+            - img
+        - cell "Fetch":
+          - button "Fetch":
+            - img
+            - text: Fetch
+        - cell:
+          - button "Invalidate token (bad data)":
+            - img
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "ETH Jul 27 9.0 ALPHA ⚙️ Utility Details 1/10 TRASH 🎪 Meme Details Fetch":
+        - cell "ETH":
+          - button "ETH"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "Jul 27"
+        - cell "9.0"
+        - cell "ALPHA ⚙️ Utility"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "1/10"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze X":
+            - img
+        - cell "Fetch":
+          - button "Fetch":
+            - img
+            - text: Fetch
+        - cell:
+          - button "Invalidate token (bad data)":
+            - img
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "TGM Jul 27 2.0 TRASH 🎪 Meme Details 2/10 TRASH 🎪 Meme Details Fetch":
+        - cell "TGM":
+          - button "TGM"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "Jul 27"
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "2/10"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze X":
+            - img
+        - cell "Fetch":
+          - button "Fetch":
+            - img
+            - text: Fetch
+        - cell:
+          - button "Invalidate token (bad data)":
+            - img
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "BABYTOTAKEKE Jul 27 2.0 TRASH 🎪 Meme Details 2/10 TRASH 🎪 Meme Details Fetch":
+        - cell "BABYTOTAKEKE":
+          - button "BABYTOTAKEKE"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "Jul 27"
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "2/10"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze X":
+            - img
+        - cell "Fetch":
+          - button "Fetch":
+            - img
+            - text: Fetch
+        - cell:
+          - button "Invalidate token (bad data)":
+            - img
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "ICM Jul 27 2.0 TRASH 🎪 Meme Details 2/10 TRASH 🎪 Meme Details Fetch":
+        - cell "ICM":
+          - button "ICM"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "Jul 27"
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "2/10"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze X":
+            - img
+        - cell "Fetch":
+          - button "Fetch":
+            - img
+            - text: Fetch
+        - cell:
+          - button "Invalidate token (bad data)":
+            - img
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "DECEMBER Jul 27 2.0 TRASH 🎪 Meme Details 2/10 TRASH 🎪 Meme Details Fetch":
+        - cell "DECEMBER":
+          - button "DECEMBER"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "Jul 27"
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "2/10"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze X":
+            - img
+        - cell "Fetch":
+          - button "Fetch":
+            - img
+            - text: Fetch
+        - cell:
+          - button "Invalidate token (bad data)":
+            - img
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "LHC Jul 27 2.0 TRASH 🎪 Meme Details 2/10 TRASH 🎪 Meme Details Fetch":
+        - cell "LHC":
+          - button "LHC"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "Jul 27"
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "2/10"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze X":
+            - img
+        - cell "Fetch":
+          - button "Fetch":
+            - img
+            - text: Fetch
+        - cell:
+          - button "Invalidate token (bad data)":
+            - img
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "BAG Jul 27 2.0 TRASH 🎪 Meme Details 2/10 TRASH 🎪 Meme Details Fetch":
+        - cell "BAG":
+          - button "BAG"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "Jul 27"
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "2/10"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze X":
+            - img
+        - cell "Fetch":
+          - button "Fetch":
+            - img
+            - text: Fetch
+        - cell:
+          - button "Invalidate token (bad data)":
+            - img
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "MEO Jul 27 2.0 TRASH 🎪 Meme Details 1/10 TRASH 🎪 Meme Details Fetch":
+        - cell "MEO":
+          - button "MEO"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "Jul 27"
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "1/10"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze X":
+            - img
+        - cell "Fetch":
+          - button "Fetch":
+            - img
+            - text: Fetch
+        - cell:
+          - button "Invalidate token (bad data)":
+            - img
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "PWEASE Jul 27 2.0 TRASH 🎪 Meme Details 2/10 TRASH 🎪 Meme Details Fetch":
+        - cell "PWEASE":
+          - button "PWEASE"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "Jul 27"
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "2/10"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze X":
+            - img
+        - cell "Fetch":
+          - button "Fetch":
+            - img
+            - text: Fetch
+        - cell:
+          - button "Invalidate token (bad data)":
+            - img
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "NIPTUNE Jul 27 2.0 TRASH 🎪 Meme Details 2/10 TRASH 🎪 Meme Details Fetch":
+        - cell "NIPTUNE":
+          - button "NIPTUNE"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "Jul 27"
+        - cell "2.0"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "2/10"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze X":
+            - img
+        - cell "Fetch":
+          - button "Fetch":
+            - img
+            - text: Fetch
+        - cell:
+          - button "Invalidate token (bad data)":
+            - img
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - row "SOL Jul 27 9.0 ALPHA ⚙️ Utility Details 2/10 TRASH 🎪 Meme Details Fetch":
+        - cell "SOL":
+          - button "SOL"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "Jul 27"
+        - cell "9.0"
+        - cell "ALPHA ⚙️ Utility"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "2/10"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze X":
+            - img
+        - cell "Fetch":
+          - button "Fetch":
+            - img
+            - text: Fetch
+        - cell:
+          - button "Invalidate token (bad data)":
+            - img
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+      - 'row "WEN Jul 26 7.0 SOLID 🎪 Meme Details 2/10 TRASH 🎪 Meme Details Entry: $67.49K Now: $87.54K ATH: N/A +30% N/A"':
+        - cell "WEN":
+          - button "WEN"
+          - button "Mark as coin of interest":
+            - img
+          - button:
+            - img
+        - cell "Jul 26"
+        - cell "7.0"
+        - cell "SOLID 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze Call":
+            - img
+        - cell "2/10"
+        - cell "TRASH 🎪 Meme"
+        - cell "Details":
+          - button "Details":
+            - text: Details
+            - img
+          - button "Reanalyze X":
+            - img
+        - 'cell "Entry: $67.49K Now: $87.54K ATH: N/A +30% N/A"':
+          - text: "Entry: $67.49K Now: $87.54K"
+          - img
+          - text: "ATH: N/A"
+          - img
+          - text: +30%
+          - img
+          - text: N/A
+        - cell:
+          - button "Invalidate token (bad data)":
+            - img
+          - button "Delete new analysis (keeps original tier analysis)":
+            - img
+  - button "Previous" [disabled]:
+    - img
+    - text: Previous
+  - button "1"
+  - button "2"
+  - button "3"
+  - button "4"
+  - button "5"
+  - button "Next":
+    - text: Next
+    - img
+- alert
+```
