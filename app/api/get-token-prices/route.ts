@@ -15,33 +15,60 @@ export async function POST(request: Request) {
     }
     
     // Query by contract address if available, otherwise by ticker
-    let query = supabase
-      .from('crypto_calls')
-      .select(`
-        price_at_call,
-        current_price,
-        ath_price,
-        ath_timestamp,
-        roi_percent,
-        ath_roi_percent,
-        market_cap_at_call,
-        current_market_cap,
-        ath_market_cap,
-        fdv_at_call,
-        current_fdv,
-        ath_fdv,
-        price_network,
-        price_fetched_at
-      `);
+    let data, error;
     
     if (contractAddress) {
       // First try contract_address column
-      query = query.eq('contract_address', contractAddress).limit(1).single();
+      const result = await supabase
+        .from('crypto_calls')
+        .select(`
+          price_at_call,
+          current_price,
+          ath_price,
+          ath_timestamp,
+          roi_percent,
+          ath_roi_percent,
+          market_cap_at_call,
+          current_market_cap,
+          ath_market_cap,
+          fdv_at_call,
+          current_fdv,
+          ath_fdv,
+          price_network,
+          price_fetched_at
+        `)
+        .eq('contract_address', contractAddress)
+        .limit(1)
+        .single();
+      
+      data = result.data;
+      error = result.error;
     } else {
-      query = query.eq('ticker', ticker).limit(1).single();
+      const result = await supabase
+        .from('crypto_calls')
+        .select(`
+          price_at_call,
+          current_price,
+          ath_price,
+          ath_timestamp,
+          roi_percent,
+          ath_roi_percent,
+          market_cap_at_call,
+          current_market_cap,
+          ath_market_cap,
+          fdv_at_call,
+          current_fdv,
+          ath_fdv,
+          price_network,
+          price_fetched_at
+        `)
+        .eq('ticker', ticker)
+        .limit(1)
+        .single();
+      
+      data = result.data;
+      error = result.error;
     }
-    
-    const { data, error } = await query;
     
     if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
       console.error('Database error:', error);
