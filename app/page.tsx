@@ -1406,10 +1406,6 @@ export default function HomePage() {
                                 currentFDV: call.current_fdv,
                                 athFDV: call.ath_fdv
                               } : null}
-                              onPriceFetched={async () => {
-                                // Refresh the data to get updated prices
-                                await fetchAnalyzedCalls()
-                              }}
                             />
                           </td>
                           <td className="py-3 px-2">

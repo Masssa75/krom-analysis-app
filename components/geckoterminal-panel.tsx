@@ -1,5 +1,6 @@
 import { X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useState, useEffect } from 'react'
 
 // Helper functions for formatting
 const formatPrice = (price: number | null | undefined) => {
@@ -40,6 +41,39 @@ interface GeckoTerminalPanelProps {
 }
 
 export function GeckoTerminalPanel({ token, onClose }: GeckoTerminalPanelProps) {
+  const [priceData, setPriceData] = useState(token.priceData || null)
+  const [loading, setLoading] = useState(false)
+  
+  useEffect(() => {
+    // Fetch fresh price data from database when panel opens
+    const fetchPriceData = async () => {
+      if (!token.contract) return
+      
+      setLoading(true)
+      try {
+        const response = await fetch('/api/get-token-prices', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contractAddress: token.contract,
+            ticker: token.ticker
+          })
+        })
+        
+        const data = await response.json()
+        if (data.priceData) {
+          setPriceData(data.priceData)
+        }
+      } catch (error) {
+        console.error('Failed to fetch price data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    
+    fetchPriceData()
+  }, [token.contract, token.ticker])
+  
   if (!token.contract) {
     return (
       <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center" onClick={onClose}>
@@ -104,17 +138,17 @@ export function GeckoTerminalPanel({ token, onClose }: GeckoTerminalPanelProps) 
           </div>
           
           <div className="flex items-center gap-6">
-            {token.priceData && (
+            {(priceData || loading) && (
               <div className="text-right grid grid-cols-3 gap-4">
                 {/* Entry Price */}
                 <div>
                   <div className="text-xs text-muted-foreground">Entry</div>
                   <div className="text-sm font-mono font-medium">
-                    ${formatPrice(token.priceData.priceAtCall)}
+                    ${loading ? '...' : formatPrice(priceData?.priceAtCall)}
                   </div>
-                  {token.priceData.marketCapAtCall && (
+                  {priceData?.marketCapAtCall && (
                     <div className="text-xs text-muted-foreground">
-                      {formatMarketCap(token.priceData.marketCapAtCall)}
+                      {formatMarketCap(priceData.marketCapAtCall)}
                     </div>
                   )}
                 </div>
@@ -123,18 +157,18 @@ export function GeckoTerminalPanel({ token, onClose }: GeckoTerminalPanelProps) 
                 <div>
                   <div className="text-xs text-muted-foreground">ATH</div>
                   <div className="text-sm font-mono font-medium">
-                    ${formatPrice(token.priceData.ath)}
+                    ${loading ? '...' : formatPrice(priceData?.ath)}
                   </div>
-                  {token.priceData.athMarketCap && (
+                  {priceData?.athMarketCap && (
                     <div className="text-xs text-muted-foreground">
-                      {formatMarketCap(token.priceData.athFdv || token.priceData.athMarketCap)}
+                      {formatMarketCap(priceData.athFdv || priceData.athMarketCap)}
                     </div>
                   )}
-                  {token.priceData.athROI !== null && token.priceData.athROI !== undefined && (
+                  {priceData?.athROI !== null && priceData?.athROI !== undefined && (
                     <div className={`text-xs font-medium ${
-                      token.priceData.athROI > 0 ? 'text-green-600' : 'text-red-600'
+                      priceData.athROI > 0 ? 'text-green-600' : 'text-red-600'
                     }`}>
-                      {token.priceData.athROI > 0 ? '+' : ''}{token.priceData.athROI.toFixed(0)}%
+                      {priceData.athROI > 0 ? '+' : ''}{priceData.athROI.toFixed(0)}%
                     </div>
                   )}
                 </div>
@@ -143,18 +177,18 @@ export function GeckoTerminalPanel({ token, onClose }: GeckoTerminalPanelProps) 
                 <div>
                   <div className="text-xs text-muted-foreground">Now</div>
                   <div className="text-sm font-mono font-medium">
-                    ${formatPrice(token.priceData.currentPrice)}
+                    ${loading ? '...' : formatPrice(priceData?.currentPrice)}
                   </div>
-                  {token.priceData.currentMcap && (
+                  {priceData?.currentMarketCap && (
                     <div className="text-xs text-muted-foreground">
-                      {formatMarketCap(token.priceData.currentFdv || token.priceData.currentMcap)}
+                      {formatMarketCap(priceData.currentFdv || priceData.currentMarketCap)}
                     </div>
                   )}
-                  {token.priceData.roi !== null && token.priceData.roi !== undefined && (
+                  {priceData?.roi !== null && priceData?.roi !== undefined && (
                     <div className={`text-xs font-medium ${
-                      token.priceData.roi > 0 ? 'text-green-600' : 'text-red-600'
+                      priceData.roi > 0 ? 'text-green-600' : 'text-red-600'
                     }`}>
-                      {token.priceData.roi > 0 ? '+' : ''}{token.priceData.roi.toFixed(0)}%
+                      {priceData.roi > 0 ? '+' : ''}{priceData.roi.toFixed(0)}%
                     </div>
                   )}
                 </div>
