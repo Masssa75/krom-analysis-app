@@ -29,7 +29,7 @@ interface GeckoTerminalPanelProps {
       currentPrice?: number | null
       priceAtCall?: number | null
       roi?: number | null
-      currentMcap?: number | null
+      currentMarketCap?: number | null
       currentFdv?: number | null
       ath?: number | null
       athROI?: number | null
