@@ -26,9 +26,10 @@ interface PriceDisplayProps {
   kromId: string
   network?: string
   existingPriceData?: PriceData | null
+  onPriceFetched?: () => void | Promise<void>
 }
 
-export function PriceDisplay({ contractAddress, callTimestamp, kromId, network, existingPriceData }: PriceDisplayProps) {
+export function PriceDisplay({ contractAddress, callTimestamp, kromId, network, existingPriceData, onPriceFetched }: PriceDisplayProps) {
   const [loading, setLoading] = useState(false)
   const [priceData, setPriceData] = useState<PriceData | null>(existingPriceData || null)
   const [error, setError] = useState<string | null>(null)
@@ -67,7 +68,7 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, network, 
       setPriceData(data)
       
       // Save to database for caching
-      await fetch('/api/save-price-data', {
+      const saveResponse = await fetch('/api/save-price-data', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -90,6 +91,11 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, network, 
           tokenSupply: data.tokenSupply
         })
       })
+      
+      if (saveResponse.ok && onPriceFetched) {
+        // Call the callback to refresh parent data
+        await onPriceFetched()
+      }
     } catch (err: any) {
       console.error('Error fetching price:', err)
       setError(err.message)

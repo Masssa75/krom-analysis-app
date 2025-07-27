@@ -1233,7 +1233,7 @@ export default function HomePage() {
                                       currentPrice: call.current_price,
                                       priceAtCall: call.price_at_call,
                                       roi: call.roi_percent,
-                                      currentMcap: call.current_mcap,
+                                      currentMcap: call.current_market_cap,
                                       currentFdv: call.current_fdv,
                                       ath: call.ath_price,
                                       athROI: call.ath_roi_percent,
@@ -1406,6 +1406,10 @@ export default function HomePage() {
                                 currentFDV: call.current_fdv,
                                 athFDV: call.ath_fdv
                               } : null}
+                              onPriceFetched={async () => {
+                                // Refresh the data to get updated prices
+                                await fetchAnalyzedCalls()
+                              }}
                             />
                           </td>
                           <td className="py-3 px-2">
