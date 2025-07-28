@@ -137,14 +137,14 @@ export function GeckoTerminalPanel({ token, onClose }: GeckoTerminalPanelProps) 
     )
   }
 
-  // Determine the network slug for GMGN
+  // Determine the network slug for GeckoTerminal
   const getNetworkSlug = (network: string | null) => {
     if (!network) return 'eth' // default to Ethereum
     
     const networkMap: Record<string, string> = {
       'ethereum': 'eth',
       'eth': 'eth',
-      'solana': 'sol',
+      'solana': 'solana',
       'bsc': 'bsc',
       'binance': 'bsc',
       'base': 'base',
@@ -161,17 +161,15 @@ export function GeckoTerminalPanel({ token, onClose }: GeckoTerminalPanelProps) 
 
   const networkSlug = getNetworkSlug(token.network)
   
-  // GMGN embed URL with dark theme and 15 minute interval
-  // Available intervals: 1S, 1, 5, 15, 60, 240, 720, 1D
-  // Available themes: light, dark
-  const embedUrl = `https://www.gmgn.cc/kline/${networkSlug}/${token.contract}?theme=dark&interval=15`
+  // GeckoTerminal embed URL - hide transactions section to maximize chart space
+  const embedUrl = `https://www.geckoterminal.com/${networkSlug}/pools/${token.contract}?embed=1&info=0&swaps=0`
   
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="bg-white dark:bg-gray-900 rounded-lg w-full max-w-7xl h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
         <div className="flex justify-between items-center p-4 border-b">
           <div className="flex-1">
-            <h3 className="text-lg font-semibold">{token.ticker} - GMGN Chart</h3>
+            <h3 className="text-lg font-semibold">{token.ticker} - GeckoTerminal Chart</h3>
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <span>Contract: {token.contract} ({networkSlug})</span>
               {token.callTimestamp && (
@@ -326,7 +324,7 @@ export function GeckoTerminalPanel({ token, onClose }: GeckoTerminalPanelProps) 
           <iframe
             src={embedUrl}
             className="w-full h-full rounded-lg"
-            title={`GMGN chart for ${token.ticker}`}
+            title={`GeckoTerminal chart for ${token.ticker}`}
           />
         </div>
       </div>
