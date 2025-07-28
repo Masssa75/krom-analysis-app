@@ -26,9 +26,10 @@ interface PriceDisplayProps {
   kromId: string
   network?: string
   existingPriceData?: PriceData | null
+  rawData?: any // To access raw_data.trade.buyPrice
 }
 
-export function PriceDisplay({ contractAddress, callTimestamp, kromId, network, existingPriceData }: PriceDisplayProps) {
+export function PriceDisplay({ contractAddress, callTimestamp, kromId, network, existingPriceData, rawData }: PriceDisplayProps) {
   const [loading, setLoading] = useState(false)
   const [priceData, setPriceData] = useState<PriceData | null>(existingPriceData || null)
   const [error, setError] = useState<string | null>(null)
@@ -147,8 +148,16 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, network, 
   }
   
   if (!priceData) {
+    // Check if we have buy price in raw_data
+    const buyPrice = rawData?.trade?.buyPrice
+    
     return (
-      <div className="flex gap-1">
+      <div className="flex gap-1 items-center">
+        {buyPrice ? (
+          <span className="text-xs font-mono">
+            Entry: ${formatPrice(buyPrice)}
+          </span>
+        ) : null}
         <Button
           size="sm"
           variant="outline"
@@ -157,7 +166,7 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, network, 
           title="Fetch price data"
         >
           <DollarSign className="h-3 w-3 mr-1" />
-          Fetch
+          {buyPrice ? 'Fetch All' : 'Fetch'}
         </Button>
       </div>
     )
