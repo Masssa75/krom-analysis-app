@@ -29,6 +29,7 @@ export function SortDropdown({ onSortChange }: SortDropdownProps) {
     switch (value) {
       case 'analysis_score': return 'Call Score'
       case 'x_analysis_score': return 'X Score'
+      case 'quality': return 'Quality'
       case 'roi_percent': return 'ROI %'
       case 'ath_roi_percent': return 'ATH ROI %'
       case 'current_market_cap': return 'Current Market Cap'
@@ -50,6 +51,14 @@ export function SortDropdown({ onSortChange }: SortDropdownProps) {
           <SelectItem value="created_at">Date Called</SelectItem>
           <SelectItem value="analysis_score">Call Score</SelectItem>
           <SelectItem value="x_analysis_score">X Score</SelectItem>
+          <SelectItem value="quality">
+            <span 
+              title="Combined score based on call analysis, X analysis, and market performance (higher = better overall quality)"
+              className="cursor-help"
+            >
+              Quality ⓘ
+            </span>
+          </SelectItem>
           <SelectItem value="roi_percent">ROI %</SelectItem>
           <SelectItem value="ath_roi_percent">ATH ROI %</SelectItem>
           <SelectItem value="current_market_cap">Current Market Cap</SelectItem>

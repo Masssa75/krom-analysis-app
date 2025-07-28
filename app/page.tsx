@@ -720,7 +720,19 @@ export default function HomePage() {
     <div className="container max-w-7xl mx-auto py-8">
       <Card className="mb-8">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl">KROM Historical Analysis Tool</CardTitle>
+          <div className="flex items-center justify-center gap-4 mb-2">
+            <CardTitle className="text-3xl">KROM Historical Analysis Tool</CardTitle>
+            <a
+              href="https://majestic-centaur-0d5fcc.netlify.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 px-3 py-1 text-sm bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-md transition-colors"
+              title="KROM API Explorer - Browse and test KROM API data"
+            >
+              <ExternalLink className="h-3 w-3" />
+              API Explorer
+            </a>
+          </div>
           <CardDescription>
             Analyze cryptocurrency calls with AI-powered scoring
           </CardDescription>

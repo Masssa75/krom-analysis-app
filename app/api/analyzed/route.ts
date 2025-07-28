@@ -110,93 +110,207 @@ export async function GET(request: NextRequest) {
       query = query.lte('market_cap_at_call', maxBuyMcap);
     }
     
-    // Add ordering and pagination
-    const { data: calls, error, count } = await query
-      .order(sortBy, { ascending: sortOrder === 'asc' })
-      .range(offset, offset + limit - 1);
-
-    if (error) {
-      console.error('Database fetch error:', error);
-      return NextResponse.json({ error: 'Failed to fetch analyzed calls' }, { status: 500 });
-    }
-
-    // Format the results
-    const results = calls?.map(call => ({
-      krom_id: call.krom_id,
-      token: call.ticker || 'Unknown',
-      contract: call.raw_data?.token?.ca || null,
-      network: call.raw_data?.token?.network || 'unknown',
-      score: call.analysis_score,
-      token_type: call.analysis_token_type || 'meme',
-      legitimacy_factor: call.analysis_legitimacy_factor || 'Unknown',
-      analysis_model: call.analysis_model,
-      buy_timestamp: call.buy_timestamp,
-      call_timestamp: call.raw_data?.timestamp ? new Date(call.raw_data.timestamp * 1000).toISOString() : null,
-      analyzed_at: call.analysis_reanalyzed_at || call.analyzed_at || call.created_at,
-      // New fields for detailed view
-      analysis_reasoning: call.analysis_reasoning,
-      analysis_batch_id: call.analysis_batch_id,
-      analysis_batch_timestamp: call.analysis_batch_timestamp,
-      analysis_prompt_used: call.analysis_prompt_used,
-      analysis_duration_ms: call.analysis_duration_ms,
-      // Call message
-      call_message: call.raw_data?.text || 'No message available',
-      group_name: call.raw_data?.groupName || call.raw_data?.group?.name || 'Unknown',
-      // X analysis fields
-      x_score: call.x_analysis_score,
-      x_tier: call.x_analysis_tier,
-      x_token_type: call.x_analysis_token_type,
-      x_legitimacy_factor: call.x_legitimacy_factor,
-      x_analysis_reasoning: call.x_analysis_reasoning,
-      x_analysis_prompt_used: call.x_analysis_prompt_used,
-      x_best_tweet: call.x_best_tweet,
-      x_analyzed_at: call.x_reanalyzed_at || call.x_analyzed_at,
-      x_tweet_count: call.x_raw_tweets ? call.x_raw_tweets.length : 0,
-      x_raw_tweets: call.x_raw_tweets || [],
-      // Comment indicator
-      has_comment: call.user_comment ? true : false,
-      // Coin of interest indicator
-      is_coin_of_interest: call.is_coin_of_interest || false,
-      coin_of_interest_notes: call.coin_of_interest_notes || null,
-      // Price data
-      price_at_call: call.price_at_call,
-      current_price: call.current_price,
-      ath_price: call.ath_price,
-      ath_timestamp: call.ath_timestamp,
-      roi_percent: call.roi_percent,
-      ath_roi_percent: call.ath_roi_percent,
-      price_network: call.price_network,
-      price_fetched_at: call.price_fetched_at,
-      // Market cap data
-      market_cap_at_call: call.market_cap_at_call,
-      current_market_cap: call.current_market_cap,
-      ath_market_cap: call.ath_market_cap,
-      fdv_at_call: call.fdv_at_call,
-      current_fdv: call.current_fdv,
-      ath_fdv: call.ath_fdv,
-      token_supply: call.token_supply,
-      is_invalidated: call.is_invalidated || false,
-      // Include raw_data for buy price display
-      raw_data: call.raw_data
-    })) || [];
-
-    // Calculate ATH ROI average
-    const validAthRois = results
-      .filter(r => r.ath_roi_percent !== null && r.ath_roi_percent !== undefined)
-      .map(r => r.ath_roi_percent);
+    // Handle special sorting cases
+    let orderedQuery = query;
     
-    const athRoiAverage = validAthRois.length > 0 
-      ? validAthRois.reduce((sum, roi) => sum + roi, 0) / validAthRois.length
-      : null;
+    if (sortBy === 'quality') {
+      // For quality sorting, we need to calculate a composite score
+      // Get all data first, then sort in JavaScript since it's a computed field
+      const { data: allCalls, error: fetchError, count } = await query;
+      
+      if (fetchError) {
+        console.error('Database fetch error:', fetchError);
+        return NextResponse.json({ error: 'Failed to fetch analyzed calls' }, { status: 500 });
+      }
+      
+      // Calculate quality score for each call
+      const callsWithQuality = allCalls?.map(call => {
+        const callScore = call.analysis_score || 0;
+        const xScore = call.x_analysis_score || 0;
+        const athRoi = call.ath_roi_percent || 0;
+        const currentRoi = call.roi_percent || 0;
+        
+        // Quality score formula: 
+        // - Call analysis (0-10): 40% weight
+        // - X analysis (0-10): 30% weight  
+        // - Performance bonus: 30% weight (based on ROI performance)
+        let performanceScore = 0;
+        if (athRoi > 1000) performanceScore = 10;
+        else if (athRoi > 500) performanceScore = 8;
+        else if (athRoi > 200) performanceScore = 6;
+        else if (athRoi > 100) performanceScore = 4;
+        else if (athRoi > 50) performanceScore = 2;
+        else if (athRoi > 0) performanceScore = 1;
+        
+        const qualityScore = (callScore * 0.4) + (xScore * 0.3) + (performanceScore * 0.3);
+        
+        return {
+          ...call,
+          quality_score: qualityScore
+        };
+      }) || [];
+      
+      // Sort by quality score
+      callsWithQuality.sort((a, b) => {
+        return sortOrder === 'asc' 
+          ? a.quality_score - b.quality_score
+          : b.quality_score - a.quality_score;
+      });
+      
+      // Apply pagination
+      const calls = callsWithQuality.slice(offset, offset + limit);
+      
+      // Format results (same as below)
+      const results = calls.map(call => ({
+        krom_id: call.krom_id,
+        token: call.ticker || 'Unknown',
+        contract: call.raw_data?.token?.ca || null,
+        network: call.raw_data?.token?.network || 'unknown',
+        score: call.analysis_score,
+        token_type: call.analysis_token_type || 'meme',
+        legitimacy_factor: call.analysis_legitimacy_factor || 'Unknown',
+        analysis_model: call.analysis_model,
+        buy_timestamp: call.buy_timestamp,
+        call_timestamp: call.raw_data?.timestamp ? new Date(call.raw_data.timestamp * 1000).toISOString() : null,
+        analyzed_at: call.analysis_reanalyzed_at || call.analyzed_at || call.created_at,
+        analysis_reasoning: call.analysis_reasoning,
+        analysis_batch_id: call.analysis_batch_id,
+        analysis_batch_timestamp: call.analysis_batch_timestamp,
+        analysis_prompt_used: call.analysis_prompt_used,
+        analysis_duration_ms: call.analysis_duration_ms,
+        call_message: call.raw_data?.text || 'No message available',
+        group_name: call.raw_data?.groupName || call.raw_data?.group?.name || 'Unknown',
+        x_score: call.x_analysis_score,
+        x_tier: call.x_analysis_tier,
+        x_token_type: call.x_analysis_token_type,
+        x_legitimacy_factor: call.x_legitimacy_factor,
+        x_analysis_reasoning: call.x_analysis_reasoning,
+        x_analysis_prompt_used: call.x_analysis_prompt_used,
+        x_best_tweet: call.x_best_tweet,
+        x_analyzed_at: call.x_reanalyzed_at || call.x_analyzed_at,
+        x_tweet_count: call.x_raw_tweets ? call.x_raw_tweets.length : 0,
+        x_raw_tweets: call.x_raw_tweets || [],
+        has_comment: call.user_comment ? true : false,
+        is_coin_of_interest: call.is_coin_of_interest || false,
+        coin_of_interest_notes: call.coin_of_interest_notes || null,
+        price_at_call: call.price_at_call,
+        current_price: call.current_price,
+        ath_price: call.ath_price,
+        ath_timestamp: call.ath_timestamp,
+        roi_percent: call.roi_percent,
+        ath_roi_percent: call.ath_roi_percent,
+        price_network: call.price_network,
+        price_fetched_at: call.price_fetched_at,
+        market_cap_at_call: call.market_cap_at_call,
+        current_market_cap: call.current_market_cap,
+        ath_market_cap: call.ath_market_cap,
+        fdv_at_call: call.fdv_at_call,
+        current_fdv: call.current_fdv,
+        ath_fdv: call.ath_fdv,
+        token_supply: call.token_supply,
+        is_invalidated: call.is_invalidated || false,
+        raw_data: call.raw_data,
+        quality_score: call.quality_score // Include quality score in response
+      }));
 
-    return NextResponse.json({
-      success: true,
-      count: count || 0,
-      limit,
-      offset,
-      results,
-      athRoiAverage
-    });
+      // Calculate ATH ROI average
+      const validAthRois = results
+        .filter(r => r.ath_roi_percent !== null && r.ath_roi_percent !== undefined)
+        .map(r => r.ath_roi_percent);
+      
+      const athRoiAverage = validAthRois.length > 0 
+        ? validAthRois.reduce((sum: number, roi: number) => sum + roi, 0) / validAthRois.length
+        : null;
+
+      return NextResponse.json({
+        success: true,
+        count: count || 0,
+        limit,
+        offset,
+        results,
+        athRoiAverage
+      });
+    } else {
+      // Standard database sorting
+      const { data: calls, error, count } = await orderedQuery
+        .order(sortBy, { ascending: sortOrder === 'asc' })
+        .range(offset, offset + limit - 1);
+      
+      if (error) {
+        console.error('Database fetch error:', error);
+        return NextResponse.json({ error: 'Failed to fetch analyzed calls' }, { status: 500 });
+      }
+
+      // Format the results (existing code)
+      const results = calls?.map(call => ({
+        krom_id: call.krom_id,
+        token: call.ticker || 'Unknown',
+        contract: call.raw_data?.token?.ca || null,
+        network: call.raw_data?.token?.network || 'unknown',
+        score: call.analysis_score,
+        token_type: call.analysis_token_type || 'meme',
+        legitimacy_factor: call.analysis_legitimacy_factor || 'Unknown',
+        analysis_model: call.analysis_model,
+        buy_timestamp: call.buy_timestamp,
+        call_timestamp: call.raw_data?.timestamp ? new Date(call.raw_data.timestamp * 1000).toISOString() : null,
+        analyzed_at: call.analysis_reanalyzed_at || call.analyzed_at || call.created_at,
+        analysis_reasoning: call.analysis_reasoning,
+        analysis_batch_id: call.analysis_batch_id,
+        analysis_batch_timestamp: call.analysis_batch_timestamp,
+        analysis_prompt_used: call.analysis_prompt_used,
+        analysis_duration_ms: call.analysis_duration_ms,
+        call_message: call.raw_data?.text || 'No message available',
+        group_name: call.raw_data?.groupName || call.raw_data?.group?.name || 'Unknown',
+        x_score: call.x_analysis_score,
+        x_tier: call.x_analysis_tier,
+        x_token_type: call.x_analysis_token_type,
+        x_legitimacy_factor: call.x_legitimacy_factor,
+        x_analysis_reasoning: call.x_analysis_reasoning,
+        x_analysis_prompt_used: call.x_analysis_prompt_used,
+        x_best_tweet: call.x_best_tweet,
+        x_analyzed_at: call.x_reanalyzed_at || call.x_analyzed_at,
+        x_tweet_count: call.x_raw_tweets ? call.x_raw_tweets.length : 0,
+        x_raw_tweets: call.x_raw_tweets || [],
+        has_comment: call.user_comment ? true : false,
+        is_coin_of_interest: call.is_coin_of_interest || false,
+        coin_of_interest_notes: call.coin_of_interest_notes || null,
+        price_at_call: call.price_at_call,
+        current_price: call.current_price,
+        ath_price: call.ath_price,
+        ath_timestamp: call.ath_timestamp,
+        roi_percent: call.roi_percent,
+        ath_roi_percent: call.ath_roi_percent,
+        price_network: call.price_network,
+        price_fetched_at: call.price_fetched_at,
+        market_cap_at_call: call.market_cap_at_call,
+        current_market_cap: call.current_market_cap,
+        ath_market_cap: call.ath_market_cap,
+        fdv_at_call: call.fdv_at_call,
+        current_fdv: call.current_fdv,
+        ath_fdv: call.ath_fdv,
+        token_supply: call.token_supply,
+        is_invalidated: call.is_invalidated || false,
+        raw_data: call.raw_data
+      })) || [];
+
+      // Calculate ATH ROI average
+      const validAthRois = results
+        .filter(r => r.ath_roi_percent !== null && r.ath_roi_percent !== undefined)
+        .map(r => r.ath_roi_percent);
+      
+      const athRoiAverage = validAthRois.length > 0 
+        ? validAthRois.reduce((sum, roi) => sum + roi, 0) / validAthRois.length
+        : null;
+
+      return NextResponse.json({
+        success: true,
+        count: count || 0,
+        limit,
+        offset,
+        results,
+        athRoiAverage
+      });
+    }
 
   } catch (error) {
     console.error('Error fetching analyzed calls:', error);
