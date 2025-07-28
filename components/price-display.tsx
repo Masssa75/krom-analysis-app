@@ -34,6 +34,14 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, network, 
   const [priceData, setPriceData] = useState<PriceData | null>(existingPriceData || null)
   const [error, setError] = useState<string | null>(null)
   
+  const formatPrice = (price: number | null) => {
+    if (price === null) return 'N/A'
+    if (price < 0.00001) return price.toExponential(2)
+    if (price < 0.01) return price.toFixed(6)
+    if (price < 1) return price.toFixed(4)
+    return price.toFixed(2)
+  }
+  
   const fetchPriceData = async () => {
     if (!contractAddress) {
       setError('No contract address')
@@ -155,7 +163,7 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, network, 
       <div className="flex gap-1 items-center">
         {buyPrice ? (
           <span className="text-xs font-mono">
-            Entry: ${formatPrice(buyPrice)}
+            Entry: $${formatPrice(buyPrice)}
           </span>
         ) : null}
         <Button
@@ -172,13 +180,6 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, network, 
     )
   }
   
-  const formatPrice = (price: number | null) => {
-    if (price === null) return 'N/A'
-    if (price < 0.00001) return `$${price.toExponential(2)}`
-    if (price < 0.01) return `$${price.toFixed(6)}`
-    if (price < 1) return `$${price.toFixed(4)}`
-    return `$${price.toFixed(2)}`
-  }
   
   const formatPercent = (percent: number | null) => {
     if (percent === null) return 'N/A'
@@ -242,7 +243,7 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, network, 
       <div className="space-y-1">
         <div 
           className="flex items-center gap-1 cursor-help hover:opacity-80 transition-opacity"
-          title={`Price: ${formatPrice(priceData.priceAtCall)}${priceData.callDateFormatted ? `\nDate: ${priceData.callDateFormatted}` : ''}`}
+          title={`Price: $${formatPrice(priceData.priceAtCall)}${priceData.callDateFormatted ? `\nDate: ${priceData.callDateFormatted}` : ''}`}
         >
           <span className="text-muted-foreground">Entry:</span>
           <span className="font-mono font-medium">{formatMarketCap(priceData.fdvAtCall || priceData.marketCapAtCall)}</span>
@@ -250,7 +251,7 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, network, 
         
         <div 
           className="flex items-center gap-1 cursor-help hover:opacity-80 transition-opacity"
-          title={`Price: ${formatPrice(priceData.currentPrice)}`}
+          title={`Price: $${formatPrice(priceData.currentPrice)}`}
         >
           <span className="text-muted-foreground">Now:</span>
           <span className="font-mono font-medium">{formatMarketCap(priceData.currentFDV || priceData.currentMarketCap)}</span>
@@ -258,7 +259,7 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, network, 
         
         <div 
           className="flex items-center gap-1 cursor-help hover:opacity-80 transition-opacity"
-          title={`Price: ${formatPrice(priceData.ath)}${priceData.athDateFormatted ? `\nDate: ${priceData.athDateFormatted}` : priceData.athDate ? `\nDate: ${new Date(priceData.athDate).toLocaleDateString()}` : ''}`}
+          title={`Price: $${formatPrice(priceData.ath)}${priceData.athDateFormatted ? `\nDate: ${priceData.athDateFormatted}` : priceData.athDate ? `\nDate: ${new Date(priceData.athDate).toLocaleDateString()}` : ''}`}
         >
           <Trophy className="h-3 w-3 text-yellow-500" />
           <span className="text-muted-foreground">ATH:</span>
