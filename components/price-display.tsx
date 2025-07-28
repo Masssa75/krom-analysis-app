@@ -203,11 +203,10 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, network, 
     return 'text-red-600 font-semibold'
   }
   
-  // Check if all price data is N/A or if we're missing market cap data
-  const hasNoData = (priceData.priceAtCall === null && priceData.currentPrice === null && priceData.ath === null) ||
-    (priceData.marketCapAtCall === null && priceData.currentMarketCap === null && priceData.athMarketCap === null &&
-     priceData.fdvAtCall === null && priceData.currentFDV === null && priceData.athFDV === null)
+  // Check if we have absolutely no data
+  const hasNoData = priceData.priceAtCall === null && priceData.currentPrice === null && priceData.ath === null
   
+  // If we have no price data at all, show refetch buttons
   if (hasNoData) {
     return (
       <div className="space-y-1.5 text-xs">
@@ -237,52 +236,105 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, network, 
     )
   }
   
+  // If we only have price data but no market cap data, show simplified view
+  const hasNoMarketCapData = (priceData.marketCapAtCall === null && priceData.currentMarketCap === null && 
+                              priceData.athMarketCap === null && priceData.fdvAtCall === null && 
+                              priceData.currentFDV === null && priceData.athFDV === null)
+  
   return (
     <div className="space-y-1.5 text-xs">
-      {/* Market Cap Column */}
-      <div className="space-y-1">
-        <div 
-          className="flex items-center gap-1 cursor-help hover:opacity-80 transition-opacity"
-          title={`Price: $${formatPrice(priceData.priceAtCall)}${priceData.callDateFormatted ? `\nDate: ${priceData.callDateFormatted}` : ''}`}
-        >
-          <span className="text-muted-foreground">Entry:</span>
-          <span className="font-mono font-medium">{formatMarketCap(priceData.fdvAtCall || priceData.marketCapAtCall)}</span>
-        </div>
-        
-        <div 
-          className="flex items-center gap-1 cursor-help hover:opacity-80 transition-opacity"
-          title={`Price: $${formatPrice(priceData.currentPrice)}`}
-        >
-          <span className="text-muted-foreground">Now:</span>
-          <span className="font-mono font-medium">{formatMarketCap(priceData.currentFDV || priceData.currentMarketCap)}</span>
-        </div>
-        
-        <div 
-          className="flex items-center gap-1 cursor-help hover:opacity-80 transition-opacity"
-          title={`Price: $${formatPrice(priceData.ath)}${priceData.athDateFormatted ? `\nDate: ${priceData.athDateFormatted}` : priceData.athDate ? `\nDate: ${new Date(priceData.athDate).toLocaleDateString()}` : ''}`}
-        >
-          <Trophy className="h-3 w-3 text-yellow-500" />
-          <span className="text-muted-foreground">ATH:</span>
-          <span className="font-mono font-medium">{formatMarketCap(priceData.athFDV || priceData.athMarketCap)}</span>
-        </div>
-      </div>
-        
-        {/* ROI Display */}
-        <div className="flex items-center gap-3 pt-1 border-t">
-          <div className={`flex items-center gap-1 ${roiColor(priceData.roi)}`}>
-            {priceData.roi !== null && priceData.roi > 0 ? (
-              <TrendingUp className="h-3 w-3" />
-            ) : (
-              <TrendingDown className="h-3 w-3" />
+      {/* Show simplified view if no market cap data */}
+      {hasNoMarketCapData ? (
+        <>
+          <div className="space-y-1">
+            {priceData.priceAtCall !== null && (
+              <div 
+                className="flex items-center gap-1"
+                title={priceData.callDateFormatted ? priceData.callDateFormatted : undefined}
+              >
+                <span className="text-muted-foreground">Entry:</span>
+                <span className="font-mono font-medium">${formatPrice(priceData.priceAtCall)}</span>
+              </div>
             )}
-            <span>{formatPercent(priceData.roi)}</span>
+            
+            {priceData.currentPrice !== null && (
+              <div className="flex items-center gap-1">
+                <span className="text-muted-foreground">Now:</span>
+                <span className="font-mono font-medium">${formatPrice(priceData.currentPrice)}</span>
+              </div>
+            )}
+            
+            {priceData.ath !== null && (
+              <div 
+                className="flex items-center gap-1"
+                title={priceData.athDateFormatted || (priceData.athDate ? new Date(priceData.athDate).toLocaleDateString() : undefined)}
+              >
+                <Trophy className="h-3 w-3 text-yellow-500" />
+                <span className="text-muted-foreground">ATH:</span>
+                <span className="font-mono font-medium">${formatPrice(priceData.ath)}</span>
+              </div>
+            )}
           </div>
           
-          <div className={`flex items-center gap-1 ${roiColor(priceData.athROI)}`}>
-            <Trophy className="h-3 w-3" />
-            <span>{formatPercent(priceData.athROI)}</span>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => fetchPriceData()}
+            className="h-6 text-xs"
+            title="Fetch complete price data"
+          >
+            <RefreshCw className="h-3 w-3 mr-1" />
+            Fetch All
+          </Button>
+        </>
+      ) : (
+        <>
+          {/* Market Cap Column */}
+          <div className="space-y-1">
+            <div 
+              className="flex items-center gap-1 cursor-help hover:opacity-80 transition-opacity"
+              title={`Price: $${formatPrice(priceData.priceAtCall)}${priceData.callDateFormatted ? `\nDate: ${priceData.callDateFormatted}` : ''}`}
+            >
+              <span className="text-muted-foreground">Entry:</span>
+              <span className="font-mono font-medium">{formatMarketCap(priceData.fdvAtCall || priceData.marketCapAtCall)}</span>
+            </div>
+            
+            <div 
+              className="flex items-center gap-1 cursor-help hover:opacity-80 transition-opacity"
+              title={`Price: $${formatPrice(priceData.currentPrice)}`}
+            >
+              <span className="text-muted-foreground">Now:</span>
+              <span className="font-mono font-medium">{formatMarketCap(priceData.currentFDV || priceData.currentMarketCap)}</span>
+            </div>
+            
+            <div 
+              className="flex items-center gap-1 cursor-help hover:opacity-80 transition-opacity"
+              title={`Price: $${formatPrice(priceData.ath)}${priceData.athDateFormatted ? `\nDate: ${priceData.athDateFormatted}` : priceData.athDate ? `\nDate: ${new Date(priceData.athDate).toLocaleDateString()}` : ''}`}
+            >
+              <Trophy className="h-3 w-3 text-yellow-500" />
+              <span className="text-muted-foreground">ATH:</span>
+              <span className="font-mono font-medium">{formatMarketCap(priceData.athFDV || priceData.athMarketCap)}</span>
+            </div>
           </div>
-        </div>
-      </div>
+            
+          {/* ROI Display */}
+          <div className="flex items-center gap-3 pt-1 border-t">
+            <div className={`flex items-center gap-1 ${roiColor(priceData.roi)}`}>
+              {priceData.roi !== null && priceData.roi > 0 ? (
+                <TrendingUp className="h-3 w-3" />
+              ) : (
+                <TrendingDown className="h-3 w-3" />
+              )}
+              <span>{formatPercent(priceData.roi)}</span>
+            </div>
+            
+            <div className={`flex items-center gap-1 ${roiColor(priceData.athROI)}`}>
+              <Trophy className="h-3 w-3" />
+              <span>{formatPercent(priceData.athROI)}</span>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
   )
 }

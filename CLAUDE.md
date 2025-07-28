@@ -52,37 +52,93 @@ Get values from `/KROMV12/.env` and add to Netlify dashboard:
 - `DELETE /api/delete-analysis` - Remove analysis data
 
 ## Database Schema Extensions
-The app adds these columns to the `crypto_calls` table:
+The app uses and extends the complete `crypto_calls` table (70 columns total).
+
+### Core App Fields Used
 ```sql
--- Call Analysis Fields
-analysis_score INTEGER (1-10)
-analysis_tier TEXT (ALPHA/SOLID/BASIC/TRASH)
-analysis_token_type TEXT (meme/utility)
-analysis_legitimacy_factor TEXT (High/Medium/Low)
-analysis_model TEXT
-analysis_reasoning TEXT
-analysis_prompt_used TEXT
-analysis_batch_id UUID
-analysis_duration_ms INTEGER
-analysis_reanalyzed_at TIMESTAMPTZ
+-- Essential Fields (from core schema)
+id UUID PRIMARY KEY
+krom_id TEXT UNIQUE
+ticker TEXT
+network TEXT
+contract_address TEXT
+buy_timestamp TIMESTAMPTZ
+raw_data JSONB
+created_at TIMESTAMPTZ
 
--- X Analysis Fields  
-x_analysis_score INTEGER (1-10)
-x_analysis_tier TEXT
-x_analysis_token_type TEXT
-x_legitimacy_factor TEXT
-x_analysis_model TEXT
-x_best_tweet TEXT
-x_analysis_reasoning TEXT
-x_analysis_batch_id UUID
-x_analysis_duration_ms INTEGER
-x_reanalyzed_at TIMESTAMPTZ
+-- Call Analysis Fields (13 total)
+analysis_score INTEGER               -- 1-10 legitimacy score
+analysis_tier TEXT                   -- ALPHA/SOLID/BASIC/TRASH
+analysis_token_type TEXT             -- meme/utility classification
+analysis_legitimacy_factor TEXT      -- High/Medium/Low
+analysis_model TEXT                  -- AI model used (gpt-4, kimi-k2, etc.)
+analysis_reasoning TEXT              -- Detailed analysis explanation
+analysis_prompt_used TEXT            -- Full prompt sent to AI
+analysis_batch_id UUID               -- Batch processing identifier
+analysis_batch_timestamp TIMESTAMPTZ -- When batch was processed
+analysis_duration_ms INTEGER         -- Processing time in milliseconds
+analysis_confidence NUMERIC          -- AI confidence level (0-1)
+analysis_reanalyzed_at TIMESTAMPTZ   -- Last re-analysis timestamp
+analysis_description TEXT            -- Legacy analysis summary
 
--- User Fields
-is_coin_of_interest BOOLEAN
-user_comment TEXT
-user_comment_updated_at TIMESTAMPTZ
+-- X Analysis Fields (18 total)
+x_analysis_score INTEGER             -- 1-10 social media score
+x_analysis_tier TEXT                 -- X research rating
+x_analysis_token_type TEXT           -- Token type from social analysis
+x_legitimacy_factor TEXT             -- Legitimacy from social presence
+x_analysis_legitimacy_factor TEXT    -- Enhanced legitimacy assessment
+x_analysis_model TEXT                -- AI model for X analysis
+x_best_tweet TEXT                    -- Most relevant tweet
+x_analysis_best_tweet TEXT           -- Alternative best tweet field
+x_analysis_reasoning TEXT            -- Detailed X analysis reasoning
+x_analysis_prompt_used TEXT          -- Prompt used for X analysis
+x_analysis_batch_id UUID             -- X analysis batch identifier
+x_analysis_batch_timestamp TIMESTAMPTZ -- X batch processing time
+x_analysis_duration_ms INTEGER       -- X analysis processing time
+x_reanalyzed_at TIMESTAMPTZ          -- Last X re-analysis timestamp
+x_analysis_key_observations JSONB    -- Key social media insights
+x_analysis_summary TEXT              -- X analysis summary
+x_raw_tweets JSONB                   -- Raw tweet data
+x_analyzed_at TIMESTAMPTZ             -- When X analysis completed
+
+-- Price & ROI Fields (13 total) - Used for performance tracking
+price_at_call NUMERIC                -- Token price when call was made
+price_current NUMERIC                -- Current token price
+current_price NUMERIC                -- Alternative current price
+price_updated_at TIMESTAMPTZ         -- When price was last updated
+price_fetched_at TIMESTAMPTZ         -- When price data was fetched
+price_change_percent NUMERIC         -- Price change percentage
+price_network TEXT                   -- Network used for price fetching
+ath_price NUMERIC                    -- All-time high price
+ath_timestamp TIMESTAMPTZ            -- When ATH was reached
+ath_roi_percent NUMERIC              -- ROI percentage from ATH
+ath_market_cap NUMERIC               -- Market cap at ATH
+ath_fdv NUMERIC                      -- Fully diluted value at ATH
+roi_percent NUMERIC                  -- Current ROI percentage
+
+-- Market Data Fields (7 total) - Enhanced metrics
+market_cap_at_call NUMERIC           -- Market cap when call was made
+current_market_cap NUMERIC           -- Current market capitalization
+fdv_at_call NUMERIC                  -- Fully diluted value at call time
+current_fdv NUMERIC                  -- Current fully diluted value
+token_supply NUMERIC                 -- Total token supply
+pool_address TEXT                    -- DEX pool address for accurate pricing
+
+-- User Interaction Fields (5 total)
+is_coin_of_interest BOOLEAN          -- User-marked interesting tokens
+coin_of_interest_marked_at TIMESTAMPTZ -- When marked as interesting
+coin_of_interest_notes TEXT          -- User notes for interesting coins
+user_comment TEXT                    -- User comments on the call
+user_comment_updated_at TIMESTAMPTZ  -- When comment was last updated
 ```
+
+### App-Specific Features
+- **Batch Processing**: Uses `analysis_batch_id` and `x_analysis_batch_id` for tracking
+- **Model Selection**: Supports GPT-4, Kimi K2, Claude Haiku, Gemini 2.5 Pro
+- **Re-analysis**: Tracks when calls are re-analyzed with different models
+- **Performance Metrics**: Duration tracking for optimization
+- **Price Integration**: Real-time price fetching via Supabase Edge Functions
+- **User Interactions**: Comments and "coins of interest" marking
 
 ## Deployment & Development
 
@@ -204,6 +260,95 @@ curl -X POST "https://api.supabase.com/v1/projects/PROJECT_ID/database/query" \
 - [ ] Advanced filtering and search
 - [ ] Real-time analysis dashboard
 - [ ] Webhook notifications for high-score tokens
+
+## Strategic Roadmap
+
+### Signal Architecture Vision
+The app will evolve into a multi-signal cryptocurrency analysis platform:
+
+#### 1. **Coin of Interest Signals** (Sources)
+- ✅ **KROM API** - Current primary source
+- 🔄 **DexScreener API** - Trending tokens, new listings
+- 📊 **Other Sources** (Future):
+  - Whale wallet tracking
+  - Social media trending (Reddit, Discord)
+  - DEX volume spikes
+  - New contract deployments
+
+#### 2. **Quality Signals** (Analysis)
+- ✅ **Call Analysis** - Legitimacy scoring (1-10)
+- ✅ **X Analysis** - Social presence quality (1-10)
+- 🔄 **On-chain Analysis** (Planned):
+  - Holder distribution metrics
+  - Liquidity depth & locks
+  - Transaction patterns
+  - Smart contract security
+- 🔄 **Project Analysis** (Planned):
+  - Website quality assessment
+  - Team verification
+  - Documentation completeness
+  - Roadmap feasibility
+
+#### 3. **Signal Aggregation**
+- Combine multiple signals into composite scores
+- Weight signals based on historical performance
+- Machine learning for signal optimization
+
+### Immediate Priorities
+1. **Complete price migration** (in progress)
+2. **Telegram notifications** for X scores 5+ via Edge Functions
+3. **DexScreener integration** as second coin source
+4. **Data analysis** on completed dataset
+
+### DexScreener Integration Architecture
+
+#### Database Design - Unified Table Approach
+Using the existing `crypto_calls` table with source differentiation:
+
+```sql
+-- New columns for multi-source support
+source TEXT DEFAULT 'krom' -- 'krom', 'dexscreener', 'whale_tracker', etc.
+source_id TEXT -- Original ID from the source
+source_data JSONB -- Source-specific data that doesn't fit standard schema
+contract_address TEXT -- Normalized contract address field
+chain TEXT -- 'ethereum', 'solana', 'arbitrum', etc.
+```
+
+#### Why Unified Table?
+- **Unified Analysis**: All quality signals work regardless of source
+- **Deduplication**: Track same token from multiple sources as one
+- **Comparison**: Easy performance metrics per source
+- **Simpler Architecture**: One table, one UI, filtered views
+
+#### DexScreener Data Mapping
+```typescript
+// DexScreener trending token → crypto_calls record
+{
+  source: 'dexscreener',
+  source_id: dexScreenerTokenId,
+  ticker: token.symbol,
+  contract_address: token.address,
+  chain: token.chainId,
+  buy_timestamp: discovered_at,
+  raw_data: null, // No KROM-style raw data
+  source_data: {
+    priceUsd: token.priceUsd,
+    volume24h: token.volume24h,
+    liquidity: token.liquidity,
+    fdv: token.fdv,
+    trending_score: token.trendingScore
+  }
+}
+```
+
+### Notification System Plan
+- Threshold: X analysis score ≥ 5
+- Delivery: Telegram via Supabase Edge Functions
+- Features:
+  - Real-time alerts for high-quality tokens
+  - Include scores, contract address, DexScreener link
+  - Rate limiting to prevent spam
+  - Separate channels for different score tiers
 
 ## Recent Updates (July 26, 2025)
 
@@ -351,11 +496,21 @@ The price fetching feature is complex to verify due to:
   - Format: "Jun 24, 2025, 01:00 AM (Thai Time)"
   - NOTE: Only works for newly fetched prices (existing data won't have formatted dates)
 
+#### Session: July 28, 2025
+- **Critical Discovery**: App was reading from wrong database column!
+  - Batch processor writes to `historical_price_usd`
+  - App reads from `price_at_call`
+  - This is why prices weren't showing in the interface
+- Fixed by copying 413 records from `historical_price_usd` to `price_at_call`
+- Entry prices now display correctly in the UI
+- **Action Required**: Update batch processors to write to `price_at_call` instead
+
 #### Next Session TODO:
-1. Research chart provider URL parameters for markers
-2. Test GeckoTerminal embed customization options  
-3. Create simple test page with visual price verification
-4. Consider adding migration to update existing price data with formatted dates
+1. Update batch processor to populate `price_at_call` column
+2. Research chart provider URL parameters for markers
+3. Test GeckoTerminal embed customization options  
+4. Create simple test page with visual price verification
+5. Consider adding migration to update existing price data with formatted dates
 
 ### Important Test Tokens
 1. **T Token** (Arbitrum)
