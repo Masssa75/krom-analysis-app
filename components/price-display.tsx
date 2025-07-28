@@ -160,11 +160,11 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, network, 
     const buyPrice = rawData?.trade?.buyPrice
     
     return (
-      <div className="flex gap-1 items-center">
+      <div className="space-y-1">
         {buyPrice ? (
-          <span className="text-xs font-mono">
+          <div className="text-xs font-mono">
             Entry: $${formatPrice(buyPrice)}
-          </span>
+          </div>
         ) : null}
         <Button
           size="sm"
