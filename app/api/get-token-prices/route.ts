@@ -8,16 +8,41 @@ const supabase = createClient(
 
 export async function POST(request: Request) {
   try {
-    const { contractAddress, ticker } = await request.json();
+    const { contractAddress, ticker, kromId } = await request.json();
     
-    if (!contractAddress && !ticker) {
-      return NextResponse.json({ error: 'Contract address or ticker is required' }, { status: 400 });
+    if (!contractAddress && !ticker && !kromId) {
+      return NextResponse.json({ error: 'Contract address, ticker, or kromId is required' }, { status: 400 });
     }
     
-    // Query by contract address if available, otherwise by ticker
+    // Query by kromId first (most specific), then contract address, then ticker
     let data, error;
     
-    if (contractAddress) {
+    if (kromId) {
+      // Query by specific kromId - this ensures we get the exact record
+      const result = await supabase
+        .from('crypto_calls')
+        .select(`
+          price_at_call,
+          current_price,
+          ath_price,
+          ath_timestamp,
+          roi_percent,
+          ath_roi_percent,
+          market_cap_at_call,
+          current_market_cap,
+          ath_market_cap,
+          fdv_at_call,
+          current_fdv,
+          ath_fdv,
+          price_network,
+          price_fetched_at
+        `)
+        .eq('krom_id', kromId)
+        .single();
+      
+      data = result.data;
+      error = result.error;
+    } else if (contractAddress) {
       // First try contract_address column
       const result = await supabase
         .from('crypto_calls')

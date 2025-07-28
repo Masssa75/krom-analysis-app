@@ -1229,6 +1229,7 @@ export default function HomePage() {
                                     ticker: call.token,
                                     contract: call.contract,
                                     network: call.network,
+                                    kromId: call.krom_id,
                                     priceData: {
                                       currentPrice: call.current_price,
                                       priceAtCall: call.price_at_call,

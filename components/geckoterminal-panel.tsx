@@ -25,6 +25,7 @@ interface GeckoTerminalPanelProps {
     ticker: string
     contract: string | null
     network: string | null
+    kromId?: string
     priceData?: {
       currentPrice?: number | null
       priceAtCall?: number | null
@@ -67,7 +68,8 @@ export function GeckoTerminalPanel({ token, onClose }: GeckoTerminalPanelProps) 
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             contractAddress: token.contract,
-            ticker: token.ticker
+            ticker: token.ticker,
+            kromId: token.kromId
           })
         })
         
@@ -83,7 +85,7 @@ export function GeckoTerminalPanel({ token, onClose }: GeckoTerminalPanelProps) 
     }
     
     fetchPriceData()
-  }, [token.contract, token.ticker])
+  }, [token.contract, token.ticker, token.kromId])
   
   // Fetch DexScreener data when info is expanded
   useEffect(() => {
