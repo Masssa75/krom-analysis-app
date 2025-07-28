@@ -175,7 +175,9 @@ export async function GET(request: NextRequest) {
       current_fdv: call.current_fdv,
       ath_fdv: call.ath_fdv,
       token_supply: call.token_supply,
-      is_invalidated: call.is_invalidated || false
+      is_invalidated: call.is_invalidated || false,
+      // Include raw_data for buy price display
+      raw_data: call.raw_data
     })) || [];
 
     // Calculate ATH ROI average
