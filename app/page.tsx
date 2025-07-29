@@ -756,12 +756,24 @@ export default function HomePage() {
                 </div>
               </div>
               <div className="text-center border-l px-6">
-                <div className="font-semibold text-2xl">
-                  {analysisCounts.callPriceCount.toLocaleString()} / {analysisCounts.currentPriceCount.toLocaleString()} / {analysisCounts.athPriceCount.toLocaleString()}
-                </div>
-                <div className="text-muted-foreground">Call / Current / ATH Prices</div>
+                <div className="font-semibold text-2xl">{analysisCounts.callPriceCount.toLocaleString()}</div>
+                <div className="text-muted-foreground">Call Prices</div>
                 <div className="text-xs text-muted-foreground">
-                  ({analysisCounts.withContracts > 0 ? ((analysisCounts.callPriceCount / analysisCounts.withContracts) * 100).toFixed(1) : 0}% / {analysisCounts.withContracts > 0 ? ((analysisCounts.currentPriceCount / analysisCounts.withContracts) * 100).toFixed(1) : 0}% / {analysisCounts.withContracts > 0 ? ((analysisCounts.athPriceCount / analysisCounts.withContracts) * 100).toFixed(1) : 0}%)
+                  ({analysisCounts.withContracts > 0 ? ((analysisCounts.callPriceCount / analysisCounts.withContracts) * 100).toFixed(1) : 0}%)
+                </div>
+              </div>
+              <div className="text-center border-l px-6">
+                <div className="font-semibold text-2xl">{analysisCounts.currentPriceCount.toLocaleString()}</div>
+                <div className="text-muted-foreground">Current Prices</div>
+                <div className="text-xs text-muted-foreground">
+                  ({analysisCounts.withContracts > 0 ? ((analysisCounts.currentPriceCount / analysisCounts.withContracts) * 100).toFixed(1) : 0}%)
+                </div>
+              </div>
+              <div className="text-center border-l px-6">
+                <div className="font-semibold text-2xl">{analysisCounts.athPriceCount.toLocaleString()}</div>
+                <div className="text-muted-foreground">ATH Prices</div>
+                <div className="text-xs text-muted-foreground">
+                  ({analysisCounts.withContracts > 0 ? ((analysisCounts.athPriceCount / analysisCounts.withContracts) * 100).toFixed(1) : 0}%)
                 </div>
               </div>
               <div className="text-center border-l px-6">
