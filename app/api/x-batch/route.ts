@@ -271,6 +271,7 @@ export async function POST(request: NextRequest) {
             x_analysis_batch_timestamp: batchTimestamp,
             x_analysis_duration_ms: duration,
             x_analysis_prompt_used: X_BATCH_ANALYSIS_PROMPT,
+            x_analyzed_at: new Date().toISOString(),
             x_reanalyzed_at: new Date().toISOString()
           })
           .eq('krom_id', call.krom_id)

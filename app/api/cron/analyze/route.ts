@@ -140,7 +140,7 @@ Respond with JSON only.`;
         const analysisResult = JSON.parse(jsonMatch[0]);
 
         // Update database with analysis results
-        await supabase
+        const { error: updateError } = await supabase
           .from('crypto_calls')
           .update({ 
             analysis_score: analysisResult.score || 5,
@@ -149,9 +149,14 @@ Respond with JSON only.`;
             analysis_model: model,
             analysis_reasoning: analysisResult.reasoning || 'No reasoning provided',
             analysis_batch_id: batchId,
-            analysis_batch_timestamp: batchTimestamp
+            analysis_batch_timestamp: batchTimestamp,
+            analyzed_at: new Date().toISOString()
           })
           .eq('krom_id', call.krom_id);
+          
+        if (updateError) {
+          throw new Error(`Database update failed: ${updateError.message}`);
+        }
 
         processed++;
       } catch (err) {
