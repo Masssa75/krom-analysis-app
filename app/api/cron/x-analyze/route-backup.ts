@@ -17,15 +17,16 @@ export async function GET(request: NextRequest) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // Process 5 calls at a time (same as original)
-    const limit = 5;
-    const model = 'moonshotai/kimi-k2';
-
-    // Check if there are calls to analyze
+    // Process 3 calls at a time (reduced for better reliability)
+    const limit = 3;
+    
+    // Fetch calls with tweets that need X analysis
     const { data: calls, error: fetchError } = await supabase
       .from('crypto_calls')
-      .select('krom_id')
-      .is('analysis_score', null)
+      .select('krom_id, ticker, x_raw_tweets')
+      .not('x_raw_tweets', 'is', null)
+      .is('x_analysis_score', null)
+      .order('created_at', { ascending: true })
       .limit(limit);
 
     if (fetchError) {
@@ -38,39 +39,31 @@ export async function GET(request: NextRequest) {
     if (!calls || calls.length === 0) {
       return NextResponse.json({ 
         success: true,
-        message: 'No calls need analysis',
+        message: 'No calls need X analysis',
         processed: 0
       });
     }
 
-    // Get total unanalyzed count for reporting
-    const { count: unanalyzedCount } = await supabase
-      .from('crypto_calls')
-      .select('*', { count: 'exact', head: true })
-      .is('analysis_score', null);
-
-    // Call the proven working analysis endpoint instead of duplicating logic
+    // Process each call with real AI
+    let processed = 0;
+    const batchId = crypto.randomUUID();
+    
+    // Call the x-batch endpoint with our calls
     const baseUrl = request.nextUrl.origin;
-    const response = await fetch(`${baseUrl}/api/analyze`, {
+    const response = await fetch(`${baseUrl}/api/x-batch`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         limit: limit,
-        model: model
+        model: 'moonshotai/kimi-k2'
       })
     });
 
-    let processed = 0;
-    let errors = 0;
-    
     if (response.ok) {
       const result = await response.json();
-      processed = result.count || 0;
-      errors = result.errors ? result.errors.length : 0;
-    } else {
-      errors = limit; // All calls failed
+      processed = result.analyzed || 0;
     }
 
     const duration = ((Date.now() - startTime) / 1000).toFixed(1);
@@ -79,19 +72,12 @@ export async function GET(request: NextRequest) {
       success: true,
       processed: processed,
       total: calls.length,
-      errors: errors,
-      remaining: unanalyzedCount ? unanalyzedCount - processed : 'unknown',
       duration: `${duration}s`,
-      timestamp: new Date().toISOString(),
-      model: model,
-      batchId: crypto.randomUUID(),
-      estimatedCompletion: unanalyzedCount && processed > 0 
-        ? `${Math.ceil((unanalyzedCount - processed) / processed)} minutes`
-        : 'calculating...'
+      timestamp: new Date().toISOString()
     });
     
   } catch (error) {
-    console.error('Cron analyze error:', error);
+    console.error('Cron X analyze error:', error);
     return NextResponse.json(
       { error: 'Failed', details: error instanceof Error ? error.message : 'Unknown' },
       { status: 500 }
