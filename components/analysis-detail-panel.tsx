@@ -325,7 +325,7 @@ export function AnalysisDetailPanel({ call, isOpen, mode, onClose, onCommentSave
                   <Cpu className="h-4 w-4 text-muted-foreground" />
                   <span className="text-muted-foreground">Model:</span>
                   <span className="font-mono">
-                    {mode === 'call' ? (call.analysis_model || 'Unknown') : 'claude-3-haiku'}
+                    {mode === 'call' ? (call.analysis_model || 'Unknown') : (call.x_analysis_model || 'Unknown')}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
