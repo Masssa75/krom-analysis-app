@@ -85,7 +85,10 @@ export default function HomePage() {
     xAnalysis: number
     withContracts: number
     pricesFetched: number
-  }>({ total: 0, callAnalysis: 0, xAnalysis: 0, withContracts: 0, pricesFetched: 0 })
+    callPriceCount: number
+    currentPriceCount: number
+    athPriceCount: number
+  }>({ total: 0, callAnalysis: 0, xAnalysis: 0, withContracts: 0, pricesFetched: 0, callPriceCount: 0, currentPriceCount: 0, athPriceCount: 0 })
 
   // Fetch analyzed calls on mount and when page/search/filter/sort changes
   useEffect(() => {
@@ -753,10 +756,12 @@ export default function HomePage() {
                 </div>
               </div>
               <div className="text-center border-l px-6">
-                <div className="font-semibold text-2xl">{analysisCounts.pricesFetched.toLocaleString()}</div>
-                <div className="text-muted-foreground">Prices Fetched</div>
+                <div className="font-semibold text-2xl">
+                  {analysisCounts.callPriceCount.toLocaleString()} / {analysisCounts.currentPriceCount.toLocaleString()} / {analysisCounts.athPriceCount.toLocaleString()}
+                </div>
+                <div className="text-muted-foreground">Call / Current / ATH Prices</div>
                 <div className="text-xs text-muted-foreground">
-                  ({analysisCounts.withContracts > 0 ? ((analysisCounts.pricesFetched / analysisCounts.withContracts) * 100).toFixed(1) : 0}%)
+                  ({analysisCounts.withContracts > 0 ? ((analysisCounts.callPriceCount / analysisCounts.withContracts) * 100).toFixed(1) : 0}% / {analysisCounts.withContracts > 0 ? ((analysisCounts.currentPriceCount / analysisCounts.withContracts) * 100).toFixed(1) : 0}% / {analysisCounts.withContracts > 0 ? ((analysisCounts.athPriceCount / analysisCounts.withContracts) * 100).toFixed(1) : 0}%)
                 </div>
               </div>
               <div className="text-center border-l px-6">
@@ -1408,6 +1413,7 @@ export default function HomePage() {
                                 currentPrice: call.current_price,
                                 ath: call.ath_price,
                                 athDate: call.ath_timestamp,
+                                priceUpdatedAt: call.price_updated_at,
                                 roi: call.roi_percent,
                                 athROI: call.ath_roi_percent,
                                 drawdownFromATH: call.ath_price && call.current_price 

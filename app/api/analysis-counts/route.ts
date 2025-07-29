@@ -55,16 +55,40 @@ export async function GET() {
       throw contractError;
     }
 
-    // Get count of calls with price data
-    const { count: pricesFetched, error: priceError } = await supabase
+    // Get count of calls with call price (entry price)
+    const { count: callPriceCount, error: callPriceError } = await supabase
+      .from('crypto_calls')
+      .select('*', { count: 'exact', head: true })
+      .not('raw_data->token->ca', 'is', null)
+      .not('price_at_call', 'is', null);
+
+    if (callPriceError) {
+      console.error('Error getting call price count:', callPriceError);
+      throw callPriceError;
+    }
+
+    // Get count of calls with current price
+    const { count: currentPriceCount, error: currentPriceError } = await supabase
       .from('crypto_calls')
       .select('*', { count: 'exact', head: true })
       .not('raw_data->token->ca', 'is', null)
       .not('current_price', 'is', null);
 
-    if (priceError) {
-      console.error('Error getting price count:', priceError);
-      throw priceError;
+    if (currentPriceError) {
+      console.error('Error getting current price count:', currentPriceError);
+      throw currentPriceError;
+    }
+
+    // Get count of calls with ATH price
+    const { count: athPriceCount, error: athPriceError } = await supabase
+      .from('crypto_calls')
+      .select('*', { count: 'exact', head: true })
+      .not('raw_data->token->ca', 'is', null)
+      .not('ath_price', 'is', null);
+
+    if (athPriceError) {
+      console.error('Error getting ATH price count:', athPriceError);
+      throw athPriceError;
     }
 
     return NextResponse.json({
@@ -72,7 +96,10 @@ export async function GET() {
       callAnalysis: callAnalysisCount || 0,
       xAnalysis: xAnalysisCount || 0,
       withContracts: withContracts || 0,
-      pricesFetched: pricesFetched || 0
+      pricesFetched: currentPriceCount || 0,  // Keep this for backward compatibility
+      callPriceCount: callPriceCount || 0,
+      currentPriceCount: currentPriceCount || 0,
+      athPriceCount: athPriceCount || 0
     });
   } catch (error: any) {
     console.error('Error fetching analysis counts:', error);
