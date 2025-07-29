@@ -14,7 +14,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid or empty kromIds array' }, { status: 400 })
     }
     
-    // Clear price data for the specified calls
+    // Clear price data AND timestamps for the specified calls
     const { error } = await supabase
       .from('crypto_calls')
       .update({
@@ -25,7 +25,8 @@ export async function POST(request: Request) {
         roi_percent: null,
         ath_roi_percent: null,
         price_network: null,
-        price_fetched_at: null,
+        price_fetched_at: null,    // Already clearing this
+        price_updated_at: null,     // IMPORTANT: Also clear this
         market_cap_at_call: null,
         current_market_cap: null,
         ath_market_cap: null,
