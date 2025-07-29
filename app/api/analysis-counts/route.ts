@@ -59,7 +59,6 @@ export async function GET() {
     const { count: callPriceCount, error: callPriceError } = await supabase
       .from('crypto_calls')
       .select('*', { count: 'exact', head: true })
-      .not('raw_data->token->ca', 'is', null)
       .not('price_at_call', 'is', null);
 
     if (callPriceError) {
@@ -71,7 +70,6 @@ export async function GET() {
     const { count: currentPriceCount, error: currentPriceError } = await supabase
       .from('crypto_calls')
       .select('*', { count: 'exact', head: true })
-      .not('raw_data->token->ca', 'is', null)
       .not('current_price', 'is', null);
 
     if (currentPriceError) {
@@ -83,7 +81,6 @@ export async function GET() {
     const { count: athPriceCount, error: athPriceError } = await supabase
       .from('crypto_calls')
       .select('*', { count: 'exact', head: true })
-      .not('raw_data->token->ca', 'is', null)
       .not('ath_price', 'is', null);
 
     if (athPriceError) {
