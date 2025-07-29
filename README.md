@@ -1,4 +1,5 @@
 # KROM Analysis Dashboard
+<!-- Force rebuild to propagate env vars - 2025-07-29 -->
 
 A powerful cryptocurrency analysis dashboard built with Next.js 15, TypeScript, and Tailwind CSS. Features AI-powered analysis, real-time data visualization, and comprehensive crypto call tracking.
 
