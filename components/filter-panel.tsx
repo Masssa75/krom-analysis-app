@@ -29,6 +29,7 @@ export interface FilterValues {
 export function FilterPanel({ onFiltersChange }: FilterPanelProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const [availableGroups, setAvailableGroups] = useState<string[]>([])
+  const [availableChains, setAvailableChains] = useState<{value: string, label: string}[]>([])
   const [filters, setFilters] = useState<FilterValues>({
     minCallScore: 1,
     minXScore: 1,
@@ -53,6 +54,16 @@ export function FilterPanel({ onFiltersChange }: FilterPanelProps) {
         }
       })
       .catch(err => console.error('Failed to fetch groups:', err));
+      
+    // Fetch available chains
+    fetch('/api/chains')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setAvailableChains(data.chains);
+        }
+      })
+      .catch(err => console.error('Failed to fetch chains:', err));
   }, [])
 
   const updateFilter = (key: keyof FilterValues, value: any) => {
@@ -202,37 +213,27 @@ export function FilterPanel({ onFiltersChange }: FilterPanelProps) {
             
             <div className="space-y-2">
               <Label>Network</Label>
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="ethereum"
-                    checked={filters.networks.includes('ethereum')}
-                    onCheckedChange={(checked) => {
-                      const networks = checked 
-                        ? [...filters.networks, 'ethereum']
-                        : filters.networks.filter(n => n !== 'ethereum')
-                      updateFilter('networks', networks)
-                    }}
-                  />
-                  <Label htmlFor="ethereum" className="text-sm font-normal cursor-pointer">
-                    Ethereum
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="solana"
-                    checked={filters.networks.includes('solana')}
-                    onCheckedChange={(checked) => {
-                      const networks = checked 
-                        ? [...filters.networks, 'solana']
-                        : filters.networks.filter(n => n !== 'solana')
-                      updateFilter('networks', networks)
-                    }}
-                  />
-                  <Label htmlFor="solana" className="text-sm font-normal cursor-pointer">
-                    Solana
-                  </Label>
-                </div>
+              <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto">
+                {availableChains.map((chain) => (
+                  <div key={chain.value} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`chain-${chain.value}`}
+                      checked={filters.networks.includes(chain.value)}
+                      onCheckedChange={(checked) => {
+                        const networks = checked 
+                          ? [...filters.networks, chain.value]
+                          : filters.networks.filter(n => n !== chain.value)
+                        updateFilter('networks', networks)
+                      }}
+                    />
+                    <Label 
+                      htmlFor={`chain-${chain.value}`} 
+                      className="text-sm font-normal cursor-pointer"
+                    >
+                      {chain.label}
+                    </Label>
+                  </div>
+                ))}
               </div>
             </div>
           </div>

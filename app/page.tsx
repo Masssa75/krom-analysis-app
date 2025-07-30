@@ -1302,6 +1302,7 @@ export default function HomePage() {
                   <thead>
                     <tr className="border-b text-left">
                       <th className="py-3 px-2 font-medium text-muted-foreground">Token</th>
+                      <th className="py-3 px-3 font-medium text-muted-foreground">Chain</th>
                       <th className="py-3 px-4 font-medium text-muted-foreground">Group</th>
                       <th className="py-3 px-4 font-medium text-muted-foreground">Date</th>
                       <th className="py-3 px-2 font-medium text-muted-foreground" colSpan={3}>Call Analysis</th>
@@ -1310,6 +1311,7 @@ export default function HomePage() {
                       <th className="py-3 px-2"></th>
                     </tr>
                     <tr className="border-b text-left text-xs">
+                      <th className="py-2 px-2"></th>
                       <th className="py-2 px-2"></th>
                       <th className="py-2 px-2"></th>
                       <th className="py-2 px-2 font-normal text-muted-foreground">Score</th>
@@ -1381,6 +1383,9 @@ export default function HomePage() {
                                 </Button>
                               )}
                             </div>
+                          </td>
+                          <td className="py-3 px-3 text-sm text-muted-foreground whitespace-nowrap">
+                            {call.network ? call.network.charAt(0).toUpperCase() + call.network.slice(1) : 'Unknown'}
                           </td>
                           <td className="py-3 px-4 text-sm text-muted-foreground whitespace-nowrap">
                             {call.group_name || 'Unknown'}
