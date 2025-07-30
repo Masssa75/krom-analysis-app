@@ -619,7 +619,14 @@ const response = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${ad
 Successfully fetched prices update:
 - `current_price`: Latest token price
 - `price_updated_at`: Timestamp of update
-- `roi_percent`: Recalculated if `price_at_call` exists
+- `roi_percent`: Automatically recalculated if `price_at_call` exists
+
+### ROI Calculation
+The refresh-prices endpoint now automatically recalculates ROI when updating prices:
+```typescript
+const roi = ((currentPrice - priceAtCall) / priceAtCall) * 100
+```
+This ensures ROI percentages are always in sync with the latest price data.
 
 ### Performance Metrics
 - **Page Load**: Instant (shows cached prices)

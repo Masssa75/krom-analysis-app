@@ -95,13 +95,21 @@ export async function POST(request: NextRequest) {
                   );
                   
                   if (originalToken) {
+                    // Calculate ROI if we have price_at_call
+                    let updateData: any = {
+                      current_price: price,
+                      price_updated_at: now.toISOString()
+                    };
+                    
+                    if (originalToken.price_at_call && originalToken.price_at_call > 0) {
+                      const roi = ((price - originalToken.price_at_call) / originalToken.price_at_call) * 100;
+                      updateData.roi_percent = roi;
+                    }
+                    
                     // Update database
                     const { error } = await supabase
                       .from('crypto_calls')
-                      .update({
-                        current_price: price,
-                        price_updated_at: now.toISOString()
-                      })
+                      .update(updateData)
                       .eq('krom_id', originalToken.id || originalToken.krom_id);
 
                     if (!error) {
@@ -146,13 +154,21 @@ export async function POST(request: NextRequest) {
                 }
 
                 if (bestPrice > 0) {
+                  // Calculate ROI if we have price_at_call
+                  let updateData: any = {
+                    current_price: bestPrice,
+                    price_updated_at: now.toISOString()
+                  };
+                  
+                  if (token.price_at_call && token.price_at_call > 0) {
+                    const roi = ((bestPrice - token.price_at_call) / token.price_at_call) * 100;
+                    updateData.roi_percent = roi;
+                  }
+                  
                   // Update database
                   const { error } = await supabase
                     .from('crypto_calls')
-                    .update({
-                      current_price: bestPrice,
-                      price_updated_at: now.toISOString()
-                    })
+                    .update(updateData)
                     .eq('krom_id', token.id || token.krom_id);
 
                   if (!error) {

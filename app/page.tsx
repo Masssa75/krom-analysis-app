@@ -195,6 +195,7 @@ export default function HomePage() {
         contract_address: contract,
         network: network,
         current_price: call.current_price,
+        price_at_call: call.price_at_call,  // Include for ROI calculation
         price_updated_at: priceUpdatedAt,
         created_at: createdAt
       }
