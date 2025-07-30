@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { TrendingUp, TrendingDown, Loader2, DollarSign, Trophy, RefreshCw } from 'lucide-react'
+import { TrendingUp, TrendingDown, Loader2, DollarSign, Trophy, RefreshCw, Clock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 interface PriceData {
@@ -41,6 +41,26 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, network, 
     if (price < 0.01) return price.toFixed(6)
     if (price < 1) return price.toFixed(4)
     return price.toFixed(2)
+  }
+  
+  const getPriceStalenessClass = (priceUpdatedAt: string | null | undefined) => {
+    if (!priceUpdatedAt) return ''
+    
+    const now = new Date()
+    const lastUpdated = new Date(priceUpdatedAt)
+    const diffMinutes = (now.getTime() - lastUpdated.getTime()) / (1000 * 60)
+    
+    // Less than 30 minutes: fresh (default color)
+    if (diffMinutes < 30) return ''
+    
+    // 30-60 minutes: slightly stale (yellow)
+    if (diffMinutes < 60) return 'text-yellow-600'
+    
+    // 60-120 minutes: stale (orange)
+    if (diffMinutes < 120) return 'text-orange-600'
+    
+    // More than 2 hours: very stale (red)
+    return 'text-red-600'
   }
   
   const fetchPriceData = async () => {
@@ -269,7 +289,12 @@ export function PriceDisplay({ contractAddress, callTimestamp, kromId, network, 
             }`}
           >
             <span className="text-muted-foreground">Now:</span>
-            <span className="font-mono font-medium">${formatPrice(priceData.currentPrice)}</span>
+            <span className={`font-mono font-medium ${getPriceStalenessClass(priceData.priceUpdatedAt)}`}>
+              ${formatPrice(priceData.currentPrice)}
+            </span>
+            {priceData.priceUpdatedAt && getPriceStalenessClass(priceData.priceUpdatedAt) && (
+              <Clock className={`h-3 w-3 ${getPriceStalenessClass(priceData.priceUpdatedAt)}`} />
+            )}
           </div>
         )}
         
