@@ -66,6 +66,7 @@ export default function HomePage() {
     minXScore: 1,
     tokenTypes: [],
     networks: [],
+    groups: [],
     onlyProfitable: false,
     minROI: null,
     minAthROI: null,
@@ -138,6 +139,9 @@ export default function HomePage() {
       }
       if (filters.networks.length > 0) {
         params.append('networks', filters.networks.join(','))
+      }
+      if (filters.groups.length > 0) {
+        params.append('groups', filters.groups.join(','))
       }
       if (filters.onlyProfitable) {
         params.append('onlyProfitable', 'true')
@@ -1298,6 +1302,7 @@ export default function HomePage() {
                   <thead>
                     <tr className="border-b text-left">
                       <th className="py-3 px-2 font-medium text-muted-foreground">Token</th>
+                      <th className="py-3 px-4 font-medium text-muted-foreground">Group</th>
                       <th className="py-3 px-4 font-medium text-muted-foreground">Date</th>
                       <th className="py-3 px-2 font-medium text-muted-foreground" colSpan={3}>Call Analysis</th>
                       <th className="py-3 px-2 font-medium text-muted-foreground" colSpan={3}>X Analysis</th>
@@ -1305,6 +1310,7 @@ export default function HomePage() {
                       <th className="py-3 px-2"></th>
                     </tr>
                     <tr className="border-b text-left text-xs">
+                      <th className="py-2 px-2"></th>
                       <th className="py-2 px-2"></th>
                       <th className="py-2 px-2 font-normal text-muted-foreground">Score</th>
                       <th className="py-2 px-2 font-normal text-muted-foreground">Tier</th>
@@ -1375,6 +1381,9 @@ export default function HomePage() {
                                 </Button>
                               )}
                             </div>
+                          </td>
+                          <td className="py-3 px-4 text-sm text-muted-foreground whitespace-nowrap">
+                            {call.group_name || 'Unknown'}
                           </td>
                           <td className="py-3 px-4 text-sm text-muted-foreground whitespace-nowrap">
                             {call.call_timestamp || call.buy_timestamp ? (

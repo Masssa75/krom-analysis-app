@@ -26,6 +26,7 @@ export async function GET(request: NextRequest) {
     const minXScore = searchParams.get('minXScore') ? parseInt(searchParams.get('minXScore')!, 10) : null;
     const tokenTypes = searchParams.get('tokenTypes') ? searchParams.get('tokenTypes')!.split(',') : [];
     const networks = searchParams.get('networks') ? searchParams.get('networks')!.split(',') : [];
+    const groups = searchParams.get('groups') ? searchParams.get('groups')!.split(',') : [];
     const onlyProfitable = searchParams.get('onlyProfitable') === 'true';
     const minROI = searchParams.get('minROI') ? parseFloat(searchParams.get('minROI')!) : null;
     const minAthROI = searchParams.get('minAthROI') ? parseFloat(searchParams.get('minAthROI')!) : null;
@@ -86,6 +87,15 @@ export async function GET(request: NextRequest) {
       // Use proper JSONB filtering syntax
       const networkConditions = actualNetworks.map(n => `raw_data->token->>network.ilike.%${n}%`).join(',');
       query = query.or(networkConditions);
+    }
+    
+    // Add groups filter
+    if (groups.length > 0) {
+      // Filter by group names in raw_data
+      const groupConditions = groups.map(g => 
+        `raw_data->>groupName.eq.${g},raw_data->group->>name.eq.${g}`
+      ).join(',');
+      query = query.or(groupConditions);
     }
     
     // Add ROI filters

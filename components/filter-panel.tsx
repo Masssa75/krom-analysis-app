@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
@@ -17,6 +17,7 @@ export interface FilterValues {
   minXScore: number
   tokenTypes: string[]
   networks: string[]
+  groups: string[]
   onlyProfitable: boolean
   minROI: number | null
   minAthROI: number | null
@@ -27,11 +28,13 @@ export interface FilterValues {
 
 export function FilterPanel({ onFiltersChange }: FilterPanelProps) {
   const [isExpanded, setIsExpanded] = useState(false)
+  const [availableGroups, setAvailableGroups] = useState<string[]>([])
   const [filters, setFilters] = useState<FilterValues>({
     minCallScore: 1,
     minXScore: 1,
     tokenTypes: [],
     networks: [],
+    groups: [],
     onlyProfitable: false,
     minROI: null,
     minAthROI: null,
@@ -39,6 +42,18 @@ export function FilterPanel({ onFiltersChange }: FilterPanelProps) {
     minBuyMcap: null,
     maxBuyMcap: null
   })
+
+  useEffect(() => {
+    // Fetch available groups
+    fetch('/api/groups')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setAvailableGroups(data.groups);
+        }
+      })
+      .catch(err => console.error('Failed to fetch groups:', err));
+  }, [])
 
   const updateFilter = (key: keyof FilterValues, value: any) => {
     const newFilters = { ...filters, [key]: value }
@@ -52,6 +67,7 @@ export function FilterPanel({ onFiltersChange }: FilterPanelProps) {
       minXScore: 1,
       tokenTypes: [],
       networks: [],
+      groups: [],
       onlyProfitable: false,
       minROI: null,
       minAthROI: null,
@@ -68,6 +84,7 @@ export function FilterPanel({ onFiltersChange }: FilterPanelProps) {
     filters.minXScore > 1 ||
     filters.tokenTypes.length > 0 ||
     filters.networks.length > 0 ||
+    filters.groups.length > 0 ||
     filters.onlyProfitable ||
     filters.minROI !== null ||
     filters.minAthROI !== null ||
@@ -219,6 +236,36 @@ export function FilterPanel({ onFiltersChange }: FilterPanelProps) {
               </div>
             </div>
           </div>
+
+          {/* Groups Filter */}
+          {availableGroups.length > 0 && (
+            <div className="space-y-2">
+              <Label>Call Groups</Label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-40 overflow-y-auto">
+                {availableGroups.map((group) => (
+                  <div key={group} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`group-${group}`}
+                      checked={filters.groups.includes(group)}
+                      onCheckedChange={(checked) => {
+                        const groups = checked 
+                          ? [...filters.groups, group]
+                          : filters.groups.filter(g => g !== group)
+                        updateFilter('groups', groups)
+                      }}
+                    />
+                    <Label 
+                      htmlFor={`group-${group}`} 
+                      className="text-sm font-normal cursor-pointer truncate"
+                      title={group}
+                    >
+                      {group}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* ROI Filters */}
           <div className="space-y-4">

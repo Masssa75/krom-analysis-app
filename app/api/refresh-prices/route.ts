@@ -145,13 +145,16 @@ export async function POST(request: NextRequest) {
               const pools = geckoData.data || [];
               
               if (pools.length > 0) {
-                let bestPrice = 0;
-                for (const pool of pools) {
-                  const poolPrice = parseFloat(pool.attributes?.token_price_usd || '0');
-                  if (poolPrice > bestPrice) {
-                    bestPrice = poolPrice;
-                  }
-                }
+                // Sort pools by liquidity to get the most reliable price
+                const sortedPools = pools.sort((a: any, b: any) => {
+                  const liquidityA = parseFloat(a.attributes?.reserve_in_usd || '0');
+                  const liquidityB = parseFloat(b.attributes?.reserve_in_usd || '0');
+                  return liquidityB - liquidityA; // Descending order
+                });
+                
+                // Use price from the pool with highest liquidity
+                const bestPool = sortedPools[0];
+                const bestPrice = parseFloat(bestPool.attributes?.token_price_usd || '0');
 
                 if (bestPrice > 0) {
                   // Calculate ROI if we have price_at_call
