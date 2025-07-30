@@ -33,6 +33,7 @@ export async function GET(request: NextRequest) {
     const minCurrentMcap = searchParams.get('minCurrentMcap') ? parseFloat(searchParams.get('minCurrentMcap')!) : null;
     const minBuyMcap = searchParams.get('minBuyMcap') ? parseFloat(searchParams.get('minBuyMcap')!) : null;
     const maxBuyMcap = searchParams.get('maxBuyMcap') ? parseFloat(searchParams.get('maxBuyMcap')!) : null;
+    const includeDeadTokens = searchParams.get('includeDeadTokens') === 'true';
     
     // Get sort params
     const sortBy = searchParams.get('sortBy') || 'created_at';
@@ -44,6 +45,11 @@ export async function GET(request: NextRequest) {
       .select('*', { count: 'exact' })
       .not('analysis_score', 'is', null)
       .or('is_invalidated.is.null,is_invalidated.eq.false'); // Exclude invalidated tokens
+    
+    // Only exclude dead tokens if includeDeadTokens is false
+    if (!includeDeadTokens) {
+      query = query.or('is_dead.is.null,is_dead.eq.false');
+    }
     
     // Add search filter if provided
     if (search) {
@@ -221,6 +227,7 @@ export async function GET(request: NextRequest) {
         ath_fdv: call.ath_fdv,
         token_supply: call.token_supply,
         is_invalidated: call.is_invalidated || false,
+        is_dead: call.is_dead || false,
         raw_data: call.raw_data,
         quality_score: call.quality_score // Include quality score in response
       }));
@@ -312,6 +319,7 @@ export async function GET(request: NextRequest) {
         ath_fdv: call.ath_fdv,
         token_supply: call.token_supply,
         is_invalidated: call.is_invalidated || false,
+        is_dead: call.is_dead || false,
         raw_data: call.raw_data
       })) || [];
 

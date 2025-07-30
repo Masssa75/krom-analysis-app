@@ -24,6 +24,7 @@ export interface FilterValues {
   minCurrentMcap: number | null
   minBuyMcap: number | null
   maxBuyMcap: number | null
+  includeDeadTokens: boolean
 }
 
 export function FilterPanel({ onFiltersChange }: FilterPanelProps) {
@@ -41,7 +42,8 @@ export function FilterPanel({ onFiltersChange }: FilterPanelProps) {
     minAthROI: null,
     minCurrentMcap: null,
     minBuyMcap: null,
-    maxBuyMcap: null
+    maxBuyMcap: null,
+    includeDeadTokens: false
   })
 
   useEffect(() => {
@@ -84,7 +86,8 @@ export function FilterPanel({ onFiltersChange }: FilterPanelProps) {
       minAthROI: null,
       minCurrentMcap: null,
       minBuyMcap: null,
-      maxBuyMcap: null
+      maxBuyMcap: null,
+      includeDeadTokens: false
     }
     setFilters(defaultFilters)
     onFiltersChange(defaultFilters)
@@ -101,7 +104,8 @@ export function FilterPanel({ onFiltersChange }: FilterPanelProps) {
     filters.minAthROI !== null ||
     filters.minCurrentMcap !== null ||
     filters.minBuyMcap !== null ||
-    filters.maxBuyMcap !== null
+    filters.maxBuyMcap !== null ||
+    filters.includeDeadTokens
 
   return (
     <Card className="mb-4">
@@ -278,6 +282,17 @@ export function FilterPanel({ onFiltersChange }: FilterPanelProps) {
               />
               <Label htmlFor="profitable" className="text-sm font-normal cursor-pointer">
                 Only show profitable tokens
+              </Label>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="dead-tokens"
+                checked={filters.includeDeadTokens}
+                onCheckedChange={(checked) => updateFilter('includeDeadTokens', checked)}
+              />
+              <Label htmlFor="dead-tokens" className="text-sm font-normal cursor-pointer">
+                Include dead tokens (no liquidity)
               </Label>
             </div>
             

@@ -88,6 +88,17 @@ export async function GET() {
       throw athPriceError;
     }
 
+    // Get count of dead tokens
+    const { count: deadTokenCount, error: deadError } = await supabase
+      .from('crypto_calls')
+      .select('*', { count: 'exact', head: true })
+      .eq('is_dead', true);
+
+    if (deadError) {
+      console.error('Error getting dead token count:', deadError);
+      throw deadError;
+    }
+
     return NextResponse.json({
       total: totalCount || 0,
       callAnalysis: callAnalysisCount || 0,
@@ -96,7 +107,8 @@ export async function GET() {
       pricesFetched: currentPriceCount || 0,  // Keep this for backward compatibility
       callPriceCount: callPriceCount || 0,
       currentPriceCount: currentPriceCount || 0,
-      athPriceCount: athPriceCount || 0
+      athPriceCount: athPriceCount || 0,
+      deadTokenCount: deadTokenCount || 0
     });
   } catch (error: any) {
     console.error('Error fetching analysis counts:', error);

@@ -11,6 +11,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Download, Copy, ExternalLink, ChevronRight, MessageSquare, RefreshCw, Search, ChevronLeft, Trash2, Star, DollarSign, Ban } from 'lucide-react'
 import { AnalysisDetailPanel } from '@/components/analysis-detail-panel'
 import { TokenTypeBadge } from '@/components/token-type-badge'
+import { DeadTokenBadge } from '@/components/dead-token-badge'
 import { PriceDisplay } from '@/components/price-display'
 import { GeckoTerminalPanel } from '@/components/geckoterminal-panel'
 import { FilterPanel, FilterValues } from '@/components/filter-panel'
@@ -72,7 +73,8 @@ export default function HomePage() {
     minAthROI: null,
     minCurrentMcap: null,
     minBuyMcap: null,
-    maxBuyMcap: null
+    maxBuyMcap: null,
+    includeDeadTokens: false
   })
   
   // Sort state
@@ -89,7 +91,8 @@ export default function HomePage() {
     callPriceCount: number
     currentPriceCount: number
     athPriceCount: number
-  }>({ total: 0, callAnalysis: 0, xAnalysis: 0, withContracts: 0, pricesFetched: 0, callPriceCount: 0, currentPriceCount: 0, athPriceCount: 0 })
+    deadTokenCount: number
+  }>({ total: 0, callAnalysis: 0, xAnalysis: 0, withContracts: 0, pricesFetched: 0, callPriceCount: 0, currentPriceCount: 0, athPriceCount: 0, deadTokenCount: 0 })
 
   // Fetch analyzed calls on mount and when page/search/filter/sort changes
   useEffect(() => {
@@ -160,6 +163,9 @@ export default function HomePage() {
       }
       if (filters.maxBuyMcap !== null) {
         params.append('maxBuyMcap', filters.maxBuyMcap.toString())
+      }
+      if (filters.includeDeadTokens) {
+        params.append('includeDeadTokens', 'true')
       }
       
       // Add sort parameters
@@ -853,6 +859,13 @@ export default function HomePage() {
                 </div>
               </div>
               <div className="text-center border-l px-6">
+                <div className="font-semibold text-2xl text-red-600">{analysisCounts.deadTokenCount.toLocaleString()}</div>
+                <div className="text-muted-foreground">Dead Tokens</div>
+                <div className="text-xs text-muted-foreground">
+                  ({((analysisCounts.deadTokenCount / analysisCounts.total) * 100).toFixed(1)}%)
+                </div>
+              </div>
+              <div className="text-center border-l px-6">
                 <div className="font-semibold text-2xl">{analysisCounts.total.toLocaleString()}</div>
                 <div className="text-muted-foreground">Total Calls</div>
               </div>
@@ -1379,6 +1392,9 @@ export default function HomePage() {
                               >
                                 <Star className={`h-3 w-3 ${call.is_coin_of_interest ? 'fill-yellow-500 text-yellow-500' : 'text-muted-foreground'}`} />
                               </button>
+                              {call.is_dead && (
+                                <DeadTokenBadge className="scale-90" />
+                              )}
                               {call.contract && (
                                 <Button
                                   size="sm"
