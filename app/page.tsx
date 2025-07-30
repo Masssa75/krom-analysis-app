@@ -169,12 +169,82 @@ export default function HomePage() {
         setAnalyzedCalls(data.results)
         setAnalyzedCount(data.count)
         setAthRoiAverage(data.athRoiAverage)
+        
+        // Check for stale prices and refresh them in the background
+        refreshStalePrices(data.results)
       }
     } catch (err) {
       console.error('Failed to fetch analyzed calls:', err)
     } finally {
       setLoadingAnalyzed(false)
       setIsSearching(false)
+    }
+  }
+
+  const refreshStalePrices = async (calls: any[]) => {
+    // Find calls with stale prices based on smart caching rules
+    const tokensToRefresh = calls.map(call => {
+      const contract = call.contract || call.raw_data?.token?.ca
+      const network = call.network || call.raw_data?.token?.network || 'unknown'
+      const priceUpdatedAt = call.price_updated_at
+      const createdAt = call.analyzed_at || call.raw_data?.timestamp
+      
+      return {
+        id: call.krom_id,
+        contract_address: contract,
+        network: network,
+        current_price: call.current_price,
+        price_updated_at: priceUpdatedAt,
+        created_at: createdAt
+      }
+    }).filter(token => token.contract_address && token.network !== 'unknown')
+
+    if (tokensToRefresh.length === 0) return
+
+    // Set loading state
+    setIsFetchingPrices(true)
+    setPriceFetchProgress(0)
+
+    try {
+      const response = await fetch('/api/refresh-prices', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ tokens: tokensToRefresh })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        
+        // Update the displayed prices if any were refreshed
+        if (data.summary.updated > 0) {
+          setAnalyzedCalls(prevCalls => {
+            return prevCalls.map(call => {
+              const contract = (call.contract || call.raw_data?.token?.ca || '').toLowerCase()
+              const updatedPrice = data.prices[contract]
+              
+              if (updatedPrice && !updatedPrice.cached) {
+                return {
+                  ...call,
+                  current_price: updatedPrice.price,
+                  price_updated_at: updatedPrice.lastUpdated,
+                  // Recalculate ROI if we have price_at_call
+                  roi_percent: call.price_at_call && updatedPrice.price
+                    ? ((updatedPrice.price - call.price_at_call) / call.price_at_call * 100)
+                    : call.roi_percent
+                }
+              }
+              return call
+            })
+          })
+        }
+      }
+    } catch (error) {
+      console.error('Error refreshing prices:', error)
+    } finally {
+      setIsFetchingPrices(false)
+      setPriceFetchProgress(0)
     }
   }
 
