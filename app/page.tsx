@@ -1310,7 +1310,7 @@ export default function HomePage() {
                       <th className="py-3 px-2 font-medium text-muted-foreground">
                         <span 
                           className="cursor-help border-b border-dotted border-muted-foreground"
-                          title="ATH (All-Time High) shows the closing price of the minute with the highest peak, providing a more realistic selling point than the absolute peak"
+                          title="ATH (All-Time High) shows the higher of the opening or closing price from the minute with the highest peak, providing a more realistic selling point than the absolute wick high"
                         >
                           Price/ROI
                         </span>

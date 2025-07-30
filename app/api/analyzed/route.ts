@@ -244,8 +244,16 @@ export async function GET(request: NextRequest) {
       });
     } else {
       // Standard database sorting
-      const { data: calls, error, count } = await orderedQuery
-        .order(sortBy, { ascending: sortOrder === 'asc' })
+      // For ROI sorting, we need to handle NULL values specially
+      let finalQuery = orderedQuery;
+      
+      if (sortBy === 'roi_percent' || sortBy === 'ath_roi_percent') {
+        // When sorting by ROI, exclude NULL values to avoid them appearing first
+        finalQuery = finalQuery.not(sortBy, 'is', null);
+      }
+      
+      const { data: calls, error, count } = await finalQuery
+        .order(sortBy, { ascending: sortOrder === 'asc', nullsFirst: false })
         .range(offset, offset + limit - 1);
       
       if (error) {
