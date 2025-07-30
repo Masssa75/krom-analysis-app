@@ -1307,7 +1307,14 @@ export default function HomePage() {
                       <th className="py-3 px-4 font-medium text-muted-foreground">Date</th>
                       <th className="py-3 px-2 font-medium text-muted-foreground" colSpan={3}>Call Analysis</th>
                       <th className="py-3 px-2 font-medium text-muted-foreground" colSpan={3}>X Analysis</th>
-                      <th className="py-3 px-2 font-medium text-muted-foreground">Price/ROI</th>
+                      <th className="py-3 px-2 font-medium text-muted-foreground">
+                        <span 
+                          className="cursor-help border-b border-dotted border-muted-foreground"
+                          title="ATH (All-Time High) shows the closing price of the minute with the highest peak, providing a more realistic selling point than the absolute peak"
+                        >
+                          Price/ROI
+                        </span>
+                      </th>
                       <th className="py-3 px-2"></th>
                     </tr>
                     <tr className="border-b text-left text-xs">
