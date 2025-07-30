@@ -33,6 +33,8 @@ export async function POST(request: NextRequest) {
     if (!tokens || !Array.isArray(tokens)) {
       return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
     }
+    
+    console.log(`[refresh-prices] Received ${tokens.length} tokens to check`);
 
     const now = new Date();
     const tokensToUpdate = [];
@@ -61,6 +63,8 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    console.log(`[refresh-prices] ${tokensToUpdate.length} tokens need updates`);
+    
     // Batch fetch prices using DexScreener (supports up to 30 tokens)
     if (tokensToUpdate.length > 0) {
       // Split into batches of 30
@@ -98,7 +102,7 @@ export async function POST(request: NextRequest) {
                         current_price: price,
                         price_updated_at: now.toISOString()
                       })
-                      .eq('id', originalToken.id);
+                      .eq('krom_id', originalToken.id || originalToken.krom_id);
 
                     if (!error) {
                       priceResults[contractAddress] = {
@@ -149,7 +153,7 @@ export async function POST(request: NextRequest) {
                       current_price: bestPrice,
                       price_updated_at: now.toISOString()
                     })
-                    .eq('id', token.id);
+                    .eq('krom_id', token.id || token.krom_id);
 
                   if (!error) {
                     priceResults[contractLower] = {

@@ -191,6 +191,7 @@ export default function HomePage() {
       
       return {
         id: call.krom_id,
+        krom_id: call.krom_id,  // Include both for compatibility
         contract_address: contract,
         network: network,
         current_price: call.current_price,
