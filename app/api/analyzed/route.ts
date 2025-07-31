@@ -230,6 +230,9 @@ export async function GET(request: NextRequest) {
         is_dead: call.is_dead || false,
         raw_data: call.raw_data,
         quality_score: call.quality_score, // Include quality score in response
+        volume_24h: call.volume_24h,
+        txns_24h: call.txns_24h,
+        last_volume_check: call.last_volume_check,
         // Security fields
         liquidity_locked: call.liquidity_locked,
         liquidity_lock_percent: call.liquidity_lock_percent,
@@ -262,8 +265,8 @@ export async function GET(request: NextRequest) {
       // For ROI sorting, we need to handle NULL values specially
       let finalQuery = orderedQuery;
       
-      if (sortBy === 'roi_percent' || sortBy === 'ath_roi_percent') {
-        // When sorting by ROI, exclude NULL values to avoid them appearing first
+      if (sortBy === 'roi_percent' || sortBy === 'ath_roi_percent' || sortBy === 'volume_24h') {
+        // When sorting by ROI or volume, exclude NULL values to avoid them appearing first
         finalQuery = finalQuery.not(sortBy, 'is', null);
       }
       
@@ -328,7 +331,10 @@ export async function GET(request: NextRequest) {
         token_supply: call.token_supply,
         is_invalidated: call.is_invalidated || false,
         is_dead: call.is_dead || false,
-        raw_data: call.raw_data
+        raw_data: call.raw_data,
+        volume_24h: call.volume_24h,
+        txns_24h: call.txns_24h,
+        last_volume_check: call.last_volume_check
       })) || [];
 
       // Calculate ATH ROI average

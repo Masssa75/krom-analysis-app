@@ -45,23 +45,35 @@ test('security modal should open when clicking icon', async ({ page }) => {
   await page.waitForSelector('table', { timeout: 30000 });
   await page.waitForTimeout(2000);
   
-  // Find a security icon button (Lock, Unlock, Shield, or AlertTriangle)
-  const securityButton = await page.locator('button svg').first();
+  // Find a security icon button in the security column (7th column)
+  // Look for any button that contains an SVG (the security icons)
+  const securityButtons = await page.locator('tbody td:nth-child(7) button').all();
   
-  if (await securityButton.count() > 0) {
-    // Click the security icon
-    await securityButton.click();
+  if (securityButtons.length > 0) {
+    // Click the first security icon
+    await securityButtons[0].click();
     
-    // Check if modal opened
-    const modalTitle = await page.locator('h2:has-text("Security Analysis")');
+    // Check if modal opened - title includes ticker name
+    const modalTitle = await page.locator('h2:has-text("Security Analysis -")');
     await expect(modalTitle).toBeVisible({ timeout: 5000 });
     
     // Check modal content
     const securityScore = await page.locator('text=/Security Score.*\\/100/');
     await expect(securityScore).toBeVisible();
     
-    // Close modal
-    await page.locator('[aria-label="Close"]').click();
+    // Check for liquidity lock status
+    const liquidityLock = await page.locator('text="Liquidity Lock"');
+    await expect(liquidityLock).toBeVisible();
+    
+    // Close modal by clicking the X button or overlay
+    const closeButton = await page.locator('button[aria-label*="Close"]').or(page.locator('button:has-text("×")'));
+    if (await closeButton.count() > 0) {
+      await closeButton.click();
+    } else {
+      // Click overlay to close
+      await page.keyboard.press('Escape');
+    }
+    
     await expect(modalTitle).not.toBeVisible();
   } else {
     console.log('No security icons found - tokens may not have security data yet');

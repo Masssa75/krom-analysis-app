@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Progress } from '@/components/ui/progress'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Download, Copy, ExternalLink, ChevronRight, MessageSquare, RefreshCw, Search, ChevronLeft, Star, DollarSign, Ban } from 'lucide-react'
+import { Download, Copy, ExternalLink, ChevronRight, MessageSquare, RefreshCw, Search, ChevronLeft, Star, DollarSign, Ban, Trash2 } from 'lucide-react'
 import { AnalysisDetailPanel } from '@/components/analysis-detail-panel'
 import { TokenTypeBadge } from '@/components/token-type-badge'
 import { DeadTokenBadge } from '@/components/dead-token-badge'
@@ -765,7 +765,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="container max-w-7xl mx-auto py-8">
+    <div className="container mx-auto py-8 px-4">
       <Card className="mb-8">
         <CardHeader className="text-center">
           <div className="flex items-center justify-center gap-4 mb-2">
@@ -935,8 +935,8 @@ export default function HomePage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
+                <div className="w-full">
+                  <table className="w-full text-sm table-auto">
                     <thead>
                       <tr className="border-b text-left">
                         <th className="py-2 px-2 font-medium text-muted-foreground">Token</th>
@@ -1096,8 +1096,8 @@ export default function HomePage() {
               </CardHeader>
               <CardContent>
                 {xResults.results && xResults.results.length > 0 && (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
+                  <div className="w-full">
+                    <table className="w-full text-sm table-auto">
                       <thead>
                         <tr className="border-b">
                           <th className="text-left py-2 px-2">Token</th>
@@ -1265,14 +1265,15 @@ export default function HomePage() {
             {loadingAnalyzed ? (
               <div className="text-center py-8 text-muted-foreground">Loading...</div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full">
+              <div className="w-full">
+                <table className="w-full table-auto">
                   <thead>
                     <tr className="border-b text-left">
                       <th className="py-3 px-2 font-medium text-muted-foreground">Token</th>
                       <th className="py-3 px-3 font-medium text-muted-foreground">Chain</th>
                       <th className="py-3 px-4 font-medium text-muted-foreground">Group</th>
                       <th className="py-3 px-4 font-medium text-muted-foreground">Date</th>
+                      <th className="py-3 px-4 font-medium text-muted-foreground">Volume</th>
                       <th className="py-3 px-2 font-medium text-muted-foreground" colSpan={3}>Call Analysis</th>
                       <th className="py-3 px-2 font-medium text-muted-foreground" colSpan={3}>X Analysis</th>
                       <th className="py-3 px-2 font-medium text-muted-foreground">
@@ -1294,6 +1295,8 @@ export default function HomePage() {
                       <th className="py-3 px-2"></th>
                     </tr>
                     <tr className="border-b text-left text-xs">
+                      <th className="py-2 px-2"></th>
+                      <th className="py-2 px-2"></th>
                       <th className="py-2 px-2"></th>
                       <th className="py-2 px-2"></th>
                       <th className="py-2 px-2"></th>
@@ -1397,6 +1400,19 @@ export default function HomePage() {
                                 })}
                               </span>
                             ) : '-'}
+                          </td>
+                          <td className="py-3 px-4 text-sm whitespace-nowrap">
+                            {call.volume_24h !== null && call.volume_24h !== undefined ? (
+                              <span className="font-medium">
+                                ${call.volume_24h >= 1000000 
+                                  ? `${(call.volume_24h / 1000000).toFixed(1)}M`
+                                  : call.volume_24h >= 1000
+                                  ? `${(call.volume_24h / 1000).toFixed(1)}K`
+                                  : call.volume_24h.toFixed(0)}
+                              </span>
+                            ) : (
+                              <span className="text-muted-foreground">-</span>
+                            )}
                           </td>
                           <td className="py-3 px-2 font-semibold">{call.score.toFixed(1)}</td>
                           <td className="py-3 px-2">
