@@ -16,6 +16,7 @@ import { PriceDisplay } from '@/components/price-display'
 import { GeckoTerminalPanel } from '@/components/geckoterminal-panel'
 import { FilterPanel, FilterValues } from '@/components/filter-panel'
 import { SortDropdown } from '@/components/sort-dropdown'
+import { SecurityDisplay } from '@/components/security-display'
 
 export default function HomePage() {
   const [count, setCount] = useState('5')
@@ -1323,6 +1324,14 @@ export default function HomePage() {
                       <th className="py-3 px-2 font-medium text-muted-foreground">
                         <span 
                           className="cursor-help border-b border-dotted border-muted-foreground"
+                          title="Security analysis including liquidity lock status, ownership renouncement, and security warnings"
+                        >
+                          Security
+                        </span>
+                      </th>
+                      <th className="py-3 px-2 font-medium text-muted-foreground">
+                        <span 
+                          className="cursor-help border-b border-dotted border-muted-foreground"
                           title="ATH (All-Time High) shows the higher of the opening or closing price from the minute with the highest peak, providing a more realistic selling point than the absolute wick high"
                         >
                           Price/ROI
@@ -1340,6 +1349,7 @@ export default function HomePage() {
                       <th className="py-2 px-2 font-normal text-muted-foreground">Score</th>
                       <th className="py-2 px-2 font-normal text-muted-foreground">Tier</th>
                       <th className="py-2 px-2 font-normal text-muted-foreground border-r"></th>
+                      <th className="py-2 px-2"></th>
                       <th className="py-2 px-2"></th>
                       <th className="py-2 px-2"></th>
                     </tr>
@@ -1521,6 +1531,18 @@ export default function HomePage() {
                                 Analyze
                               </Button>
                             )}
+                          </td>
+                          <td className="py-3 px-2">
+                            <SecurityDisplay
+                              liquidityLocked={call.liquidity_locked}
+                              liquidityLockPercent={call.liquidity_lock_percent}
+                              ownershipRenounced={call.ownership_renounced}
+                              securityScore={call.security_score}
+                              securityWarnings={call.security_warnings}
+                              securityCheckedAt={call.security_checked_at}
+                              securityRawData={call.security_raw_data}
+                              ticker={call.token}
+                            />
                           </td>
                           <td className="py-3 px-2">
                             <PriceDisplay 

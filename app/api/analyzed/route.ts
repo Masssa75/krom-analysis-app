@@ -229,7 +229,15 @@ export async function GET(request: NextRequest) {
         is_invalidated: call.is_invalidated || false,
         is_dead: call.is_dead || false,
         raw_data: call.raw_data,
-        quality_score: call.quality_score // Include quality score in response
+        quality_score: call.quality_score, // Include quality score in response
+        // Security fields
+        liquidity_locked: call.liquidity_locked,
+        liquidity_lock_percent: call.liquidity_lock_percent,
+        ownership_renounced: call.ownership_renounced,
+        security_score: call.security_score,
+        security_warnings: call.security_warnings,
+        security_checked_at: call.security_checked_at,
+        security_raw_data: call.security_raw_data
       }));
 
       // Calculate ATH ROI average
