@@ -37,6 +37,8 @@ export function SortDropdown({ onSortChange }: SortDropdownProps) {
       case 'created_at': return 'Date Called'
       case 'ticker': return 'Token Name'
       case 'volume_24h': return '24h Volume'
+      case 'liquidity_usd': return 'Liquidity'
+      case 'price_change_24h': return '24h Price Change'
       default: return value
     }
   }
@@ -63,6 +65,8 @@ export function SortDropdown({ onSortChange }: SortDropdownProps) {
           <SelectItem value="roi_percent">ROI %</SelectItem>
           <SelectItem value="ath_roi_percent">ATH ROI %</SelectItem>
           <SelectItem value="volume_24h">24h Volume</SelectItem>
+          <SelectItem value="liquidity_usd">Liquidity</SelectItem>
+          <SelectItem value="price_change_24h">24h Price Change</SelectItem>
           <SelectItem value="current_market_cap">Current Market Cap</SelectItem>
           <SelectItem value="market_cap_at_call">Market Cap at Call</SelectItem>
           <SelectItem value="ticker">Token Name</SelectItem>

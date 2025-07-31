@@ -1274,6 +1274,8 @@ export default function HomePage() {
                       <th className="py-3 px-4 font-medium text-muted-foreground">Group</th>
                       <th className="py-3 px-4 font-medium text-muted-foreground">Date</th>
                       <th className="py-3 px-4 font-medium text-muted-foreground">Volume</th>
+                      <th className="py-3 px-4 font-medium text-muted-foreground">Liquidity</th>
+                      <th className="py-3 px-4 font-medium text-muted-foreground">24h %</th>
                       <th className="py-3 px-2 font-medium text-muted-foreground" colSpan={3}>Call Analysis</th>
                       <th className="py-3 px-2 font-medium text-muted-foreground" colSpan={3}>X Analysis</th>
                       <th className="py-3 px-2 font-medium text-muted-foreground">
@@ -1295,6 +1297,7 @@ export default function HomePage() {
                       <th className="py-3 px-2"></th>
                     </tr>
                     <tr className="border-b text-left text-xs">
+                      <th className="py-2 px-2"></th>
                       <th className="py-2 px-2"></th>
                       <th className="py-2 px-2"></th>
                       <th className="py-2 px-2"></th>
@@ -1409,6 +1412,34 @@ export default function HomePage() {
                                   : call.volume_24h >= 1000
                                   ? `${(call.volume_24h / 1000).toFixed(1)}K`
                                   : call.volume_24h.toFixed(0)}
+                              </span>
+                            ) : (
+                              <span className="text-muted-foreground">-</span>
+                            )}
+                          </td>
+                          <td className="py-3 px-4 text-sm whitespace-nowrap">
+                            {call.liquidity_usd !== null && call.liquidity_usd !== undefined ? (
+                              <span className="font-medium">
+                                ${call.liquidity_usd >= 1000000 
+                                  ? `${(call.liquidity_usd / 1000000).toFixed(1)}M`
+                                  : call.liquidity_usd >= 1000
+                                  ? `${(call.liquidity_usd / 1000).toFixed(1)}K`
+                                  : call.liquidity_usd.toFixed(0)}
+                              </span>
+                            ) : (
+                              <span className="text-muted-foreground">-</span>
+                            )}
+                          </td>
+                          <td className="py-3 px-4 text-sm whitespace-nowrap">
+                            {call.price_change_24h !== null && call.price_change_24h !== undefined ? (
+                              <span className={`font-medium ${
+                                call.price_change_24h > 0 
+                                  ? 'text-green-600 dark:text-green-400' 
+                                  : call.price_change_24h < 0 
+                                  ? 'text-red-600 dark:text-red-400' 
+                                  : ''
+                              }`}>
+                                {call.price_change_24h > 0 ? '+' : ''}{call.price_change_24h.toFixed(1)}%
                               </span>
                             ) : (
                               <span className="text-muted-foreground">-</span>
