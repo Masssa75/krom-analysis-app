@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Progress } from '@/components/ui/progress'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Download, Copy, ExternalLink, ChevronRight, MessageSquare, RefreshCw, Search, ChevronLeft, Trash2, Star, DollarSign, Ban } from 'lucide-react'
+import { Download, Copy, ExternalLink, ChevronRight, MessageSquare, RefreshCw, Search, ChevronLeft, Star, DollarSign, Ban } from 'lucide-react'
 import { AnalysisDetailPanel } from '@/components/analysis-detail-panel'
 import { TokenTypeBadge } from '@/components/token-type-badge'
 import { DeadTokenBadge } from '@/components/dead-token-badge'
@@ -562,44 +562,6 @@ export default function HomePage() {
         }
       }, index * delayBetweenFetches)
     })
-  }
-  
-  const clearPrices = async () => {
-    // Get all krom_ids from the current page
-    const kromIds = analyzedCalls.map(call => call.krom_id)
-    
-    if (kromIds.length === 0) {
-      alert('No calls on this page to clear prices for!')
-      return
-    }
-    
-    if (!confirm(`Clear price data for ${kromIds.length} calls on this page?`)) {
-      return
-    }
-    
-    try {
-      const response = await fetch('/api/clear-prices', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ kromIds })
-      })
-      
-      if (!response.ok) {
-        throw new Error('Failed to clear prices')
-      }
-      
-      const result = await response.json()
-      
-      // Refresh the analyzed calls to show updated data
-      await fetchAnalyzedCalls()
-      
-      alert(result.message)
-    } catch (error) {
-      console.error('Error clearing prices:', error)
-      alert('Failed to clear prices. Please try again.')
-    }
   }
   
   const fetchPricesViaEdgeFunction = async () => {
@@ -1261,14 +1223,6 @@ export default function HomePage() {
                       Fetch All Prices
                     </>
                   )}
-                </Button>
-                <Button
-                  onClick={clearPrices}
-                  variant="outline"
-                  className="text-red-600 hover:text-red-700"
-                >
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Clear Prices
                 </Button>
                 <Button
                   onClick={fetchPricesViaEdgeFunction}
