@@ -58,47 +58,9 @@ export async function GET() {
     );
 
     if (!response.ok) {
-      // Fallback to mock data if Management API fails
-      const mockJobs = [
-        {
-          jobid: 3,
-          jobname: 'ath-continuous-update',
-          schedule: '* * * * *',
-          active: true,
-          lastRun: '45 seconds ago',
-          successRate: 100,
-          status: 'success'
-        },
-        {
-          jobid: 4,
-          jobname: 'price-fetcher',
-          schedule: '*/5 * * * *',
-          active: true,
-          lastRun: '2 minutes ago',
-          successRate: 94,
-          status: 'success'
-        },
-        {
-          jobid: 5,
-          jobname: 'call-analyzer',
-          schedule: '*/5 * * * *',
-          active: true,
-          lastRun: '4 minutes ago',
-          successRate: 88,
-          status: 'warning'
-        },
-        {
-          jobid: 6,
-          jobname: 'x-analyzer',
-          schedule: '*/5 * * * *',
-          active: true,
-          lastRun: '3 minutes ago',
-          successRate: 92,
-          status: 'success'
-        }
-      ];
-      
-      return NextResponse.json(mockJobs);
+      // Return empty array if Management API fails
+      console.error('Failed to fetch cron jobs from Management API');
+      return NextResponse.json([]);
     }
 
     const data = await response.json();
@@ -146,46 +108,7 @@ export async function GET() {
   } catch (error) {
     console.error('Error fetching cron jobs:', error);
     
-    // Return mock data on error
-    const mockJobs = [
-      {
-        jobid: 3,
-        jobname: 'ath-continuous-update',
-        schedule: '* * * * *',
-        active: true,
-        lastRun: '45 seconds ago',
-        successRate: 100,
-        status: 'success'
-      },
-      {
-        jobid: 4,
-        jobname: 'price-fetcher',
-        schedule: '*/5 * * * *',
-        active: true,
-        lastRun: '2 minutes ago',
-        successRate: 94,
-        status: 'success'
-      },
-      {
-        jobid: 5,
-        jobname: 'call-analyzer',
-        schedule: '*/5 * * * *',
-        active: true,
-        lastRun: '4 minutes ago',
-        successRate: 88,
-        status: 'warning'
-      },
-      {
-        jobid: 6,
-        jobname: 'x-analyzer',
-        schedule: '*/5 * * * *',
-        active: true,
-        lastRun: '3 minutes ago',
-        successRate: 92,
-        status: 'success'
-      }
-    ];
-    
-    return NextResponse.json(mockJobs);
+    // Return empty array on error - never show mock data
+    return NextResponse.json([]);
   }
 }

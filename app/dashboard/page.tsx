@@ -272,7 +272,17 @@ export default function DashboardPage() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {cronJobs.map((job) => (
+              {cronJobs.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                    <div className="flex flex-col items-center">
+                      <p className="text-sm">No cron jobs data available</p>
+                      <p className="text-xs mt-1">Check Supabase pg_cron configuration or Management API access</p>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                cronJobs.map((job) => (
                 <tr key={job.jobid} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">{job.jobname}</div>
@@ -306,7 +316,8 @@ export default function DashboardPage() {
                     </div>
                   </td>
                 </tr>
-              ))}
+                ))
+              )}
             </tbody>
           </table>
         </div>

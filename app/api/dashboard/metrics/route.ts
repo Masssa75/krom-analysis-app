@@ -78,8 +78,8 @@ export async function GET() {
       estimatedCompletion,
       priceUpdatesTotal: priceUpdatesTotal || 0,
       priceUpdatesStale: priceUpdatesStale || 0,
-      apiSuccessRate: 94.2, // This would need real calculation from logs
-      notificationsSent: 12, // This would need real data from notification logs
+      apiSuccessRate: 0, // Would need real calculation from logs
+      notificationsSent: 0, // Would need real data from notification logs
       highRoiAlerts: highRoiAlerts || 0,
       callAnalysisPending: callAnalysisPending || 0,
       xAnalysisPending: xAnalysisPending || 0,
