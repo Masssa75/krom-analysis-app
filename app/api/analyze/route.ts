@@ -284,6 +284,38 @@ Respond with JSON only.`;
       }
     }
     
+    // Save results to database
+    for (const result of results) {
+      if (result.krom_id) {  // Remove the score check - save even failed analyses
+        try {
+          const updateData = {
+            analysis_score: result.score,
+            analysis_tier: result.score >= 7 ? 'ALPHA' : result.score >= 5 ? 'SOLID' : result.score >= 3 ? 'BASIC' : 'TRASH',
+            analysis_token_type: result.token_type || 'meme',
+            analysis_legitimacy_factor: result.legitimacy_factor || 'Unknown',
+            analysis_model: model,
+            analysis_reasoning: result.analysis_reasoning || result.reasoning || 'Analysis failed',
+            analysis_prompt_used: result.analysis_prompt_used || '',
+            analysis_batch_id: batchId,
+            analysis_batch_timestamp: batchTimestamp,
+            analysis_duration_ms: result.analysis_duration_ms || 0,
+            analyzed_at: new Date().toISOString()
+          };
+          
+          const { error: updateError } = await supabase
+            .from('crypto_calls')
+            .update(updateData)
+            .eq('krom_id', result.krom_id);
+            
+          if (updateError) {
+            console.error(`Failed to update call ${result.krom_id}:`, updateError);
+          }
+        } catch (err) {
+          console.error(`Error saving result for ${result.krom_id}:`, err);
+        }
+      }
+    }
+    
     const duration = ((Date.now() - startTime) / 1000).toFixed(1);
     
     const responseData = {
