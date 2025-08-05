@@ -35,8 +35,8 @@ export async function GET(request: NextRequest) {
     const maxBuyMcap = searchParams.get('maxBuyMcap') ? parseFloat(searchParams.get('maxBuyMcap')!) : null;
     const includeDeadTokens = searchParams.get('includeDeadTokens') === 'true';
     
-    // Get sort params
-    const sortBy = searchParams.get('sortBy') || 'created_at';
+    // Get sort params - default to analyzed_at so newest analyzed calls appear first
+    const sortBy = searchParams.get('sortBy') || 'analyzed_at';
     const sortOrder = searchParams.get('sortOrder') || 'desc';
 
     // Build query
