@@ -264,7 +264,13 @@ Respond with JSON only.`;
         }
         
       } catch (err) {
-        console.error(`Error analyzing call ${call.krom_id}:`, err);
+        console.error(`Error analyzing call ${call.krom_id} (${call.ticker}):`, err);
+        console.error('Call data:', {
+          ticker: call.ticker,
+          contract: call.raw_data?.token?.ca || 'missing',
+          network: call.raw_data?.token?.network || 'missing',
+          message: call.raw_data?.text ? 'present' : 'missing'
+        });
         results.push({
           token: call.ticker || 'Unknown',
           contract: null,
