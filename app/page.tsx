@@ -17,7 +17,6 @@ import { GeckoTerminalPanel } from '@/components/geckoterminal-panel'
 import { FilterPanel, FilterValues } from '@/components/filter-panel'
 import { SortDropdown } from '@/components/sort-dropdown'
 import { SecurityDisplay } from '@/components/security-display'
-import { TopPerformersTicker } from '@/components/top-performers-ticker'
 
 export default function HomePage() {
   const [count, setCount] = useState('5')
@@ -766,10 +765,8 @@ export default function HomePage() {
   }
 
   return (
-    <>
-      <TopPerformersTicker />
-      <div className="container mx-auto py-8 px-4">
-        <Card className="mb-8">
+    <div className="container mx-auto py-8 px-4">
+      <Card className="mb-8">
         <CardHeader className="text-center">
           <div className="flex items-center justify-center gap-4 mb-2">
             <CardTitle className="text-3xl">KROM Historical Analysis Tool</CardTitle>
@@ -1703,6 +1700,5 @@ export default function HomePage() {
         />
       )}
     </div>
-    </>
   )
 }
