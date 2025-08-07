@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import ChartModal from './ChartModal'
+import { SortDropdown } from './sort-dropdown'
 
 interface RecentCall {
   id: string
@@ -38,16 +39,18 @@ export default function RecentCalls() {
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [totalCount, setTotalCount] = useState(0)
+  const [sortBy, setSortBy] = useState('buy_timestamp')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const itemsPerPage = 20
 
   useEffect(() => {
     fetchRecentCalls()
-  }, [currentPage])
+  }, [currentPage, sortBy, sortOrder])
 
   const fetchRecentCalls = async () => {
     setLoading(true)
     try {
-      const response = await fetch(`/api/recent-calls?limit=${itemsPerPage}&page=${currentPage}`)
+      const response = await fetch(`/api/recent-calls?limit=${itemsPerPage}&page=${currentPage}&sortBy=${sortBy}&sortOrder=${sortOrder}`)
       const data = await response.json()
       setCalls(data.data || [])
       setTotalPages(data.totalPages || 1)
@@ -158,11 +161,18 @@ export default function RecentCalls() {
     setIsModalOpen(true)
   }
 
+  const handleSortChange = (newSortBy: string, newSortOrder: 'asc' | 'desc') => {
+    setSortBy(newSortBy)
+    setSortOrder(newSortOrder)
+    setCurrentPage(1) // Reset to first page when sorting changes
+  }
+
   return (
     <div className="py-8 px-0 bg-[#0a0b0d]">
       <div className="max-w-[1200px] mx-auto">
         <div className="flex justify-between items-center mb-8 px-10">
           <h2 className="text-xl text-[#00ff88] tracking-[3px] font-extralight m-0">RECENT CALLS</h2>
+          <SortDropdown onSortChange={handleSortChange} />
         </div>
         
         <div className="flex flex-col gap-0">
@@ -274,6 +284,13 @@ export default function RecentCalls() {
                       <span className="text-[#666] text-[10px]">ROI</span>
                       <span className="text-base font-semibold" style={{ color: roiColor }}>
                         {formatROI(call.roi_percent)}
+                      </span>
+                    </div>
+                    
+                    <div className="flex flex-col items-center">
+                      <span className="text-[#666] text-[10px]">ATH ROI</span>
+                      <span className="text-base font-semibold text-[#00ff88]">
+                        {formatROI(call.ath_roi_percent)}
                       </span>
                     </div>
                     

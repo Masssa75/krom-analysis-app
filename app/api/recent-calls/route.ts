@@ -11,11 +11,19 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '20')
     const offset = parseInt(searchParams.get('offset') || '0')
     const page = parseInt(searchParams.get('page') || '1')
+    const sortBy = searchParams.get('sortBy') || 'buy_timestamp'
+    const sortOrder = searchParams.get('sortOrder') || 'desc'
     
     const supabase = createClient(supabaseUrl, supabaseKey)
     
     // Calculate actual offset from page if provided
     const actualOffset = page > 1 ? (page - 1) * limit : offset
+    
+    // Map 'created_at' to 'buy_timestamp' for consistency
+    let actualSortBy = sortBy
+    if (sortBy === 'created_at') {
+      actualSortBy = 'buy_timestamp'
+    }
     
     // First get the total count
     const { count: totalCount, error: countError } = await supabase
@@ -59,7 +67,7 @@ export async function GET(request: NextRequest) {
         raw_data
       `)
       .or('is_invalidated.is.null,is_invalidated.eq.false')
-      .order('buy_timestamp', { ascending: false })
+      .order(actualSortBy, { ascending: sortOrder === 'asc' })
       .range(actualOffset, actualOffset + limit - 1)
     
     if (error) {
