@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import ChartModal from './ChartModal'
 import { SortDropdown } from './sort-dropdown'
-import Filters, { FilterState } from './Filters'
 
 interface RecentCall {
   id: string
@@ -33,7 +32,13 @@ interface RecentCall {
   group_name: string
 }
 
-export default function RecentCalls() {
+interface RecentCallsProps {
+  filters?: {
+    tokenType?: 'all' | 'meme' | 'utility'
+  }
+}
+
+export default function RecentCalls({ filters = { tokenType: 'all' } }: RecentCallsProps) {
   const [calls, setCalls] = useState<RecentCall[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedToken, setSelectedToken] = useState<RecentCall | null>(null)
@@ -43,8 +48,11 @@ export default function RecentCalls() {
   const [totalCount, setTotalCount] = useState(0)
   const [sortBy, setSortBy] = useState('buy_timestamp')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
-  const [filters, setFilters] = useState<FilterState>({ tokenType: 'all' })
   const itemsPerPage = 20
+
+  useEffect(() => {
+    setCurrentPage(1)  // Reset to first page when filters change
+  }, [filters])
 
   useEffect(() => {
     fetchRecentCalls()
@@ -58,7 +66,7 @@ export default function RecentCalls() {
         page: currentPage.toString(),
         sortBy,
         sortOrder,
-        tokenType: filters.tokenType
+        tokenType: filters?.tokenType || 'all'
       })
       const response = await fetch(`/api/recent-calls?${params}`)
       const data = await response.json()
@@ -187,21 +195,12 @@ export default function RecentCalls() {
     setCurrentPage(1) // Reset to first page when sorting changes
   }
 
-  const handleFiltersChange = (newFilters: FilterState) => {
-    setFilters(newFilters)
-    setCurrentPage(1) // Reset to first page when filters change
-  }
-
   return (
     <div className="py-8 px-0 bg-[#0a0b0d]">
       <div className="max-w-[1200px] mx-auto">
-        <div className="flex justify-between items-center mb-6 px-10">
+        <div className="flex justify-between items-center mb-8 px-10">
           <h2 className="text-xl text-[#00ff88] tracking-[3px] font-extralight m-0">RECENT CALLS</h2>
           <SortDropdown onSortChange={handleSortChange} />
-        </div>
-        
-        <div className="px-10">
-          <Filters onFiltersChange={handleFiltersChange} />
         </div>
         
         <div className="flex flex-col gap-0">
