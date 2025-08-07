@@ -16,8 +16,14 @@ interface TopCall {
   roi_percent: number
   analysis_score: number
   analysis_tier: string
+  analysis_reasoning?: string
   x_analysis_score: number
   x_analysis_tier: string
+  x_analysis_reasoning?: string
+  x_best_tweet?: string
+  pool_address?: string
+  volume_24h?: number
+  liquidity_usd?: number
 }
 
 export default function TopEarlyCalls() {

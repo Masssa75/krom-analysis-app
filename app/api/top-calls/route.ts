@@ -47,8 +47,11 @@ export async function GET(request: NextRequest) {
         roi_percent,
         analysis_score,
         analysis_tier,
+        analysis_reasoning,
         x_analysis_score,
         x_analysis_tier,
+        x_analysis_reasoning,
+        x_best_tweet,
         pool_address,
         volume_24h,
         liquidity_usd

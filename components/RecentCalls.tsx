@@ -16,9 +16,15 @@ interface RecentCall {
   roi_percent: number
   analysis_score: number
   analysis_tier: string
+  analysis_reasoning?: string
   x_analysis_score: number
   x_analysis_tier: string
+  x_analysis_reasoning?: string
+  x_best_tweet?: string
   analysis_token_type: string
+  pool_address?: string
+  volume_24h?: number
+  liquidity_usd?: number
   market_cap_at_call: number
   current_market_cap: number
   group_name: string

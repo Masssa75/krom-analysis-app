@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 interface ChartModalProps {
   isOpen: boolean
@@ -17,8 +17,11 @@ interface ChartModalProps {
     ath_roi_percent: number
     analysis_score?: number
     analysis_tier?: string
+    analysis_reasoning?: string
     x_analysis_score?: number
     x_analysis_tier?: string
+    x_analysis_reasoning?: string
+    x_best_tweet?: string
     volume_24h?: number
     liquidity_usd?: number
     pool_address?: string
@@ -27,6 +30,9 @@ interface ChartModalProps {
 }
 
 export default function ChartModal({ isOpen, onClose, token }: ChartModalProps) {
+  const [showCallInfo, setShowCallInfo] = useState(false)
+  const [showXInfo, setShowXInfo] = useState(false)
+
   // Close on ESC key
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -255,8 +261,21 @@ export default function ChartModal({ isOpen, onClose, token }: ChartModalProps) 
             <div className="flex gap-8">
               {/* AI Scores */}
               {token.analysis_score && (
-                <div className="flex flex-col">
-                  <div className="text-[10px] text-[#666] mb-1 uppercase tracking-wider">AI Score</div>
+                <div className="flex flex-col relative">
+                  <div className="flex items-center gap-1 mb-1">
+                    <div className="text-[10px] text-[#666] uppercase tracking-wider">Call Analysis</div>
+                    <button
+                      onClick={() => setShowCallInfo(!showCallInfo)}
+                      className="text-[#444] hover:text-[#888] transition-colors"
+                      title="View analysis details"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="16" x2="12" y2="12"/>
+                        <line x1="12" y1="8" x2="12.01" y2="8"/>
+                      </svg>
+                    </button>
+                  </div>
                   <div className="flex items-center gap-1.5">
                     <span className="font-semibold" style={{ color: getTierColors(token.analysis_tier || '').text }}>
                       {token.analysis_score.toFixed(1)}
@@ -273,12 +292,39 @@ export default function ChartModal({ isOpen, onClose, token }: ChartModalProps) 
                       </span>
                     )}
                   </div>
+                  
+                  {/* Call Analysis Info Popover */}
+                  {showCallInfo && token.analysis_reasoning && (
+                    <div className="absolute bottom-full left-0 mb-2 w-[400px] bg-[#1a1c1f] border border-[#2a2d31] rounded-lg p-4 shadow-xl z-10">
+                      <div className="text-xs font-semibold text-[#00ff88] mb-2">Call Analysis Details</div>
+                      <p className="text-xs text-[#ccc] leading-relaxed">{token.analysis_reasoning}</p>
+                      <button 
+                        onClick={() => setShowCallInfo(false)}
+                        className="mt-3 text-[10px] text-[#666] hover:text-[#888]"
+                      >
+                        Click to close
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
               
               {token.x_analysis_score && (
-                <div className="flex flex-col">
-                  <div className="text-[10px] text-[#666] mb-1 uppercase tracking-wider">X Score</div>
+                <div className="flex flex-col relative">
+                  <div className="flex items-center gap-1 mb-1">
+                    <div className="text-[10px] text-[#666] uppercase tracking-wider">Tweet Analysis</div>
+                    <button
+                      onClick={() => setShowXInfo(!showXInfo)}
+                      className="text-[#444] hover:text-[#888] transition-colors"
+                      title="View tweet analysis"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="16" x2="12" y2="12"/>
+                        <line x1="12" y1="8" x2="12.01" y2="8"/>
+                      </svg>
+                    </button>
+                  </div>
                   <div className="flex items-center gap-1.5">
                     <span className="font-semibold" style={{ color: getTierColors(token.x_analysis_tier || '').text }}>
                       {token.x_analysis_score.toFixed(1)}
@@ -295,6 +341,28 @@ export default function ChartModal({ isOpen, onClose, token }: ChartModalProps) 
                       </span>
                     )}
                   </div>
+                  
+                  {/* X Analysis Info Popover */}
+                  {showXInfo && (token.x_analysis_reasoning || token.x_best_tweet) && (
+                    <div className="absolute bottom-full left-0 mb-2 w-[400px] bg-[#1a1c1f] border border-[#2a2d31] rounded-lg p-4 shadow-xl z-10">
+                      <div className="text-xs font-semibold text-[#00ff88] mb-2">Tweet Analysis Details</div>
+                      {token.x_best_tweet && (
+                        <div className="mb-3">
+                          <div className="text-[10px] text-[#888] mb-1">Best Tweet:</div>
+                          <p className="text-xs text-[#aaa] italic border-l-2 border-[#333] pl-2">{token.x_best_tweet}</p>
+                        </div>
+                      )}
+                      {token.x_analysis_reasoning && (
+                        <p className="text-xs text-[#ccc] leading-relaxed">{token.x_analysis_reasoning}</p>
+                      )}
+                      <button 
+                        onClick={() => setShowXInfo(false)}
+                        className="mt-3 text-[10px] text-[#666] hover:text-[#888]"
+                      >
+                        Click to close
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
 

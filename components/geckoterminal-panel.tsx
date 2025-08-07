@@ -264,7 +264,7 @@ export function GeckoTerminalPanel({ token, onClose }: GeckoTerminalPanelProps) 
             onClick={() => setIsInfoExpanded(!isInfoExpanded)}
             className="w-full px-4 py-2 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
           >
-            <span className="text-sm font-medium">Token Info & Links</span>
+            <span className="text-sm font-medium">Market Data & Links</span>
             {isInfoExpanded ? (
               <ChevronUp className="h-4 w-4 text-muted-foreground" />
             ) : (
@@ -273,7 +273,26 @@ export function GeckoTerminalPanel({ token, onClose }: GeckoTerminalPanelProps) 
           </button>
           
           {isInfoExpanded && (
-            <div className="px-4 pb-3">
+            <div className="px-4 pb-3 space-y-3">
+              {/* Market Cap Data Section */}
+              {priceData && (
+                <div className="grid grid-cols-2 gap-4 text-sm border-b pb-3">
+                  <div>
+                    <span className="text-muted-foreground">Current Market Cap:</span>
+                    <span className="ml-2 font-medium">
+                      {formatMarketCap(priceData.currentMarketCap) || 'N/A'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Market Cap at Call:</span>
+                    <span className="ml-2 font-medium">
+                      {formatMarketCap(priceData.marketCapAtCall) || 'N/A'}
+                    </span>
+                  </div>
+                </div>
+              )}
+              
+              {/* Social Links Section */}
               {dexLoading ? (
                 <div className="text-sm text-muted-foreground py-2">Loading token information...</div>
               ) : (
