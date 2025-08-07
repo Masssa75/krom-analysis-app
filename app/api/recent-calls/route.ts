@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
     const callsWithGroups = (data || []).map(call => {
       let groupName = 'Unknown Group'
       if (call.raw_data && typeof call.raw_data === 'object') {
-        groupName = call.raw_data.group_username || call.raw_data.group_name || 'Unknown Group'
+        groupName = call.raw_data.groupName || call.raw_data.group || call.raw_data.group_username || 'Unknown Group'
       }
       
       return {
