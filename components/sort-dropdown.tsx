@@ -49,18 +49,18 @@ export function SortDropdown({ onSortChange }: SortDropdownProps) {
         <SelectTrigger className="w-[200px] bg-[#1a1c1f] border-[#2a2d31] text-[#ccc] hover:bg-[#222426] hover:border-[#333]">
           <SelectValue />
         </SelectTrigger>
-        <SelectContent className="bg-[#1a1c1f] border-[#2a2d31]">
-          <SelectItem value="created_at">Date Called</SelectItem>
-          <SelectItem value="analysis_score">Call Score</SelectItem>
-          <SelectItem value="x_analysis_score">X Score</SelectItem>
-          <SelectItem value="roi_percent">ROI %</SelectItem>
-          <SelectItem value="ath_roi_percent">ATH ROI %</SelectItem>
-          <SelectItem value="volume_24h">24h Volume</SelectItem>
-          <SelectItem value="liquidity_usd">Liquidity</SelectItem>
-          <SelectItem value="price_change_24h">24h Price Change</SelectItem>
-          <SelectItem value="current_market_cap">Current Market Cap</SelectItem>
-          <SelectItem value="market_cap_at_call">Market Cap at Call</SelectItem>
-          <SelectItem value="ticker">Token Name</SelectItem>
+        <SelectContent className="bg-[#1a1c1f] border-[#2a2d31] text-[#ccc]">
+          <SelectItem value="created_at" className="text-[#ccc] focus:bg-[#222426] focus:text-white">Date Called</SelectItem>
+          <SelectItem value="analysis_score" className="text-[#ccc] focus:bg-[#222426] focus:text-white">Call Score</SelectItem>
+          <SelectItem value="x_analysis_score" className="text-[#ccc] focus:bg-[#222426] focus:text-white">X Score</SelectItem>
+          <SelectItem value="roi_percent" className="text-[#ccc] focus:bg-[#222426] focus:text-white">ROI %</SelectItem>
+          <SelectItem value="ath_roi_percent" className="text-[#ccc] focus:bg-[#222426] focus:text-white">ATH ROI %</SelectItem>
+          <SelectItem value="volume_24h" className="text-[#ccc] focus:bg-[#222426] focus:text-white">24h Volume</SelectItem>
+          <SelectItem value="liquidity_usd" className="text-[#ccc] focus:bg-[#222426] focus:text-white">Liquidity</SelectItem>
+          <SelectItem value="price_change_24h" className="text-[#ccc] focus:bg-[#222426] focus:text-white">24h Price Change</SelectItem>
+          <SelectItem value="current_market_cap" className="text-[#ccc] focus:bg-[#222426] focus:text-white">Current Market Cap</SelectItem>
+          <SelectItem value="market_cap_at_call" className="text-[#ccc] focus:bg-[#222426] focus:text-white">Market Cap at Call</SelectItem>
+          <SelectItem value="ticker" className="text-[#ccc] focus:bg-[#222426] focus:text-white">Token Name</SelectItem>
         </SelectContent>
       </Select>
       

@@ -25,20 +25,32 @@ export async function GET(request: NextRequest) {
       actualSortBy = 'buy_timestamp'
     }
     
+    // For ATH ROI sorting, we should only show tokens that have ATH ROI data
+    const isAthRoiSort = actualSortBy === 'ath_roi_percent'
+    const isRoiSort = actualSortBy === 'roi_percent'
+    
     // First get the total count
-    const { count: totalCount, error: countError } = await supabase
+    let countQuery = supabase
       .from('crypto_calls')
       .select('*', { count: 'exact', head: true })
       .or('is_invalidated.is.null,is_invalidated.eq.false')
+    
+    // Apply same filters for count when sorting by ATH ROI
+    if (isAthRoiSort) {
+      countQuery = countQuery
+        .not('ath_roi_percent', 'is', null)
+        .gt('ath_roi_percent', 0)
+    } else if (isRoiSort) {
+      countQuery = countQuery
+        .not('roi_percent', 'is', null)
+    }
+    
+    const { count: totalCount, error: countError } = await countQuery
     
     if (countError) {
       console.error('Error fetching count:', countError)
       return NextResponse.json({ error: 'Failed to fetch count' }, { status: 500 })
     }
-    
-    // For certain sorts (ATH ROI, ROI %), we need to fetch all data first
-    // because many entries have null values and we want non-null values first
-    const needsAllData = ['ath_roi_percent', 'roi_percent'].includes(actualSortBy)
     
     // Build the query
     let query = supabase
@@ -72,10 +84,18 @@ export async function GET(request: NextRequest) {
       `)
       .or('is_invalidated.is.null,is_invalidated.eq.false')
     
-    // Apply ordering
-    if (needsAllData) {
-      // For ATH ROI and ROI sorting, fetch all and sort/paginate in memory
-      query = query.order('buy_timestamp', { ascending: false })
+    // When sorting by ATH ROI, only include tokens with ATH ROI > 0
+    if (isAthRoiSort) {
+      query = query
+        .not('ath_roi_percent', 'is', null)
+        .gt('ath_roi_percent', 0)
+        .order('ath_roi_percent', { ascending: sortOrder === 'asc' })
+        .range(actualOffset, actualOffset + limit - 1)
+    } else if (isRoiSort) {
+      query = query
+        .not('roi_percent', 'is', null)
+        .order('roi_percent', { ascending: sortOrder === 'asc' })
+        .range(actualOffset, actualOffset + limit - 1)
     } else {
       query = query
         .order(actualSortBy, { ascending: sortOrder === 'asc' })
@@ -90,7 +110,7 @@ export async function GET(request: NextRequest) {
     }
     
     // Extract group name from raw_data
-    let callsWithGroups = (data || []).map(call => {
+    const callsWithGroups = (data || []).map(call => {
       let groupName = 'Unknown Group'
       if (call.raw_data && typeof call.raw_data === 'object') {
         groupName = call.raw_data.groupName || call.raw_data.group || call.raw_data.group_username || 'Unknown Group'
@@ -101,36 +121,6 @@ export async function GET(request: NextRequest) {
         group_name: groupName
       }
     })
-    
-    // If we fetched all data for sorting, now sort and paginate
-    if (needsAllData) {
-      // Log some data stats for debugging
-      const withAthRoi = callsWithGroups.filter((c: any) => c.ath_roi_percent !== null && c.ath_roi_percent !== undefined).length
-      const withPriceAtCall = callsWithGroups.filter((c: any) => c.price_at_call !== null && c.price_at_call !== undefined).length
-      const withAthPrice = callsWithGroups.filter((c: any) => c.ath_price !== null && c.ath_price !== undefined).length
-      
-      console.log(`Data stats: Total=${callsWithGroups.length}, WithAthRoi=${withAthRoi}, WithPriceAtCall=${withPriceAtCall}, WithAthPrice=${withAthPrice}`)
-      
-      // Sort by the requested field, putting non-null values first
-      callsWithGroups.sort((a: any, b: any) => {
-        const aVal = a[actualSortBy]
-        const bVal = b[actualSortBy]
-        
-        // Nulls go to the end
-        if (aVal === null || aVal === undefined) return 1
-        if (bVal === null || bVal === undefined) return -1
-        
-        // Sort by value
-        if (sortOrder === 'asc') {
-          return aVal - bVal
-        } else {
-          return bVal - aVal
-        }
-      })
-      
-      // Now paginate
-      callsWithGroups = callsWithGroups.slice(actualOffset, actualOffset + limit)
-    }
     
     const totalPages = Math.ceil((totalCount || 0) / limit)
     
