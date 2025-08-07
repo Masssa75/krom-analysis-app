@@ -1,6 +1,7 @@
 'use client'
 
 import TopEarlyCalls from '@/components/TopEarlyCalls'
+import RecentCalls from '@/components/RecentCalls'
 
 export default function HomePage() {
   return (
@@ -25,10 +26,7 @@ export default function HomePage() {
         <TopEarlyCalls />
 
         {/* Recent Calls Section */}
-        <div className="p-10 border-b border-[#111]">
-          <h2 className="text-xl text-[#00ff88] tracking-[3px] font-extralight mb-5">RECENT CALLS</h2>
-          <p className="text-[#444] text-sm italic">Recent calls will appear here</p>
-        </div>
+        <RecentCalls />
       </div>
     </div>
   )
