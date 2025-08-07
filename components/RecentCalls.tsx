@@ -44,11 +44,21 @@ export default function RecentCalls() {
     setLoading(false)
   }
 
-  const formatMarketCap = (mcap: number) => {
-    if (!mcap) return '-'
-    if (mcap >= 1000000) return `$${(mcap / 1000000).toFixed(1)}M`
-    if (mcap >= 1000) return `$${(mcap / 1000).toFixed(0)}K`
-    return `$${mcap.toFixed(0)}`
+  const formatPrice = (price: number | null | undefined) => {
+    if (!price && price !== 0) return '-'
+    
+    // Very small prices (likely meme coins)
+    if (price < 0.00000001) return `$${price.toExponential(2)}`
+    if (price < 0.000001) return `$${price.toFixed(9)}`
+    if (price < 0.001) return `$${price.toFixed(6)}`
+    if (price < 1) return `$${price.toFixed(4)}`
+    if (price < 100) return `$${price.toFixed(2)}`
+    if (price < 10000) return `$${price.toFixed(0)}`
+    
+    // For market cap style display
+    if (price >= 1000000) return `$${(price / 1000000).toFixed(1)}M`
+    if (price >= 1000) return `$${(price / 1000).toFixed(0)}K`
+    return `$${price.toFixed(0)}`
   }
 
   const formatROI = (roi: number) => {
@@ -210,25 +220,25 @@ export default function RecentCalls() {
                   </div>
                   
                   <div className="flex items-center gap-8">
-                    {/* Market Cap Info */}
+                    {/* Price Info */}
                     <div className="flex flex-col items-center">
                       <span className="text-[#666] text-[10px]">ENTRY</span>
                       <span className="text-white text-sm font-medium">
-                        {formatMarketCap(call.market_cap_at_call)}
+                        {formatPrice(call.price_at_call)}
                       </span>
                     </div>
                     
                     <div className="flex flex-col items-center">
                       <span className="text-[#666] text-[10px]">ATH</span>
                       <span className="text-white text-sm font-medium">
-                        {call.ath_price ? formatMarketCap((call.market_cap_at_call || 0) * ((call.ath_roi_percent || 0) / 100 + 1)) : '-'}
+                        {formatPrice(call.ath_price)}
                       </span>
                     </div>
                     
                     <div className="flex flex-col items-center">
                       <span className="text-[#666] text-[10px]">NOW</span>
                       <span className="text-white text-sm font-medium">
-                        {formatMarketCap(call.current_market_cap)}
+                        {formatPrice(call.current_price)}
                       </span>
                     </div>
                     
