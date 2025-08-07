@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import ChartModal from './ChartModal'
 
 interface RecentCall {
   id: string
@@ -26,6 +27,8 @@ interface RecentCall {
 export default function RecentCalls() {
   const [calls, setCalls] = useState<RecentCall[]>([])
   const [loading, setLoading] = useState(true)
+  const [selectedToken, setSelectedToken] = useState<RecentCall | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
     fetchRecentCalls()
@@ -138,6 +141,11 @@ export default function RecentCalls() {
     return colors[tier] || { bg: '#88888822', text: '#888' }
   }
 
+  const handleTokenClick = (call: RecentCall) => {
+    setSelectedToken(call)
+    setIsModalOpen(true)
+  }
+
   return (
     <div className="py-8 px-0 bg-[#0a0b0d]">
       <div className="max-w-[1200px] mx-auto">
@@ -170,7 +178,11 @@ export default function RecentCalls() {
               const xTier = getTierColor(call.x_analysis_tier)
               
               return (
-                <div key={call.id} className="flex justify-between items-center py-3 px-10 border-b border-[#1a1c1f] hover:bg-[#0f1011] transition-colors">
+                <div 
+                  key={call.id} 
+                  className="flex justify-between items-center py-3 px-10 border-b border-[#1a1c1f] hover:bg-[#0f1011] transition-colors cursor-pointer"
+                  onClick={() => handleTokenClick(call)}
+                >
                   <div className="flex items-center gap-5">
                     {/* Token Info */}
                     <div className="flex items-center gap-2">
@@ -261,6 +273,16 @@ export default function RecentCalls() {
           )}
         </div>
       </div>
+
+      {/* Chart Modal */}
+      <ChartModal 
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false)
+          setSelectedToken(null)
+        }}
+        token={selectedToken}
+      />
     </div>
   )
 }

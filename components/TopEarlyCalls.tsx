@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import ChartModal from './ChartModal'
 
 interface TopCall {
   id: string
@@ -23,6 +24,8 @@ export default function TopEarlyCalls() {
   const [calls, setCalls] = useState<TopCall[]>([])
   const [period, setPeriod] = useState<string>('90d')
   const [loading, setLoading] = useState(true)
+  const [selectedToken, setSelectedToken] = useState<TopCall | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
     fetchTopCalls()
@@ -45,6 +48,11 @@ export default function TopEarlyCalls() {
     // Convert from percentage to X multiplier (e.g., 100% = 2x, 200% = 3x)
     const multiplier = (roi / 100) + 1
     return `${Math.round(multiplier)}x`
+  }
+
+  const handleTokenClick = (call: TopCall) => {
+    setSelectedToken(call)
+    setIsModalOpen(true)
   }
 
   return (
@@ -97,7 +105,11 @@ export default function TopEarlyCalls() {
             </div>
           ) : (
             calls.slice(0, 9).map(call => (
-              <div key={call.id} className="text-lg font-extralight font-mono whitespace-nowrap leading-relaxed">
+              <div 
+                key={call.id} 
+                className="text-lg font-extralight font-mono whitespace-nowrap leading-relaxed cursor-pointer hover:opacity-80 transition-opacity"
+                onClick={() => handleTokenClick(call)}
+              >
                 <span className="text-[#00ff88] opacity-50">[</span>
                 <span className="text-white font-normal">{call.ticker}</span>
                 <span className="text-[#00ff88] opacity-50">:</span>
@@ -108,6 +120,16 @@ export default function TopEarlyCalls() {
           )}
         </div>
       </div>
+
+      {/* Chart Modal */}
+      <ChartModal 
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false)
+          setSelectedToken(null)
+        }}
+        token={selectedToken}
+      />
     </div>
   )
 }
