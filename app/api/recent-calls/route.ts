@@ -34,6 +34,9 @@ export async function GET(request: NextRequest) {
         analysis_token_type,
         market_cap_at_call,
         current_market_cap,
+        pool_address,
+        volume_24h,
+        liquidity_usd,
         source,
         raw_data
       `)

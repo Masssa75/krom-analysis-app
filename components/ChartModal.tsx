@@ -133,11 +133,18 @@ export default function ChartModal({ isOpen, onClose, token }: ChartModalProps) 
 
   const roiColor = token.roi_percent >= 0 ? '#00ff88' : '#ff4444'
 
-  // Build GeckoTerminal embed URL
+  // Build GeckoTerminal embed URL for chart view
   const geckoNetwork = token.network.toLowerCase() === 'ethereum' ? 'eth' : token.network.toLowerCase()
-  const geckoTerminalUrl = token.pool_address 
-    ? `https://www.geckoterminal.com/${geckoNetwork}/pools/${token.pool_address}?embed=1&info=0&swaps=0`
-    : `https://www.geckoterminal.com/${geckoNetwork}/pools?token=${token.contract_address}&embed=1&info=0&swaps=0`
+  
+  // If we have a pool address, use it directly; otherwise search by token
+  let geckoTerminalUrl = ''
+  if (token.pool_address) {
+    // Direct pool URL with chart
+    geckoTerminalUrl = `https://www.geckoterminal.com/${geckoNetwork}/pools/${token.pool_address}?embed=1&info=0&swaps=0`
+  } else {
+    // Search for pools by token address
+    geckoTerminalUrl = `https://www.geckoterminal.com/${geckoNetwork}/tokens/${token.contract_address}?embed=1`
+  }
 
   return (
     <div 
@@ -220,7 +227,10 @@ export default function ChartModal({ isOpen, onClose, token }: ChartModalProps) 
             {/* Action Buttons */}
             <div className="flex gap-3">
               <a 
-                href={`https://www.geckoterminal.com/${geckoNetwork}/pools?token=${token.contract_address}`}
+                href={token.pool_address 
+                  ? `https://www.geckoterminal.com/${geckoNetwork}/pools/${token.pool_address}`
+                  : `https://www.geckoterminal.com/${geckoNetwork}/tokens/${token.contract_address}`
+                }
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-5 py-2.5 rounded-lg text-[13px] font-medium bg-[#1a1c1f] border border-[#2a2d31] text-[#ccc] hover:bg-[#222426] hover:border-[#333] hover:text-white transition-all flex items-center gap-1.5"

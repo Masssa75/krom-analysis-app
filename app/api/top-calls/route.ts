@@ -48,7 +48,10 @@ export async function GET(request: NextRequest) {
         analysis_score,
         analysis_tier,
         x_analysis_score,
-        x_analysis_tier
+        x_analysis_tier,
+        pool_address,
+        volume_24h,
+        liquidity_usd
       `)
       .not('ath_roi_percent', 'is', null)
       .gt('ath_roi_percent', 0)

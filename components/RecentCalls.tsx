@@ -180,13 +180,17 @@ export default function RecentCalls() {
               return (
                 <div 
                   key={call.id} 
-                  className="flex justify-between items-center py-3 px-10 border-b border-[#1a1c1f] hover:bg-[#0f1011] transition-colors cursor-pointer"
-                  onClick={() => handleTokenClick(call)}
+                  className="flex justify-between items-center py-3 px-10 border-b border-[#1a1c1f] hover:bg-[#0f1011] transition-colors"
                 >
                   <div className="flex items-center gap-5">
                     {/* Token Info */}
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold text-white text-base">{call.ticker}</span>
+                      <span 
+                        className="font-semibold text-white text-base cursor-pointer hover:text-[#00ff88] transition-colors"
+                        onClick={() => handleTokenClick(call)}
+                      >
+                        {call.ticker}
+                      </span>
                       <span 
                         className="text-[10px] px-1 py-0.5 rounded-sm font-medium"
                         style={{ 
