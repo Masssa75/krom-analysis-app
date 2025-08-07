@@ -1,5 +1,7 @@
 'use client'
 
+import TopEarlyCalls from '@/components/TopEarlyCalls'
+
 export default function HomePage() {
   return (
     <div className="fixed inset-0 flex bg-[#0a0b0d]">
@@ -20,10 +22,7 @@ export default function HomePage() {
       {/* Main Content */}
       <div className="flex-1 flex flex-col bg-black overflow-y-auto">
         {/* Top Early Calls Section */}
-        <div className="p-10 border-b border-[#111]">
-          <h2 className="text-xl text-[#00ff88] tracking-[3px] font-extralight mb-5">TOP EARLY CALLS</h2>
-          <p className="text-[#444] text-sm italic">Top performing calls will appear here</p>
-        </div>
+        <TopEarlyCalls />
 
         {/* Recent Calls Section */}
         <div className="p-10 border-b border-[#111]">
