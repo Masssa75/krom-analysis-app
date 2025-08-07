@@ -24,6 +24,7 @@ interface RecentCall {
   x_analysis_reasoning?: string
   x_best_tweet?: string
   analysis_token_type: string
+  x_analysis_token_type?: string
   pool_address?: string
   volume_24h?: number
   liquidity_usd?: number
@@ -250,11 +251,24 @@ export default function RecentCalls({ filters = { tokenType: 'all' } }: RecentCa
                       >
                         {getNetworkLabel(call.network)}
                       </span>
-                      {call.analysis_token_type && (
-                        <span className="text-[9px] px-1.5 py-0.5 rounded-sm font-semibold bg-[#ff00ff22] text-[#ff00ff]">
-                          {call.analysis_token_type.toUpperCase()}
-                        </span>
-                      )}
+                      {(() => {
+                        // If either analysis says utility, show utility
+                        const tokenType = (call.analysis_token_type === 'utility' || call.x_analysis_token_type === 'utility') 
+                          ? 'utility' 
+                          : (call.analysis_token_type || call.x_analysis_token_type || null)
+                        
+                        if (!tokenType) return null
+                        
+                        return (
+                          <span className={`text-[9px] px-1.5 py-0.5 rounded-sm font-semibold ${
+                            tokenType === 'utility' 
+                              ? 'bg-[#00a8ff22] text-[#00a8ff]' 
+                              : 'bg-[#ff00ff22] text-[#ff00ff]'
+                          }`}>
+                            {tokenType.toUpperCase()}
+                          </span>
+                        )
+                      })()}
                     </div>
                     
                     {/* Scores */}

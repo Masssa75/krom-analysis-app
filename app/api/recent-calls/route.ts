@@ -38,7 +38,13 @@ export async function GET(request: NextRequest) {
     
     // Apply token type filter
     if (tokenType !== 'all') {
-      countQuery = countQuery.eq('analysis_token_type', tokenType)
+      if (tokenType === 'utility') {
+        // Show if either analysis says utility
+        countQuery = countQuery.or('analysis_token_type.eq.utility,x_analysis_token_type.eq.utility')
+      } else if (tokenType === 'meme') {
+        // Show only if both analyses say meme (or one is null)
+        countQuery = countQuery.or('and(analysis_token_type.eq.meme,x_analysis_token_type.is.null),and(analysis_token_type.is.null,x_analysis_token_type.eq.meme),and(analysis_token_type.eq.meme,x_analysis_token_type.eq.meme)')
+      }
     }
     
     // Apply same filters for count when sorting by ATH ROI
@@ -81,6 +87,7 @@ export async function GET(request: NextRequest) {
         x_analysis_reasoning,
         x_best_tweet,
         analysis_token_type,
+        x_analysis_token_type,
         market_cap_at_call,
         current_market_cap,
         pool_address,
@@ -93,7 +100,13 @@ export async function GET(request: NextRequest) {
     
     // Apply token type filter
     if (tokenType !== 'all') {
-      query = query.eq('analysis_token_type', tokenType)
+      if (tokenType === 'utility') {
+        // Show if either analysis says utility
+        query = query.or('analysis_token_type.eq.utility,x_analysis_token_type.eq.utility')
+      } else if (tokenType === 'meme') {
+        // Show only if both analyses say meme (or one is null)
+        query = query.or('and(analysis_token_type.eq.meme,x_analysis_token_type.is.null),and(analysis_token_type.is.null,x_analysis_token_type.eq.meme),and(analysis_token_type.eq.meme,x_analysis_token_type.eq.meme)')
+      }
     }
     
     // When sorting by ATH ROI, only include tokens with ATH ROI > 0
