@@ -52,6 +52,7 @@ export async function GET(request: NextRequest) {
       `)
       .not('ath_roi_percent', 'is', null)
       .gt('ath_roi_percent', 0)
+      .or('is_invalidated.is.null,is_invalidated.eq.false')
       .order('ath_roi_percent', { ascending: false })
       .limit(9)
     

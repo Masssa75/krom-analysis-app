@@ -42,9 +42,6 @@ export default function TopEarlyCalls() {
   }
 
   const formatROI = (roi: number) => {
-    if (roi >= 1000) {
-      return `${Math.round(roi / 100) / 10}kx`
-    }
     return `${Math.round(roi)}x`
   }
 
