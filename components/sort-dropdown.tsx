@@ -44,12 +44,12 @@ export function SortDropdown({ onSortChange }: SortDropdownProps) {
 
   return (
     <div className="flex items-center gap-2">
-      <Label className="text-sm font-medium">Sort by:</Label>
+      <span className="text-[#666] text-[13px] font-medium">Sort by:</span>
       <Select value={sortBy} onValueChange={handleSortByChange}>
-        <SelectTrigger className="w-[200px]">
+        <SelectTrigger className="w-[200px] bg-[#1a1c1f] border-[#2a2d31] text-[#ccc] hover:bg-[#222426] hover:border-[#333]">
           <SelectValue />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="bg-[#1a1c1f] border-[#2a2d31]">
           <SelectItem value="created_at">Date Called</SelectItem>
           <SelectItem value="analysis_score">Call Score</SelectItem>
           <SelectItem value="x_analysis_score">X Score</SelectItem>
@@ -68,7 +68,7 @@ export function SortDropdown({ onSortChange }: SortDropdownProps) {
         size="sm"
         variant="outline"
         onClick={toggleSortOrder}
-        className="px-2"
+        className="px-2 bg-[#1a1c1f] border-[#2a2d31] text-[#888] hover:bg-[#222426] hover:border-[#333] hover:text-[#ccc]"
         title={sortOrder === 'asc' ? 'Sort ascending' : 'Sort descending'}
       >
         {sortOrder === 'asc' ? (

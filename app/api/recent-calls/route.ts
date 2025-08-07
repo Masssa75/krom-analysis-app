@@ -36,8 +36,12 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch count' }, { status: 500 })
     }
     
-    // Fetch recent calls ordered by timestamp
-    const { data, error } = await supabase
+    // For certain sorts (ATH ROI, ROI %), we need to fetch all data first
+    // because many entries have null values and we want non-null values first
+    const needsAllData = ['ath_roi_percent', 'roi_percent'].includes(actualSortBy)
+    
+    // Build the query
+    let query = supabase
       .from('crypto_calls')
       .select(`
         id,
@@ -67,8 +71,18 @@ export async function GET(request: NextRequest) {
         raw_data
       `)
       .or('is_invalidated.is.null,is_invalidated.eq.false')
-      .order(actualSortBy, { ascending: sortOrder === 'asc' })
-      .range(actualOffset, actualOffset + limit - 1)
+    
+    // Apply ordering
+    if (needsAllData) {
+      // For ATH ROI and ROI sorting, fetch all and sort/paginate in memory
+      query = query.order('buy_timestamp', { ascending: false })
+    } else {
+      query = query
+        .order(actualSortBy, { ascending: sortOrder === 'asc' })
+        .range(actualOffset, actualOffset + limit - 1)
+    }
+    
+    const { data, error } = await query
     
     if (error) {
       console.error('Error fetching recent calls:', error)
@@ -76,7 +90,7 @@ export async function GET(request: NextRequest) {
     }
     
     // Extract group name from raw_data
-    const callsWithGroups = (data || []).map(call => {
+    let callsWithGroups = (data || []).map(call => {
       let groupName = 'Unknown Group'
       if (call.raw_data && typeof call.raw_data === 'object') {
         groupName = call.raw_data.groupName || call.raw_data.group || call.raw_data.group_username || 'Unknown Group'
@@ -87,6 +101,36 @@ export async function GET(request: NextRequest) {
         group_name: groupName
       }
     })
+    
+    // If we fetched all data for sorting, now sort and paginate
+    if (needsAllData) {
+      // Log some data stats for debugging
+      const withAthRoi = callsWithGroups.filter((c: any) => c.ath_roi_percent !== null && c.ath_roi_percent !== undefined).length
+      const withPriceAtCall = callsWithGroups.filter((c: any) => c.price_at_call !== null && c.price_at_call !== undefined).length
+      const withAthPrice = callsWithGroups.filter((c: any) => c.ath_price !== null && c.ath_price !== undefined).length
+      
+      console.log(`Data stats: Total=${callsWithGroups.length}, WithAthRoi=${withAthRoi}, WithPriceAtCall=${withPriceAtCall}, WithAthPrice=${withAthPrice}`)
+      
+      // Sort by the requested field, putting non-null values first
+      callsWithGroups.sort((a: any, b: any) => {
+        const aVal = a[actualSortBy]
+        const bVal = b[actualSortBy]
+        
+        // Nulls go to the end
+        if (aVal === null || aVal === undefined) return 1
+        if (bVal === null || bVal === undefined) return -1
+        
+        // Sort by value
+        if (sortOrder === 'asc') {
+          return aVal - bVal
+        } else {
+          return bVal - aVal
+        }
+      })
+      
+      // Now paginate
+      callsWithGroups = callsWithGroups.slice(actualOffset, actualOffset + limit)
+    }
     
     const totalPages = Math.ceil((totalCount || 0) / limit)
     
