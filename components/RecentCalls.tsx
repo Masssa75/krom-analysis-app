@@ -162,14 +162,7 @@ export default function RecentCalls() {
     <div className="py-8 px-0 bg-[#0a0b0d]">
       <div className="max-w-[1200px] mx-auto">
         <div className="flex justify-between items-center mb-8 px-10">
-          <div className="flex items-center gap-4">
-            <h2 className="text-xl text-[#00ff88] tracking-[3px] font-extralight m-0">RECENT CALLS</h2>
-            {totalCount > 0 && (
-              <span className="text-[#666] text-sm">
-                ({totalCount} total • Page {currentPage} of {totalPages})
-              </span>
-            )}
-          </div>
+          <h2 className="text-xl text-[#00ff88] tracking-[3px] font-extralight m-0">RECENT CALLS</h2>
         </div>
         
         <div className="flex flex-col gap-0">
@@ -318,17 +311,17 @@ export default function RecentCalls() {
                 ««
               </button>
               
-              {/* Previous Button */}
+              {/* Previous Arrow Button */}
               <button
                 onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                 disabled={currentPage === 1}
-                className={`px-3 py-1.5 text-sm rounded transition-colors ${
+                className={`w-8 h-8 text-sm rounded transition-colors ${
                   currentPage === 1 
                     ? 'bg-[#1a1c1f] text-[#444] cursor-not-allowed' 
                     : 'bg-[#1a1c1f] text-white hover:bg-[#252729]'
                 }`}
               >
-                ‹ Previous
+                ‹
               </button>
               
               {/* Page Numbers */}
@@ -363,17 +356,17 @@ export default function RecentCalls() {
                 })}
               </div>
               
-              {/* Next Button */}
+              {/* Next Arrow Button */}
               <button
                 onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                 disabled={currentPage === totalPages}
-                className={`px-3 py-1.5 text-sm rounded transition-colors ${
+                className={`w-8 h-8 text-sm rounded transition-colors ${
                   currentPage === totalPages 
                     ? 'bg-[#1a1c1f] text-[#444] cursor-not-allowed' 
                     : 'bg-[#1a1c1f] text-white hover:bg-[#252729]'
                 }`}
               >
-                Next ›
+                ›
               </button>
               
               {/* Last Page Button */}

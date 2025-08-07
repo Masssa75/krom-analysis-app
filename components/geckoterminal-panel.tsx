@@ -274,20 +274,47 @@ export function GeckoTerminalPanel({ token, onClose }: GeckoTerminalPanelProps) 
           
           {isInfoExpanded && (
             <div className="px-4 pb-3 space-y-3">
-              {/* Market Cap Data Section */}
+              {/* Market Cap & Supply Data Section */}
               {priceData && (
-                <div className="grid grid-cols-2 gap-4 text-sm border-b pb-3">
-                  <div>
-                    <span className="text-muted-foreground">Current Market Cap:</span>
-                    <span className="ml-2 font-medium">
-                      {formatMarketCap(priceData.currentMarketCap) || 'N/A'}
-                    </span>
+                <div className="space-y-3 border-b pb-3">
+                  {/* Market Cap Row */}
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-muted-foreground">Current Market Cap:</span>
+                      <span className="ml-2 font-medium">
+                        {formatMarketCap(priceData.currentMarketCap) || 'N/A'}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Market Cap at Call:</span>
+                      <span className="ml-2 font-medium">
+                        {priceData.marketCapAtCall 
+                          ? formatMarketCap(priceData.marketCapAtCall)
+                          : priceData.priceAtCall && priceData.totalSupply
+                            ? formatMarketCap(priceData.priceAtCall * priceData.totalSupply)
+                            : 'N/A'}
+                      </span>
+                    </div>
                   </div>
-                  <div>
-                    <span className="text-muted-foreground">Market Cap at Call:</span>
-                    <span className="ml-2 font-medium">
-                      {formatMarketCap(priceData.marketCapAtCall) || 'N/A'}
-                    </span>
+                  
+                  {/* Supply Info Row */}
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-muted-foreground">Circulating Supply:</span>
+                      <span className="ml-2 font-medium">
+                        {priceData.circulatingSupply 
+                          ? `${(priceData.circulatingSupply / 1000000).toFixed(1)}M`
+                          : 'N/A'}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Total Supply:</span>
+                      <span className="ml-2 font-medium">
+                        {priceData.totalSupply 
+                          ? `${(priceData.totalSupply / 1000000).toFixed(1)}M`
+                          : 'N/A'}
+                      </span>
+                    </div>
                   </div>
                 </div>
               )}

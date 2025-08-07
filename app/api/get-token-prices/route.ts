@@ -35,7 +35,10 @@ export async function POST(request: Request) {
           current_fdv,
           ath_fdv,
           price_network,
-          price_fetched_at
+          price_fetched_at,
+          circulating_supply,
+          total_supply,
+          max_supply
         `)
         .eq('krom_id', kromId)
         .single();
@@ -60,7 +63,10 @@ export async function POST(request: Request) {
           current_fdv,
           ath_fdv,
           price_network,
-          price_fetched_at
+          price_fetched_at,
+          circulating_supply,
+          total_supply,
+          max_supply
         `)
         .eq('contract_address', contractAddress)
         .limit(1)
@@ -85,7 +91,10 @@ export async function POST(request: Request) {
           current_fdv,
           ath_fdv,
           price_network,
-          price_fetched_at
+          price_fetched_at,
+          circulating_supply,
+          total_supply,
+          max_supply
         `)
         .eq('ticker', ticker)
         .limit(1)
@@ -122,7 +131,10 @@ export async function POST(request: Request) {
       currentFdv: data.current_fdv,
       athFdv: data.ath_fdv,
       network: data.price_network,
-      lastFetched: data.price_fetched_at
+      lastFetched: data.price_fetched_at,
+      circulatingSupply: data.circulating_supply,
+      totalSupply: data.total_supply,
+      maxSupply: data.max_supply
     };
     
     return NextResponse.json({ priceData });
