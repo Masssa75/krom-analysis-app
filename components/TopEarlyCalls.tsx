@@ -21,7 +21,7 @@ interface TopCall {
 
 export default function TopEarlyCalls() {
   const [calls, setCalls] = useState<TopCall[]>([])
-  const [period, setPeriod] = useState<string>('all')
+  const [period, setPeriod] = useState<string>('90d')
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -43,153 +43,72 @@ export default function TopEarlyCalls() {
 
   const formatROI = (roi: number) => {
     if (roi >= 1000) {
-      return `${(roi / 1000).toFixed(1)}k%`
+      return `${Math.round(roi / 100) / 10}kx`
     }
-    return `${roi.toFixed(0)}%`
-  }
-
-  const formatPrice = (price: number) => {
-    if (!price) return '-'
-    if (price < 0.00001) return `$${price.toExponential(2)}`
-    if (price < 0.01) return `$${price.toFixed(6)}`
-    if (price < 1) return `$${price.toFixed(4)}`
-    return `$${price.toFixed(2)}`
-  }
-
-  const getNetworkColor = (network: string) => {
-    const colors: { [key: string]: string } = {
-      ethereum: 'text-blue-400',
-      solana: 'text-purple-400',
-      bsc: 'text-yellow-400',
-      base: 'text-blue-300',
-      arbitrum: 'text-blue-500',
-      polygon: 'text-purple-300'
-    }
-    return colors[network.toLowerCase()] || 'text-gray-400'
-  }
-
-  const getScoreBadge = (score: number | null, tier: string | null) => {
-    if (!score) return null
-    
-    let bgColor = 'bg-gray-800'
-    let textColor = 'text-gray-400'
-    
-    if (tier === 'ALPHA') {
-      bgColor = 'bg-green-900/30'
-      textColor = 'text-green-400'
-    } else if (tier === 'SOLID') {
-      bgColor = 'bg-blue-900/30'
-      textColor = 'text-blue-400'
-    } else if (tier === 'BASIC') {
-      bgColor = 'bg-yellow-900/30'
-      textColor = 'text-yellow-400'
-    } else if (tier === 'TRASH') {
-      bgColor = 'bg-red-900/30'
-      textColor = 'text-red-400'
-    }
-    
-    return (
-      <span className={`px-2 py-0.5 rounded text-xs ${bgColor} ${textColor}`}>
-        {score}/10
-      </span>
-    )
+    return `${Math.round(roi)}x`
   }
 
   return (
-    <div className="p-10 border-b border-[#111]">
-      <div className="flex items-center justify-between mb-8">
-        <h2 className="text-xl text-[#00ff88] tracking-[3px] font-extralight">TOP EARLY CALLS</h2>
-        <div className="flex gap-2">
-          {['24h', '7d', '90d', 'all'].map(p => (
-            <button
-              key={p}
-              onClick={() => setPeriod(p)}
-              className={`px-4 py-1.5 text-xs uppercase tracking-wider transition-all ${
-                period === p 
-                  ? 'bg-[#00ff88] text-black font-semibold' 
-                  : 'bg-[#1a1c1f] text-[#666] hover:bg-[#222427] hover:text-[#888]'
-              }`}
-            >
-              {p === 'all' ? 'All Time' : p.toUpperCase()}
-            </button>
-          ))}
+    <div className="bg-black border-b border-[#111] py-10">
+      <div className="max-w-[1200px] mx-auto px-10">
+        <div className="flex justify-between items-center mb-8">
+          <div className="text-xl text-[#00ff88] tracking-[3px] font-extralight flex items-center gap-4">
+            TOP EARLY CALLS
+          </div>
+          
+          {/* Time Selector with Dots */}
+          <div className="flex gap-8">
+            {[
+              { key: '24h', label: '24H' },
+              { key: '7d', label: '7D' },
+              { key: '90d', label: '90D' },
+              { key: 'all', label: 'ALL TIME' }
+            ].map(({ key, label }) => (
+              <button
+                key={key}
+                onClick={() => setPeriod(key)}
+                className={`flex items-center gap-2 bg-transparent border-none text-sm font-normal tracking-wider cursor-pointer transition-all ${
+                  period === key ? 'text-white' : 'text-[#666] hover:text-[#999]'
+                }`}
+              >
+                <span className={`w-2.5 h-2.5 rounded-full transition-all ${
+                  period === key 
+                    ? 'bg-[#00ff88] shadow-[0_0_10px_rgba(0,255,136,0.5)]' 
+                    : 'bg-[#333]'
+                }`} />
+                <span>{label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Calls Grid */}
+        <div className="grid grid-cols-3 gap-x-10 gap-y-5 text-left">
+          {loading ? (
+            [...Array(9)].map((_, i) => (
+              <div key={i} className="text-lg font-extralight font-mono whitespace-nowrap leading-relaxed">
+                <span className="text-[#00ff88] opacity-50">[</span>
+                <span className="text-white font-normal animate-pulse">Loading</span>
+                <span className="text-[#00ff88] opacity-50">]</span>
+              </div>
+            ))
+          ) : calls.length === 0 ? (
+            <div className="col-span-3 text-center text-[#666] py-8">
+              No calls found for this time period
+            </div>
+          ) : (
+            calls.slice(0, 9).map(call => (
+              <div key={call.id} className="text-lg font-extralight font-mono whitespace-nowrap leading-relaxed">
+                <span className="text-[#00ff88] opacity-50">[</span>
+                <span className="text-white font-normal">{call.ticker}</span>
+                <span className="text-[#00ff88] opacity-50">:</span>
+                <span className="text-[#00ff88]">{formatROI(call.ath_roi_percent)}</span>
+                <span className="text-[#00ff88] opacity-50">]</span>
+              </div>
+            ))
+          )}
         </div>
       </div>
-
-      {loading ? (
-        <div className="grid grid-cols-3 gap-4">
-          {[...Array(9)].map((_, i) => (
-            <div key={i} className="bg-[#0f1011] border border-[#1a1c1f] p-4 animate-pulse">
-              <div className="h-4 bg-[#1a1c1f] rounded mb-2"></div>
-              <div className="h-8 bg-[#1a1c1f] rounded mb-2"></div>
-              <div className="h-4 bg-[#1a1c1f] rounded"></div>
-            </div>
-          ))}
-        </div>
-      ) : calls.length === 0 ? (
-        <div className="text-[#444] text-center py-8">
-          No calls found for this time period
-        </div>
-      ) : (
-        <div className="grid grid-cols-3 gap-4">
-          {calls.map((call, index) => (
-            <div 
-              key={call.id} 
-              className="bg-[#0f1011] border border-[#1a1c1f] p-4 hover:border-[#2a2d31] transition-colors group"
-            >
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-[#333] text-2xl font-bold">#{index + 1}</span>
-                  <div>
-                    <div className="font-semibold text-white">{call.ticker}</div>
-                    <div className={`text-xs ${getNetworkColor(call.network)}`}>
-                      {call.network.toUpperCase()}
-                    </div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-[#00ff88] font-bold text-lg">
-                    +{formatROI(call.ath_roi_percent)}
-                  </div>
-                  <div className="text-[#666] text-xs">ATH ROI</div>
-                </div>
-              </div>
-
-              <div className="space-y-2 text-xs">
-                <div className="flex justify-between">
-                  <span className="text-[#666]">Entry</span>
-                  <span className="text-[#888]">{formatPrice(call.price_at_call)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-[#666]">ATH</span>
-                  <span className="text-[#00ff88]">{formatPrice(call.ath_price)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-[#666]">Current</span>
-                  <span className="text-[#888]">{formatPrice(call.current_price)}</span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 mt-3 pt-3 border-t border-[#1a1c1f]">
-                {getScoreBadge(call.analysis_score, call.analysis_tier)}
-                {getScoreBadge(call.x_analysis_score, call.x_analysis_tier)}
-                <a
-                  href={`https://dexscreener.com/${call.network}/${call.contract_address}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="ml-auto text-[#444] hover:text-[#00ff88] transition-colors"
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                    <polyline points="15 3 21 3 21 9" />
-                    <line x1="10" y1="14" x2="21" y2="3" />
-                  </svg>
-                </a>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   )
 }
