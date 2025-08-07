@@ -42,7 +42,9 @@ export default function TopEarlyCalls() {
   }
 
   const formatROI = (roi: number) => {
-    return `${Math.round(roi)}x`
+    // Convert from percentage to X multiplier (e.g., 100% = 2x, 200% = 3x)
+    const multiplier = (roi / 100) + 1
+    return `${Math.round(multiplier)}x`
   }
 
   return (
