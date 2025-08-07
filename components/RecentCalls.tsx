@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import ChartModal from './ChartModal'
 import { SortDropdown } from './sort-dropdown'
+import Filters, { FilterState } from './Filters'
 
 interface RecentCall {
   id: string
@@ -13,6 +14,7 @@ interface RecentCall {
   price_at_call: number
   ath_price: number
   ath_roi_percent: number
+  ath_market_cap: number
   current_price: number
   roi_percent: number
   analysis_score: number
@@ -41,16 +43,24 @@ export default function RecentCalls() {
   const [totalCount, setTotalCount] = useState(0)
   const [sortBy, setSortBy] = useState('buy_timestamp')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
+  const [filters, setFilters] = useState<FilterState>({ tokenType: 'all' })
   const itemsPerPage = 20
 
   useEffect(() => {
     fetchRecentCalls()
-  }, [currentPage, sortBy, sortOrder])
+  }, [currentPage, sortBy, sortOrder, filters])
 
   const fetchRecentCalls = async () => {
     setLoading(true)
     try {
-      const response = await fetch(`/api/recent-calls?limit=${itemsPerPage}&page=${currentPage}&sortBy=${sortBy}&sortOrder=${sortOrder}`)
+      const params = new URLSearchParams({
+        limit: itemsPerPage.toString(),
+        page: currentPage.toString(),
+        sortBy,
+        sortOrder,
+        tokenType: filters.tokenType
+      })
+      const response = await fetch(`/api/recent-calls?${params}`)
       const data = await response.json()
       setCalls(data.data || [])
       setTotalPages(data.totalPages || 1)
@@ -77,6 +87,16 @@ export default function RecentCalls() {
     if (price >= 1000000) return `$${(price / 1000000).toFixed(1)}M`
     if (price >= 1000) return `$${(price / 1000).toFixed(0)}K`
     return `$${price.toFixed(0)}`
+  }
+
+  const formatMarketCap = (marketCap: number | null | undefined) => {
+    if (!marketCap && marketCap !== 0) return 'N/A'
+    
+    // Format market caps nicely
+    if (marketCap >= 1000000000) return `$${(marketCap / 1000000000).toFixed(2)}B`
+    if (marketCap >= 1000000) return `$${(marketCap / 1000000).toFixed(1)}M`
+    if (marketCap >= 1000) return `$${(marketCap / 1000).toFixed(0)}K`
+    return `$${marketCap.toFixed(0)}`
   }
 
   const formatROI = (roi: number) => {
@@ -167,12 +187,21 @@ export default function RecentCalls() {
     setCurrentPage(1) // Reset to first page when sorting changes
   }
 
+  const handleFiltersChange = (newFilters: FilterState) => {
+    setFilters(newFilters)
+    setCurrentPage(1) // Reset to first page when filters change
+  }
+
   return (
     <div className="py-8 px-0 bg-[#0a0b0d]">
       <div className="max-w-[1200px] mx-auto">
-        <div className="flex justify-between items-center mb-8 px-10">
+        <div className="flex justify-between items-center mb-6 px-10">
           <h2 className="text-xl text-[#00ff88] tracking-[3px] font-extralight m-0">RECENT CALLS</h2>
           <SortDropdown onSortChange={handleSortChange} />
+        </div>
+        
+        <div className="px-10">
+          <Filters onFiltersChange={handleFiltersChange} />
         </div>
         
         <div className="flex flex-col gap-0">
@@ -258,25 +287,25 @@ export default function RecentCalls() {
                   </div>
                   
                   <div className="flex items-center gap-8">
-                    {/* Price Info */}
+                    {/* Market Cap Info */}
                     <div className="flex flex-col items-center">
-                      <span className="text-[#666] text-[10px]">ENTRY</span>
+                      <span className="text-[#666] text-[10px]">ENTRY MC</span>
                       <span className="text-white text-sm font-medium">
-                        {formatPrice(call.price_at_call)}
+                        {formatMarketCap(call.market_cap_at_call)}
                       </span>
                     </div>
                     
                     <div className="flex flex-col items-center">
-                      <span className="text-[#666] text-[10px]">ATH</span>
+                      <span className="text-[#666] text-[10px]">ATH MC</span>
                       <span className="text-white text-sm font-medium">
-                        {formatPrice(call.ath_price)}
+                        {formatMarketCap(call.ath_market_cap)}
                       </span>
                     </div>
                     
                     <div className="flex flex-col items-center">
-                      <span className="text-[#666] text-[10px]">NOW</span>
+                      <span className="text-[#666] text-[10px]">NOW MC</span>
                       <span className="text-white text-sm font-medium">
-                        {formatPrice(call.current_price)}
+                        {formatMarketCap(call.current_market_cap)}
                       </span>
                     </div>
                     

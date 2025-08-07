@@ -13,6 +13,7 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1')
     const sortBy = searchParams.get('sortBy') || 'buy_timestamp'
     const sortOrder = searchParams.get('sortOrder') || 'desc'
+    const tokenType = searchParams.get('tokenType') || 'all'
     
     const supabase = createClient(supabaseUrl, supabaseKey)
     
@@ -34,6 +35,11 @@ export async function GET(request: NextRequest) {
       .from('crypto_calls')
       .select('*', { count: 'exact', head: true })
       .or('is_invalidated.is.null,is_invalidated.eq.false')
+    
+    // Apply token type filter
+    if (tokenType !== 'all') {
+      countQuery = countQuery.eq('analysis_token_type', tokenType)
+    }
     
     // Apply same filters for count when sorting by ATH ROI
     if (isAthRoiSort) {
@@ -64,6 +70,7 @@ export async function GET(request: NextRequest) {
         price_at_call,
         ath_price,
         ath_roi_percent,
+        ath_market_cap,
         current_price,
         roi_percent,
         analysis_score,
@@ -83,6 +90,11 @@ export async function GET(request: NextRequest) {
         raw_data
       `)
       .or('is_invalidated.is.null,is_invalidated.eq.false')
+    
+    // Apply token type filter
+    if (tokenType !== 'all') {
+      query = query.eq('analysis_token_type', tokenType)
+    }
     
     // When sorting by ATH ROI, only include tokens with ATH ROI > 0
     if (isAthRoiSort) {
