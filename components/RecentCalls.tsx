@@ -35,17 +35,23 @@ export default function RecentCalls() {
   const [loading, setLoading] = useState(true)
   const [selectedToken, setSelectedToken] = useState<RecentCall | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [totalCount, setTotalCount] = useState(0)
+  const itemsPerPage = 20
 
   useEffect(() => {
     fetchRecentCalls()
-  }, [])
+  }, [currentPage])
 
   const fetchRecentCalls = async () => {
     setLoading(true)
     try {
-      const response = await fetch('/api/recent-calls?limit=10')
+      const response = await fetch(`/api/recent-calls?limit=${itemsPerPage}&page=${currentPage}`)
       const data = await response.json()
       setCalls(data.data || [])
+      setTotalPages(data.totalPages || 1)
+      setTotalCount(data.totalCount || 0)
     } catch (error) {
       console.error('Error fetching recent calls:', error)
       setCalls([])
@@ -156,12 +162,19 @@ export default function RecentCalls() {
     <div className="py-8 px-0 bg-[#0a0b0d]">
       <div className="max-w-[1200px] mx-auto">
         <div className="flex justify-between items-center mb-8 px-10">
-          <h2 className="text-xl text-[#00ff88] tracking-[3px] font-extralight m-0">RECENT CALLS</h2>
+          <div className="flex items-center gap-4">
+            <h2 className="text-xl text-[#00ff88] tracking-[3px] font-extralight m-0">RECENT CALLS</h2>
+            {totalCount > 0 && (
+              <span className="text-[#666] text-sm">
+                ({totalCount} total • Page {currentPage} of {totalPages})
+              </span>
+            )}
+          </div>
         </div>
         
         <div className="flex flex-col gap-0">
           {loading ? (
-            [...Array(5)].map((_, i) => (
+            [...Array(Math.min(itemsPerPage, 10))].map((_, i) => (
               <div key={i} className="flex justify-between items-center py-3 px-10 border-b border-[#1a1c1f] animate-pulse">
                 <div className="flex items-center gap-5">
                   <div className="h-6 w-20 bg-[#1a1c1f] rounded"></div>
@@ -282,6 +295,103 @@ export default function RecentCalls() {
             })
           )}
         </div>
+        
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between mt-6 px-10">
+            <div className="text-[#666] text-sm">
+              Showing {((currentPage - 1) * itemsPerPage) + 1}-{Math.min(currentPage * itemsPerPage, totalCount)} of {totalCount} calls
+            </div>
+            
+            <div className="flex items-center gap-2">
+              {/* First Page Button */}
+              <button
+                onClick={() => setCurrentPage(1)}
+                disabled={currentPage === 1}
+                className={`px-3 py-1.5 text-sm rounded transition-colors ${
+                  currentPage === 1 
+                    ? 'bg-[#1a1c1f] text-[#444] cursor-not-allowed' 
+                    : 'bg-[#1a1c1f] text-white hover:bg-[#252729]'
+                }`}
+                title="Go to first page"
+              >
+                ««
+              </button>
+              
+              {/* Previous Button */}
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className={`px-3 py-1.5 text-sm rounded transition-colors ${
+                  currentPage === 1 
+                    ? 'bg-[#1a1c1f] text-[#444] cursor-not-allowed' 
+                    : 'bg-[#1a1c1f] text-white hover:bg-[#252729]'
+                }`}
+              >
+                ‹ Previous
+              </button>
+              
+              {/* Page Numbers */}
+              <div className="flex items-center gap-1">
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let pageNum
+                  if (totalPages <= 5) {
+                    pageNum = i + 1
+                  } else if (currentPage <= 3) {
+                    pageNum = i + 1
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i
+                  } else {
+                    pageNum = currentPage - 2 + i
+                  }
+                  
+                  if (pageNum < 1 || pageNum > totalPages) return null
+                  
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => setCurrentPage(pageNum)}
+                      className={`w-8 h-8 text-sm rounded transition-colors ${
+                        currentPage === pageNum
+                          ? 'bg-[#00ff88] text-black font-semibold'
+                          : 'bg-[#1a1c1f] text-white hover:bg-[#252729]'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  )
+                })}
+              </div>
+              
+              {/* Next Button */}
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+                className={`px-3 py-1.5 text-sm rounded transition-colors ${
+                  currentPage === totalPages 
+                    ? 'bg-[#1a1c1f] text-[#444] cursor-not-allowed' 
+                    : 'bg-[#1a1c1f] text-white hover:bg-[#252729]'
+                }`}
+              >
+                Next ›
+              </button>
+              
+              {/* Last Page Button */}
+              <button
+                onClick={() => setCurrentPage(totalPages)}
+                disabled={currentPage === totalPages}
+                className={`px-3 py-1.5 text-sm rounded transition-colors ${
+                  currentPage === totalPages 
+                    ? 'bg-[#1a1c1f] text-[#444] cursor-not-allowed' 
+                    : 'bg-[#1a1c1f] text-white hover:bg-[#252729]'
+                }`}
+                title="Go to last page"
+              >
+                »»
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Chart Modal */}

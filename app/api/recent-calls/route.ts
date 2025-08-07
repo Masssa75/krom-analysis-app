@@ -8,10 +8,25 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
-    const limit = parseInt(searchParams.get('limit') || '10')
+    const limit = parseInt(searchParams.get('limit') || '20')
     const offset = parseInt(searchParams.get('offset') || '0')
+    const page = parseInt(searchParams.get('page') || '1')
     
     const supabase = createClient(supabaseUrl, supabaseKey)
+    
+    // Calculate actual offset from page if provided
+    const actualOffset = page > 1 ? (page - 1) * limit : offset
+    
+    // First get the total count
+    const { count: totalCount, error: countError } = await supabase
+      .from('crypto_calls')
+      .select('*', { count: 'exact', head: true })
+      .or('is_invalidated.is.null,is_invalidated.eq.false')
+    
+    if (countError) {
+      console.error('Error fetching count:', countError)
+      return NextResponse.json({ error: 'Failed to fetch count' }, { status: 500 })
+    }
     
     // Fetch recent calls ordered by timestamp
     const { data, error } = await supabase
@@ -45,7 +60,7 @@ export async function GET(request: NextRequest) {
       `)
       .or('is_invalidated.is.null,is_invalidated.eq.false')
       .order('buy_timestamp', { ascending: false })
-      .range(offset, offset + limit - 1)
+      .range(actualOffset, actualOffset + limit - 1)
     
     if (error) {
       console.error('Error fetching recent calls:', error)
@@ -65,7 +80,15 @@ export async function GET(request: NextRequest) {
       }
     })
     
-    return NextResponse.json({ data: callsWithGroups })
+    const totalPages = Math.ceil((totalCount || 0) / limit)
+    
+    return NextResponse.json({ 
+      data: callsWithGroups,
+      totalCount: totalCount || 0,
+      totalPages,
+      currentPage: page,
+      limit
+    })
   } catch (error) {
     console.error('Error in recent-calls API:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
