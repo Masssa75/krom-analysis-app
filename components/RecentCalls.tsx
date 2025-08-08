@@ -36,6 +36,11 @@ interface RecentCall {
 interface RecentCallsProps {
   filters?: {
     tokenType?: 'all' | 'meme' | 'utility'
+    networks?: string[]
+    liquidityMin?: number
+    liquidityMax?: number
+    marketCapMin?: number
+    marketCapMax?: number
   }
 }
 
@@ -67,8 +72,23 @@ export default function RecentCalls({ filters = { tokenType: 'all' } }: RecentCa
         page: currentPage.toString(),
         sortBy,
         sortOrder,
-        tokenType: filters?.tokenType || 'all'
+        tokenType: filters?.tokenType || 'all',
+        networks: filters?.networks?.join(',') || 'ethereum,solana,bsc,base'
       })
+      
+      // Add optional range filters
+      if (filters?.liquidityMin !== undefined) {
+        params.set('liquidityMin', filters.liquidityMin.toString())
+      }
+      if (filters?.liquidityMax !== undefined) {
+        params.set('liquidityMax', filters.liquidityMax.toString())
+      }
+      if (filters?.marketCapMin !== undefined) {
+        params.set('marketCapMin', filters.marketCapMin.toString())
+      }
+      if (filters?.marketCapMax !== undefined) {
+        params.set('marketCapMax', filters.marketCapMax.toString())
+      }
       const response = await fetch(`/api/recent-calls?${params}`)
       const data = await response.json()
       setCalls(data.data || [])

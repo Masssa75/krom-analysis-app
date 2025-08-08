@@ -6,31 +6,47 @@ import RecentCalls from '@/components/RecentCalls'
 
 interface FilterState {
   tokenType: 'all' | 'meme' | 'utility'
+  networks: string[]
+  liquidityMin?: number
+  liquidityMax?: number
+  marketCapMin?: number
+  marketCapMax?: number
 }
 
 export default function HomePage() {
-  const [filters, setFilters] = useState<FilterState>({ tokenType: 'all' })
+  const [filters, setFilters] = useState<FilterState>({ 
+    tokenType: 'all',
+    networks: ['ethereum', 'solana', 'bsc', 'base']
+  })
   const [isTokenTypeCollapsed, setIsTokenTypeCollapsed] = useState(false)
   const [includeUtility, setIncludeUtility] = useState(true)
   const [includeMeme, setIncludeMeme] = useState(true)
+  const [isNetworksCollapsed, setIsNetworksCollapsed] = useState(true)
+  const [selectedNetworks, setSelectedNetworks] = useState<string[]>(['ethereum', 'solana', 'bsc', 'base'])
+  const [isRangeFiltersCollapsed, setIsRangeFiltersCollapsed] = useState(true)
+  const [liquidityMin, setLiquidityMin] = useState<string>('')
+  const [liquidityMax, setLiquidityMax] = useState<string>('')
+  const [marketCapMin, setMarketCapMin] = useState<string>('')
+  const [marketCapMax, setMarketCapMax] = useState<string>('')
 
-  const handleTokenTypeChange = () => {
+  const handleTokenTypeChange = (utilityChecked: boolean, memeChecked: boolean) => {
     let newType: FilterState['tokenType'] = 'all'
     
-    if (includeUtility && includeMeme) {
+    if (utilityChecked && memeChecked) {
       newType = 'all'
-    } else if (includeUtility && !includeMeme) {
+    } else if (utilityChecked && !memeChecked) {
       newType = 'utility'
-    } else if (!includeUtility && includeMeme) {
+    } else if (!utilityChecked && memeChecked) {
       newType = 'meme'
     } else {
-      // Neither selected, default to all
+      // Neither selected, default to all - re-check both
       setIncludeUtility(true)
       setIncludeMeme(true)
       newType = 'all'
+      return // Don't update filters since we're resetting
     }
     
-    setFilters({ tokenType: newType })
+    setFilters(prev => ({ ...prev, tokenType: newType }))
   }
 
   return (
@@ -71,8 +87,9 @@ export default function HomePage() {
                     includeUtility ? 'bg-[#00ff88] border-[#00ff88]' : 'border-[#333]'
                   }`}
                   onClick={() => {
-                    setIncludeUtility(!includeUtility)
-                    setTimeout(handleTokenTypeChange, 0)
+                    const newUtilityState = !includeUtility
+                    setIncludeUtility(newUtilityState)
+                    handleTokenTypeChange(newUtilityState, includeMeme)
                   }}
                 >
                   {includeUtility && <span className="text-black font-bold text-xs">✓</span>}
@@ -88,14 +105,172 @@ export default function HomePage() {
                     includeMeme ? 'bg-[#00ff88] border-[#00ff88]' : 'border-[#333]'
                   }`}
                   onClick={() => {
-                    setIncludeMeme(!includeMeme)
-                    setTimeout(handleTokenTypeChange, 0)
+                    const newMemeState = !includeMeme
+                    setIncludeMeme(newMemeState)
+                    handleTokenTypeChange(includeUtility, newMemeState)
                   }}
                 >
                   {includeMeme && <span className="text-black font-bold text-xs">✓</span>}
                 </div>
                 <span>Meme Tokens</span>
               </label>
+            </div>
+          </div>
+        </div>
+
+        {/* Networks Filter */}
+        <div className={`border-b border-[#1a1c1f] ${isNetworksCollapsed ? 'collapsed' : ''}`}>
+          <div 
+            className="px-5 py-5 cursor-pointer flex justify-between items-center bg-[#111214] hover:bg-[#1a1c1f] hover:pl-6 transition-all"
+            onClick={() => setIsNetworksCollapsed(!isNetworksCollapsed)}
+          >
+            <h3 className={`text-[13px] uppercase tracking-[1px] font-semibold transition-colors ${!isNetworksCollapsed ? 'text-[#00ff88]' : 'text-[#888]'}`}>
+              Networks
+            </h3>
+            <span className={`text-xs transition-all ${!isNetworksCollapsed ? 'text-[#00ff88]' : 'text-[#666]'} ${isNetworksCollapsed ? 'rotate-[-90deg]' : ''}`}>
+              ▼
+            </span>
+          </div>
+          <div className={`bg-[#0a0b0d] overflow-hidden transition-all ${isNetworksCollapsed ? 'max-h-0 opacity-0' : 'max-h-[500px] opacity-100 p-5'}`}>
+            <div className="flex flex-col gap-3">
+              {[
+                { id: 'ethereum', label: 'Ethereum', color: '#627eea' },
+                { id: 'solana', label: 'Solana', color: '#00ffa3' },
+                { id: 'bsc', label: 'BSC', color: '#ffcc00' },
+                { id: 'base', label: 'Base', color: '#0052ff' }
+              ].map(network => (
+                <label 
+                  key={network.id}
+                  className="flex items-center gap-2.5 cursor-pointer text-sm text-[#ccc] hover:text-white transition-colors"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div 
+                    className={`w-5 h-5 border-2 rounded-[5px] transition-all flex items-center justify-center ${
+                      selectedNetworks.includes(network.id) ? 'bg-[#00ff88] border-[#00ff88]' : 'border-[#333]'
+                    }`}
+                    onClick={() => {
+                      const newNetworks = selectedNetworks.includes(network.id)
+                        ? selectedNetworks.filter(n => n !== network.id)
+                        : [...selectedNetworks, network.id]
+                      
+                      // Don't allow empty selection
+                      if (newNetworks.length === 0) return
+                      
+                      setSelectedNetworks(newNetworks)
+                      setFilters(prev => ({ ...prev, networks: newNetworks }))
+                    }}
+                  >
+                    {selectedNetworks.includes(network.id) && <span className="text-black font-bold text-xs">✓</span>}
+                  </div>
+                  <span style={{ color: selectedNetworks.includes(network.id) ? network.color : '#ccc' }}>
+                    {network.label}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Range Filters (Liquidity & Market Cap) */}
+        <div className={`border-b border-[#1a1c1f] ${isRangeFiltersCollapsed ? 'collapsed' : ''}`}>
+          <div 
+            className="px-5 py-5 cursor-pointer flex justify-between items-center bg-[#111214] hover:bg-[#1a1c1f] hover:pl-6 transition-all"
+            onClick={() => setIsRangeFiltersCollapsed(!isRangeFiltersCollapsed)}
+          >
+            <h3 className={`text-[13px] uppercase tracking-[1px] font-semibold transition-colors ${!isRangeFiltersCollapsed ? 'text-[#00ff88]' : 'text-[#888]'}`}>
+              Liquidity & Market Cap
+            </h3>
+            <span className={`text-xs transition-all ${!isRangeFiltersCollapsed ? 'text-[#00ff88]' : 'text-[#666]'} ${isRangeFiltersCollapsed ? 'rotate-[-90deg]' : ''}`}>
+              ▼
+            </span>
+          </div>
+          <div className={`bg-[#0a0b0d] overflow-hidden transition-all ${isRangeFiltersCollapsed ? 'max-h-0 opacity-0' : 'max-h-[500px] opacity-100 p-5'}`}>
+            <div className="space-y-5">
+              {/* Liquidity Range */}
+              <div>
+                <label className="text-xs uppercase tracking-wider text-[#666] mb-2 block">Liquidity (USD)</label>
+                <div className="flex gap-2 items-center">
+                  <input
+                    type="number"
+                    placeholder="Min"
+                    value={liquidityMin}
+                    onChange={(e) => {
+                      setLiquidityMin(e.target.value)
+                      const min = e.target.value ? parseFloat(e.target.value) : undefined
+                      setFilters(prev => ({ ...prev, liquidityMin: min }))
+                    }}
+                    className="flex-1 bg-[#1a1c1f] border border-[#2a2d31] rounded px-3 py-2 text-sm text-white placeholder-[#666] focus:outline-none focus:border-[#00ff88] transition-colors"
+                  />
+                  <span className="text-[#666]">-</span>
+                  <input
+                    type="number"
+                    placeholder="Max"
+                    value={liquidityMax}
+                    onChange={(e) => {
+                      setLiquidityMax(e.target.value)
+                      const max = e.target.value ? parseFloat(e.target.value) : undefined
+                      setFilters(prev => ({ ...prev, liquidityMax: max }))
+                    }}
+                    className="flex-1 bg-[#1a1c1f] border border-[#2a2d31] rounded px-3 py-2 text-sm text-white placeholder-[#666] focus:outline-none focus:border-[#00ff88] transition-colors"
+                  />
+                </div>
+                <div className="mt-1 text-[10px] text-[#666]">
+                  e.g., 10000 for $10K minimum
+                </div>
+              </div>
+
+              {/* Market Cap Range */}
+              <div>
+                <label className="text-xs uppercase tracking-wider text-[#666] mb-2 block">Market Cap (USD)</label>
+                <div className="flex gap-2 items-center">
+                  <input
+                    type="number"
+                    placeholder="Min"
+                    value={marketCapMin}
+                    onChange={(e) => {
+                      setMarketCapMin(e.target.value)
+                      const min = e.target.value ? parseFloat(e.target.value) : undefined
+                      setFilters(prev => ({ ...prev, marketCapMin: min }))
+                    }}
+                    className="flex-1 bg-[#1a1c1f] border border-[#2a2d31] rounded px-3 py-2 text-sm text-white placeholder-[#666] focus:outline-none focus:border-[#00ff88] transition-colors"
+                  />
+                  <span className="text-[#666]">-</span>
+                  <input
+                    type="number"
+                    placeholder="Max"
+                    value={marketCapMax}
+                    onChange={(e) => {
+                      setMarketCapMax(e.target.value)
+                      const max = e.target.value ? parseFloat(e.target.value) : undefined
+                      setFilters(prev => ({ ...prev, marketCapMax: max }))
+                    }}
+                    className="flex-1 bg-[#1a1c1f] border border-[#2a2d31] rounded px-3 py-2 text-sm text-white placeholder-[#666] focus:outline-none focus:border-[#00ff88] transition-colors"
+                  />
+                </div>
+                <div className="mt-1 text-[10px] text-[#666]">
+                  e.g., 1000000 for $1M maximum
+                </div>
+              </div>
+
+              {/* Clear button */}
+              <button
+                onClick={() => {
+                  setLiquidityMin('')
+                  setLiquidityMax('')
+                  setMarketCapMin('')
+                  setMarketCapMax('')
+                  setFilters(prev => ({ 
+                    ...prev, 
+                    liquidityMin: undefined,
+                    liquidityMax: undefined,
+                    marketCapMin: undefined,
+                    marketCapMax: undefined
+                  }))
+                }}
+                className="w-full py-2 px-4 bg-[#1a1c1f] hover:bg-[#2a2d31] text-[#888] hover:text-white text-xs uppercase tracking-wider rounded transition-colors"
+              >
+                Clear Range Filters
+              </button>
             </div>
           </div>
         </div>

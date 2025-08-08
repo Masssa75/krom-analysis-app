@@ -14,6 +14,11 @@ export async function GET(request: NextRequest) {
     const sortBy = searchParams.get('sortBy') || 'buy_timestamp'
     const sortOrder = searchParams.get('sortOrder') || 'desc'
     const tokenType = searchParams.get('tokenType') || 'all'
+    const networks = searchParams.get('networks')?.split(',').filter(Boolean) || []
+    const liquidityMin = searchParams.get('liquidityMin') ? parseFloat(searchParams.get('liquidityMin')!) : undefined
+    const liquidityMax = searchParams.get('liquidityMax') ? parseFloat(searchParams.get('liquidityMax')!) : undefined
+    const marketCapMin = searchParams.get('marketCapMin') ? parseFloat(searchParams.get('marketCapMin')!) : undefined
+    const marketCapMax = searchParams.get('marketCapMax') ? parseFloat(searchParams.get('marketCapMax')!) : undefined
     
     const supabase = createClient(supabaseUrl, supabaseKey)
     
@@ -35,6 +40,27 @@ export async function GET(request: NextRequest) {
       .from('crypto_calls')
       .select('*', { count: 'exact', head: true })
       .or('is_invalidated.is.null,is_invalidated.eq.false')
+    
+    // Apply networks filter
+    if (networks.length > 0) {
+      countQuery = countQuery.in('network', networks)
+    }
+    
+    // Apply liquidity filters
+    if (liquidityMin !== undefined) {
+      countQuery = countQuery.gte('liquidity_usd', liquidityMin)
+    }
+    if (liquidityMax !== undefined) {
+      countQuery = countQuery.lte('liquidity_usd', liquidityMax)
+    }
+    
+    // Apply market cap filters
+    if (marketCapMin !== undefined) {
+      countQuery = countQuery.gte('current_market_cap', marketCapMin)
+    }
+    if (marketCapMax !== undefined) {
+      countQuery = countQuery.lte('current_market_cap', marketCapMax)
+    }
     
     // Apply token type filter
     if (tokenType !== 'all') {
@@ -97,6 +123,27 @@ export async function GET(request: NextRequest) {
         raw_data
       `)
       .or('is_invalidated.is.null,is_invalidated.eq.false')
+    
+    // Apply networks filter
+    if (networks.length > 0) {
+      query = query.in('network', networks)
+    }
+    
+    // Apply liquidity filters
+    if (liquidityMin !== undefined) {
+      query = query.gte('liquidity_usd', liquidityMin)
+    }
+    if (liquidityMax !== undefined) {
+      query = query.lte('liquidity_usd', liquidityMax)
+    }
+    
+    // Apply market cap filters
+    if (marketCapMin !== undefined) {
+      query = query.gte('current_market_cap', marketCapMin)
+    }
+    if (marketCapMax !== undefined) {
+      query = query.lte('current_market_cap', marketCapMax)
+    }
     
     // Apply token type filter
     if (tokenType !== 'all') {
