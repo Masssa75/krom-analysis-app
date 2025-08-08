@@ -41,6 +41,7 @@ interface RecentCallsProps {
     liquidityMax?: number
     marketCapMin?: number
     marketCapMax?: number
+    excludeRugs?: boolean
   }
 }
 
@@ -88,6 +89,9 @@ export default function RecentCalls({ filters = { tokenType: 'all' } }: RecentCa
       }
       if (filters?.marketCapMax !== undefined) {
         params.set('marketCapMax', filters.marketCapMax.toString())
+      }
+      if (filters?.excludeRugs !== undefined) {
+        params.set('excludeRugs', filters.excludeRugs.toString())
       }
       const response = await fetch(`/api/recent-calls?${params}`)
       const data = await response.json()

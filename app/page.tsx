@@ -12,18 +12,22 @@ interface FilterState {
   liquidityMax?: number
   marketCapMin?: number
   marketCapMax?: number
+  excludeRugs?: boolean
 }
 
 export default function HomePage() {
   const [filters, setFilters] = useState<FilterState>({ 
     tokenType: 'all',
-    networks: ['ethereum', 'solana', 'bsc', 'base']
+    networks: ['ethereum', 'solana', 'bsc', 'base'],
+    excludeRugs: true
   })
   const [isTokenTypeCollapsed, setIsTokenTypeCollapsed] = useState(false)
   const [includeUtility, setIncludeUtility] = useState(true)
   const [includeMeme, setIncludeMeme] = useState(true)
   const [isNetworksCollapsed, setIsNetworksCollapsed] = useState(true)
   const [selectedNetworks, setSelectedNetworks] = useState<string[]>(['ethereum', 'solana', 'bsc', 'base'])
+  const [isRugsCollapsed, setIsRugsCollapsed] = useState(true)
+  const [excludeRugs, setExcludeRugs] = useState(true)
   const [isRangeFiltersCollapsed, setIsRangeFiltersCollapsed] = useState(true)
   const [liquidityMin, setLiquidityMin] = useState<string>('')
   const [liquidityMax, setLiquidityMax] = useState<string>('')
@@ -142,6 +146,51 @@ export default function HomePage() {
                 </div>
                 <span>Meme Tokens</span>
               </label>
+            </div>
+          </div>
+        </div>
+
+        {/* Rugs Filter */}
+        <div className={`border-b border-[#1a1c1f] ${isRugsCollapsed ? 'collapsed' : ''}`}>
+          <div 
+            className="px-5 py-5 cursor-pointer flex justify-between items-center bg-[#111214] hover:bg-[#1a1c1f] hover:pl-6 transition-all"
+            onClick={() => setIsRugsCollapsed(!isRugsCollapsed)}
+          >
+            <h3 className={`text-[13px] uppercase tracking-[1px] font-semibold transition-colors ${!isRugsCollapsed ? 'text-[#00ff88]' : 'text-[#888]'}`}>
+              Rugs
+            </h3>
+            <span className={`text-xs transition-all ${!isRugsCollapsed ? 'text-[#00ff88]' : 'text-[#666]'} ${isRugsCollapsed ? 'rotate-[-90deg]' : ''}`}>
+              ▼
+            </span>
+          </div>
+          <div className={`bg-[#0a0b0d] overflow-hidden transition-all ${isRugsCollapsed ? 'max-h-0 opacity-0' : 'max-h-[500px] opacity-100 p-5'}`}>
+            <div className="flex flex-col gap-3">
+              <label 
+                className="flex items-center gap-2.5 cursor-pointer text-sm text-[#ccc] hover:text-white transition-colors"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div 
+                  className={`w-5 h-5 border-2 rounded-[5px] transition-all flex items-center justify-center ${
+                    !excludeRugs ? 'bg-[#00ff88] border-[#00ff88]' : 'border-[#333]'
+                  }`}
+                  onClick={() => {
+                    const newExcludeState = !excludeRugs
+                    setExcludeRugs(newExcludeState)
+                    setFilters(prev => ({ ...prev, excludeRugs: newExcludeState }))
+                  }}
+                >
+                  {!excludeRugs && <span className="text-black font-bold text-xs">✓</span>}
+                </div>
+                <span>Include Rugs</span>
+              </label>
+              <div className="text-xs text-[#666] mt-1">
+                When unchecked, hides tokens with:
+                <ul className="list-disc list-inside mt-1 ml-2">
+                  <li>ATH ROI &lt; 20% AND</li>
+                  <li>Current ROI &lt; -75% AND</li>
+                  <li>Liquidity &amp; Market Cap both &lt; $50K</li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>

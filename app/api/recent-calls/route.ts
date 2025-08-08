@@ -19,6 +19,7 @@ export async function GET(request: NextRequest) {
     const liquidityMax = searchParams.get('liquidityMax') ? parseFloat(searchParams.get('liquidityMax')!) : undefined
     const marketCapMin = searchParams.get('marketCapMin') ? parseFloat(searchParams.get('marketCapMin')!) : undefined
     const marketCapMax = searchParams.get('marketCapMax') ? parseFloat(searchParams.get('marketCapMax')!) : undefined
+    const excludeRugs = searchParams.get('excludeRugs') === 'true'
     
     const supabase = createClient(supabaseUrl, supabaseKey)
     
@@ -71,6 +72,20 @@ export async function GET(request: NextRequest) {
         // Show only if both analyses say meme (or one is null)
         countQuery = countQuery.or('and(analysis_token_type.eq.meme,x_analysis_token_type.is.null),and(analysis_token_type.is.null,x_analysis_token_type.eq.meme),and(analysis_token_type.eq.meme,x_analysis_token_type.eq.meme)')
       }
+    }
+    
+    // Apply rugs filter
+    if (excludeRugs) {
+      // Exclude tokens that meet ALL these conditions:
+      // - ATH ROI < 20% (or null)
+      // - Current ROI < -75% (or null)
+      // - Both liquidity AND market cap < $50K (or null)
+      countQuery = countQuery.or(
+        'ath_roi_percent.gte.20,' +
+        'roi_percent.gte.-75,' +
+        'liquidity_usd.gte.50000,' +
+        'current_market_cap.gte.50000'
+      )
     }
     
     // Apply same filters for count when sorting by ATH ROI
@@ -154,6 +169,20 @@ export async function GET(request: NextRequest) {
         // Show only if both analyses say meme (or one is null)
         query = query.or('and(analysis_token_type.eq.meme,x_analysis_token_type.is.null),and(analysis_token_type.is.null,x_analysis_token_type.eq.meme),and(analysis_token_type.eq.meme,x_analysis_token_type.eq.meme)')
       }
+    }
+    
+    // Apply rugs filter
+    if (excludeRugs) {
+      // Exclude tokens that meet ALL these conditions:
+      // - ATH ROI < 20% (or null)
+      // - Current ROI < -75% (or null) 
+      // - Both liquidity AND market cap < $50K (or null)
+      query = query.or(
+        'ath_roi_percent.gte.20,' +
+        'roi_percent.gte.-75,' +
+        'liquidity_usd.gte.50000,' +
+        'current_market_cap.gte.50000'
+      )
     }
     
     // When sorting by ATH ROI, only include tokens with ATH ROI > 0
