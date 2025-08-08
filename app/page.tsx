@@ -199,7 +199,7 @@ export default function HomePage() {
                       const min = e.target.value ? parseFloat(e.target.value) : undefined
                       setFilters(prev => ({ ...prev, liquidityMin: min }))
                     }}
-                    className="flex-1 bg-[#1a1c1f] border border-[#2a2d31] rounded px-2 py-1.5 text-sm text-white placeholder-[#666] focus:outline-none focus:border-[#00ff88] transition-colors"
+                    className="w-24 bg-[#1a1c1f] border border-[#2a2d31] rounded px-2 py-1.5 text-sm text-white placeholder-[#666] focus:outline-none focus:border-[#00ff88] transition-colors"
                   />
                   <span className="text-[#666] text-xs">-</span>
                   <input
@@ -211,7 +211,7 @@ export default function HomePage() {
                       const max = e.target.value ? parseFloat(e.target.value) : undefined
                       setFilters(prev => ({ ...prev, liquidityMax: max }))
                     }}
-                    className="flex-1 bg-[#1a1c1f] border border-[#2a2d31] rounded px-2 py-1.5 text-sm text-white placeholder-[#666] focus:outline-none focus:border-[#00ff88] transition-colors"
+                    className="w-24 bg-[#1a1c1f] border border-[#2a2d31] rounded px-2 py-1.5 text-sm text-white placeholder-[#666] focus:outline-none focus:border-[#00ff88] transition-colors"
                   />
                 </div>
               </div>
@@ -229,7 +229,7 @@ export default function HomePage() {
                       const min = e.target.value ? parseFloat(e.target.value) : undefined
                       setFilters(prev => ({ ...prev, marketCapMin: min }))
                     }}
-                    className="flex-1 bg-[#1a1c1f] border border-[#2a2d31] rounded px-2 py-1.5 text-sm text-white placeholder-[#666] focus:outline-none focus:border-[#00ff88] transition-colors"
+                    className="w-24 bg-[#1a1c1f] border border-[#2a2d31] rounded px-2 py-1.5 text-sm text-white placeholder-[#666] focus:outline-none focus:border-[#00ff88] transition-colors"
                   />
                   <span className="text-[#666] text-xs">-</span>
                   <input
@@ -241,7 +241,7 @@ export default function HomePage() {
                       const max = e.target.value ? parseFloat(e.target.value) : undefined
                       setFilters(prev => ({ ...prev, marketCapMax: max }))
                     }}
-                    className="flex-1 bg-[#1a1c1f] border border-[#2a2d31] rounded px-2 py-1.5 text-sm text-white placeholder-[#666] focus:outline-none focus:border-[#00ff88] transition-colors"
+                    className="w-24 bg-[#1a1c1f] border border-[#2a2d31] rounded px-2 py-1.5 text-sm text-white placeholder-[#666] focus:outline-none focus:border-[#00ff88] transition-colors"
                   />
                 </div>
               </div>
