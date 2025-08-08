@@ -1,6 +1,7 @@
 'use client'
 
-import { Map, Cpu, Smartphone, Link, TrendingUp, Users, PieChart, Award, Globe, ArrowLeft } from 'lucide-react'
+import { useState } from 'react'
+import { Smartphone, Gift, Bot, Bell, ChartBar, Trophy, Coins, Rocket, FileText, Users, MessageSquare, ArrowLeft, ChevronDown, ChevronUp } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import FloatingMenu from '@/components/FloatingMenu'
 
@@ -9,75 +10,113 @@ interface RoadmapItem {
   icon: React.ReactNode
   title: string
   description: string
+  detailedDescription?: string
   tags: string[]
   quarter: string
 }
 
 export default function RoadmapPage() {
   const router = useRouter()
+  const [expandedItem, setExpandedItem] = useState<number | null>(null)
+  
   const roadmapItems: RoadmapItem[] = [
-    {
-      status: 'completed',
-      icon: <Cpu size={24} />,
-      title: 'Enhanced AI Analysis Engine',
-      description: 'Core upgrade to GPT-4 Turbo for improved token analysis',
-      tags: ['AI', 'Core'],
-      quarter: 'Q1 2025'
-    },
     {
       status: 'in-progress',
       icon: <Smartphone size={24} />,
-      title: 'Mobile App Beta',
-      description: 'Launch iOS and Android apps with real-time notifications for high-score calls and portfolio tracking.',
+      title: 'Mobile Responsiveness',
+      description: 'Fully responsive design for seamless mobile experience',
+      detailedDescription: 'Complete mobile optimization of the KROM app to ensure perfect functionality on all devices. Users will be able to analyze tokens, view charts, and receive notifications directly on their phones with an optimized UI.',
       tags: ['Mobile', 'UX'],
       quarter: 'Q1 2025'
     },
     {
-      status: 'in-progress',
-      icon: <Link size={24} />,
-      title: 'DeFi Integration Suite',
-      description: 'Direct integration with Uniswap, PancakeSwap, and other DEXs for instant trading from the platform.',
-      tags: ['DeFi', 'Trading'],
-      quarter: 'Q2 2025'
+      status: 'planned',
+      icon: <Gift size={24} />,
+      title: 'Telegram Referral Program',
+      description: 'Earn KROM tokens by referring users to our Telegram group',
+      detailedDescription: 'A comprehensive referral bot for the Telegram group where users earn tokens for inviting others. Top referrers will receive several thousand dollars worth of KROM tokens from our supply allocation. The program will track invites, prevent gaming, and automatically distribute rewards.',
+      tags: ['Rewards', 'Community'],
+      quarter: 'Q1 2025'
+    },
+    {
+      status: 'planned',
+      icon: <Bot size={24} />,
+      title: 'AI New Token Analysis',
+      description: 'Analyze 40+ new GeckoTerminal tokens per minute',
+      detailedDescription: 'Our AI will continuously scan and analyze new tokens appearing on GeckoTerminal (40+ per minute). The system will identify the most promising opportunities based on multiple signals and immediately notify users when high-potential tokens are detected.',
+      tags: ['AI', 'Analysis'],
+      quarter: 'Q1 2025'
     },
     {
       status: 'in-progress',
-      icon: <TrendingUp size={24} />,
-      title: 'Advanced Charting Tools',
-      description: 'TradingView integration with custom indicators specific to memecoin and altcoin trading patterns.',
-      tags: ['Charts', 'Analytics'],
+      icon: <Bell size={24} />,
+      title: 'Push Notifications',
+      description: 'Instant Telegram alerts for high-rated projects and ATHs',
+      detailedDescription: 'Already implemented internally, this feature sends instant notifications to your Telegram for: high-scoring tokens (8+), major ATH achievements, and other important signals. Simply connect your Telegram to receive personalized alerts directly to your phone.',
+      tags: ['Notifications', 'Telegram'],
+      quarter: 'Q1 2025'
+    },
+    {
+      status: 'planned',
+      icon: <ChartBar size={24} />,
+      title: 'PhD Data Analysis',
+      description: 'Advanced signal detection with professional data analysis',
+      detailedDescription: 'Partnership with a PhD data analyst to run comprehensive analysis on our database. They will identify the most profitable patterns and signals, which will be made available to KROM holders. This deep analysis will uncover hidden alpha in the data.',
+      tags: ['Analytics', 'Premium'],
       quarter: 'Q2 2025'
+    },
+    {
+      status: 'planned',
+      icon: <Coins size={24} />,
+      title: 'Token Gating',
+      description: 'Premium features for KROM holders',
+      detailedDescription: 'Certain advanced features will be exclusively available to users who hold and stake KROM tokens. The more KROM you hold, the more features you unlock, including premium signals, early alerts, and advanced analytics.',
+      tags: ['Tokenomics', 'Premium'],
+      quarter: 'Q2 2025'
+    },
+    {
+      status: 'planned',
+      icon: <Trophy size={24} />,
+      title: 'Group Leaderboards',
+      description: 'Rankings for the most successful call groups',
+      detailedDescription: 'Comprehensive leaderboards showing which call groups have the highest success rates across different categories (ROI, win rate, ATH achievements). This helps users identify and follow the most reliable sources.',
+      tags: ['Social', 'Analytics'],
+      quarter: 'Q2 2025'
+    },
+    {
+      status: 'planned',
+      icon: <Rocket size={24} />,
+      title: 'No-Code Launchpad',
+      description: 'Launch your own token with our integrated launchpad',
+      detailedDescription: 'Already built launchpad integration allowing users to create and launch their own tokens easily. Includes tutorials on using no-code tools like Lovable and Claude to build apps. Instant monetization through token creation with full support from KROM ecosystem.',
+      tags: ['Launchpad', 'DeFi'],
+      quarter: 'Q3 2025'
+    },
+    {
+      status: 'planned',
+      icon: <FileText size={24} />,
+      title: 'Paper Trading & User Calls',
+      description: 'Track user predictions and promote successful callers',
+      detailedDescription: 'Users can post their own token calls which we track and analyze. Successful callers with proven track records get their calls featured on the main dashboard. This creates a meritocracy where the best analysts rise to the top.',
+      tags: ['Community', 'Trading'],
+      quarter: 'Q3 2025'
     },
     {
       status: 'planned',
       icon: <Users size={24} />,
-      title: 'Social Trading Features',
-      description: 'Follow top performers, copy trades, and share insights with the KROM community.',
-      tags: ['Social', 'Community'],
-      quarter: 'Q3 2025'
-    },
-    {
-      status: 'completed',
-      icon: <PieChart size={24} />,
-      title: 'Automated Portfolio Tracking',
-      description: 'Connect wallets to track P&L, get tax reports, and monitor portfolio performance across all chains.',
-      tags: ['Portfolio', 'Automation'],
-      quarter: 'Q3 2025'
-    },
-    {
-      status: 'planned',
-      icon: <Award size={24} />,
-      title: 'DAO Governance Launch',
-      description: 'Decentralized governance for platform decisions, fee structures, and feature prioritization.',
-      tags: ['DAO', 'Governance'],
+      title: 'Project Self-Promotion',
+      description: 'Projects can submit for AI and manual review',
+      detailedDescription: 'Projects can submit themselves for analysis. Our AI performs initial screening, then the best projects receive manual review. Approved projects get featured on the platform with full notification support to users.',
+      tags: ['Projects', 'Marketing'],
       quarter: 'Q4 2025'
     },
     {
       status: 'planned',
-      icon: <Globe size={24} />,
-      title: 'Cross-Chain Support',
-      description: 'Expand beyond EVM chains to support Solana, Cosmos, and other emerging ecosystems.',
-      tags: ['Multi-chain', 'Infrastructure'],
+      icon: <MessageSquare size={24} />,
+      title: 'Community Feature Requests',
+      description: 'Vote on new features, data sources, and improvements',
+      detailedDescription: 'Community members can suggest new features, analysis methods, data sources, or any improvements. The most popular suggestions (by community vote) will be implemented rapidly. This ensures the platform evolves based on real user needs.',
+      tags: ['Community', 'Governance'],
       quarter: 'Q4 2025'
     }
   ]
@@ -129,6 +168,7 @@ export default function RoadmapPage() {
           {roadmapItems.map((item, index) => (
             <div
               key={index}
+              onClick={() => setExpandedItem(expandedItem === index ? null : index)}
               className={`relative bg-[#111214] border-2 ${getItemBorderClass(item.status)} rounded-2xl p-7 cursor-pointer transition-all duration-300 hover:border-[#2a2d31] hover:translate-x-1`}
             >
               {/* Status Dot */}
@@ -144,9 +184,12 @@ export default function RoadmapPage() {
                 <div className="text-[#00ff88] opacity-80 flex-shrink-0">
                   {item.icon}
                 </div>
-                <h3 className="text-[1.35rem] font-normal tracking-[0.02em] text-[#e0e0e0]">
+                <h3 className="text-[1.35rem] font-normal tracking-[0.02em] text-[#e0e0e0] flex-1">
                   {item.title}
                 </h3>
+                <div className="text-[#666] transition-transform duration-300">
+                  {expandedItem === index ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                </div>
               </div>
 
               {/* Description */}
@@ -154,9 +197,18 @@ export default function RoadmapPage() {
                 {item.description}
               </p>
 
+              {/* Expanded Details */}
+              {expandedItem === index && item.detailedDescription && (
+                <div className="pl-10 mb-5 pt-4 border-t border-[#1a1c1f] animate-fadeIn">
+                  <p className="text-[#aaa] leading-relaxed">
+                    {item.detailedDescription}
+                  </p>
+                </div>
+              )}
+
               {/* Meta Information */}
               <div className="flex gap-4 items-center pl-10">
-                <div className="flex gap-2 flex-1">
+                <div className="flex gap-2 flex-1 flex-wrap">
                   {item.tags.map((tag, tagIndex) => (
                     <span
                       key={tagIndex}
@@ -177,6 +229,23 @@ export default function RoadmapPage() {
       
       {/* Floating Menu */}
       <FloatingMenu />
+      
+      <style jsx>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-out;
+        }
+      `}</style>
     </div>
   )
 }
