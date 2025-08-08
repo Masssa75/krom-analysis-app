@@ -22,15 +22,6 @@ export default function RoadmapPage() {
   const roadmapItems: RoadmapItem[] = [
     {
       status: 'in-progress',
-      icon: <Smartphone size={24} />,
-      title: 'Mobile Responsiveness',
-      description: 'Fully responsive design for seamless mobile experience',
-      detailedDescription: 'Complete mobile optimization of the KROM app to ensure perfect functionality on all devices. Users will be able to analyze tokens, view charts, and receive notifications directly on their phones with an optimized UI.',
-      tags: ['Mobile', 'UX'],
-      quarter: 'Q1 2025'
-    },
-    {
-      status: 'planned',
       icon: <Gift size={24} />,
       title: 'Telegram Referral Program',
       description: 'Earn KROM tokens by referring users to our Telegram group',
@@ -39,7 +30,7 @@ export default function RoadmapPage() {
       quarter: 'Q1 2025'
     },
     {
-      status: 'planned',
+      status: 'in-progress',
       icon: <Bot size={24} />,
       title: 'AI New Token Analysis',
       description: 'Analyze 40+ new GeckoTerminal tokens per minute',
@@ -48,7 +39,7 @@ export default function RoadmapPage() {
       quarter: 'Q1 2025'
     },
     {
-      status: 'in-progress',
+      status: 'completed',
       icon: <Bell size={24} />,
       title: 'Push Notifications',
       description: 'Instant Telegram alerts for high-rated projects and ATHs',
@@ -85,8 +76,17 @@ export default function RoadmapPage() {
     },
     {
       status: 'planned',
+      icon: <Smartphone size={24} />,
+      title: 'Mobile Responsiveness',
+      description: 'Fully responsive design for seamless mobile experience',
+      detailedDescription: 'Complete mobile optimization of the KROM app to ensure perfect functionality on all devices. Users will be able to analyze tokens, view charts, and receive notifications directly on their phones with an optimized UI.',
+      tags: ['Mobile', 'UX'],
+      quarter: 'Q2 2025'
+    },
+    {
+      status: 'planned',
       icon: <Rocket size={24} />,
-      title: 'No-Code Launchpad',
+      title: 'Vibe Coding Launchpad',
       description: 'Launch your own token with our integrated launchpad',
       detailedDescription: 'Already built launchpad integration allowing users to create and launch their own tokens easily. Includes tutorials on using no-code tools like Lovable and Claude to build apps. Instant monetization through token creation with full support from KROM ecosystem.',
       tags: ['Launchpad', 'DeFi'],

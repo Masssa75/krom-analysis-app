@@ -80,23 +80,21 @@ export default function FloatingMenu() {
             : 'opacity-0 pointer-events-none scale-[0.8] translate-y-[20px]'
         }`}>
           {menuItems.map((item, index) => (
-            <div 
+            <button 
               key={index}
-              className="flex items-center justify-end gap-3"
+              onClick={item.onClick}
+              className="flex items-center justify-end gap-3 group"
               style={{
                 animation: isOpen ? `slideIn 0.3s ease-out ${index * 0.05}s both` : 'none'
               }}
             >
-              <span className="bg-[#1a1c1f] text-white px-3 py-2 rounded-md text-[13px] font-medium whitespace-nowrap shadow-[0_4px_12px_rgba(0,0,0,0.3)] border border-[#2a2d31]">
+              <span className="bg-[#1a1c1f] text-white px-3 py-2 rounded-md text-[13px] font-medium whitespace-nowrap shadow-[0_4px_12px_rgba(0,0,0,0.3)] border border-[#2a2d31] transition-all group-hover:bg-[#2a2d31]">
                 {item.label}
               </span>
-              <button 
-                onClick={item.onClick}
-                className="w-[50px] h-[50px] rounded-full bg-[#111214] border-2 border-[#2a2d31] text-[#00ff88] flex items-center justify-center cursor-pointer transition-all shadow-[0_4px_12px_rgba(0,0,0,0.3)] hover:bg-[#1a1c1f] hover:scale-110 hover:border-[#00ff88]"
-              >
+              <div className="w-[50px] h-[50px] rounded-full bg-[#111214] border-2 border-[#2a2d31] text-[#00ff88] flex items-center justify-center transition-all shadow-[0_4px_12px_rgba(0,0,0,0.3)] group-hover:bg-[#1a1c1f] group-hover:scale-110 group-hover:border-[#00ff88]">
                 {item.icon}
-              </button>
-            </div>
+              </div>
+            </button>
           ))}
         </div>
 
