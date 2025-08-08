@@ -184,8 +184,8 @@ export default function HomePage() {
               ▼
             </span>
           </div>
-          <div className={`bg-[#0a0b0d] overflow-hidden transition-all ${isRangeFiltersCollapsed ? 'max-h-0 opacity-0' : 'max-h-[500px] opacity-100 p-5'}`}>
-            <div className="space-y-5">
+          <div className={`bg-[#0a0b0d] overflow-hidden transition-all ${isRangeFiltersCollapsed ? 'max-h-0 opacity-0' : 'max-h-[500px] opacity-100 p-4'}`}>
+            <div className="space-y-4">
               {/* Liquidity Range */}
               <div>
                 <label className="text-xs uppercase tracking-wider text-[#666] mb-2 block">Liquidity (USD)</label>
@@ -199,9 +199,9 @@ export default function HomePage() {
                       const min = e.target.value ? parseFloat(e.target.value) : undefined
                       setFilters(prev => ({ ...prev, liquidityMin: min }))
                     }}
-                    className="flex-1 bg-[#1a1c1f] border border-[#2a2d31] rounded px-3 py-2 text-sm text-white placeholder-[#666] focus:outline-none focus:border-[#00ff88] transition-colors"
+                    className="flex-1 bg-[#1a1c1f] border border-[#2a2d31] rounded px-2 py-1.5 text-sm text-white placeholder-[#666] focus:outline-none focus:border-[#00ff88] transition-colors"
                   />
-                  <span className="text-[#666]">-</span>
+                  <span className="text-[#666] text-xs">-</span>
                   <input
                     type="number"
                     placeholder="Max"
@@ -211,11 +211,8 @@ export default function HomePage() {
                       const max = e.target.value ? parseFloat(e.target.value) : undefined
                       setFilters(prev => ({ ...prev, liquidityMax: max }))
                     }}
-                    className="flex-1 bg-[#1a1c1f] border border-[#2a2d31] rounded px-3 py-2 text-sm text-white placeholder-[#666] focus:outline-none focus:border-[#00ff88] transition-colors"
+                    className="flex-1 bg-[#1a1c1f] border border-[#2a2d31] rounded px-2 py-1.5 text-sm text-white placeholder-[#666] focus:outline-none focus:border-[#00ff88] transition-colors"
                   />
-                </div>
-                <div className="mt-1 text-[10px] text-[#666]">
-                  e.g., 10000 for $10K minimum
                 </div>
               </div>
 
@@ -232,9 +229,9 @@ export default function HomePage() {
                       const min = e.target.value ? parseFloat(e.target.value) : undefined
                       setFilters(prev => ({ ...prev, marketCapMin: min }))
                     }}
-                    className="flex-1 bg-[#1a1c1f] border border-[#2a2d31] rounded px-3 py-2 text-sm text-white placeholder-[#666] focus:outline-none focus:border-[#00ff88] transition-colors"
+                    className="flex-1 bg-[#1a1c1f] border border-[#2a2d31] rounded px-2 py-1.5 text-sm text-white placeholder-[#666] focus:outline-none focus:border-[#00ff88] transition-colors"
                   />
-                  <span className="text-[#666]">-</span>
+                  <span className="text-[#666] text-xs">-</span>
                   <input
                     type="number"
                     placeholder="Max"
@@ -244,11 +241,8 @@ export default function HomePage() {
                       const max = e.target.value ? parseFloat(e.target.value) : undefined
                       setFilters(prev => ({ ...prev, marketCapMax: max }))
                     }}
-                    className="flex-1 bg-[#1a1c1f] border border-[#2a2d31] rounded px-3 py-2 text-sm text-white placeholder-[#666] focus:outline-none focus:border-[#00ff88] transition-colors"
+                    className="flex-1 bg-[#1a1c1f] border border-[#2a2d31] rounded px-2 py-1.5 text-sm text-white placeholder-[#666] focus:outline-none focus:border-[#00ff88] transition-colors"
                   />
-                </div>
-                <div className="mt-1 text-[10px] text-[#666]">
-                  e.g., 1000000 for $1M maximum
                 </div>
               </div>
 
