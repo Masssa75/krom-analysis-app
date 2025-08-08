@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 
-test('Buy button opens Jupiter exchange with correct swap parameters', async ({ page, context }) => {
+test('Buy button opens Raydium exchange with correct swap parameters', async ({ page, context }) => {
   // Navigate to the deployed app
   await page.goto('https://lively-torrone-8199e0.netlify.app/')
   
@@ -31,13 +31,13 @@ test('Buy button opens Jupiter exchange with correct swap parameters', async ({ 
   // Get the popup page
   const popup = await popupPromise
   
-  // Check the URL contains Jupiter and the correct token addresses
-  expect(popup.url()).toContain('jup.ag')
-  expect(popup.url()).toContain('SOL')
-  expect(popup.url()).toContain('9eCEK7ttNtroHsFLnW8jW7pS9MtSAPrPPrZ6QCUFpump')
+  // Check the URL contains Raydium and the correct token addresses
+  expect(popup.url()).toContain('raydium.io')
+  expect(popup.url()).toContain('inputMint=sol')
+  expect(popup.url()).toContain('outputMint=9eCEK7ttNtroHsFLnW8jW7pS9MtSAPrPPrZ6QCUFpump')
   
   // Close the popup
   await popup.close()
   
-  console.log('✅ Buy button correctly opens Jupiter exchange for SOL to KROM swap')
+  console.log('✅ Buy button correctly opens Raydium exchange for SOL to KROM swap')
 })
