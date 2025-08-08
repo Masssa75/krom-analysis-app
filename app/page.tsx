@@ -69,7 +69,13 @@ export default function HomePage() {
               </svg>
             </button>
           </div>
-          <p className="text-[#666] text-xs">Advanced Token Discovery</p>
+          <p className="text-[#666] text-xs">Advanced AI Powered Token Discovery</p>
+          <div className="mt-2 mb-[15px]">
+            <div className="text-[10px] text-[#666] mb-1">Contract Address:</div>
+            <div className="text-[11px] text-[#888] break-all font-mono">
+              9eCEK7ttNtroHsFLnW8jW7pS9MtSAPrPPrZ6QCUFpump
+            </div>
+          </div>
         </div>
 
         {/* Filters Title */}
