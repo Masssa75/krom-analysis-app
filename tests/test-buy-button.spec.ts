@@ -14,13 +14,17 @@ test('Buy button opens Raydium exchange with correct swap parameters', async ({ 
   await expect(buyButton).toHaveCSS('background-color', 'rgb(42, 45, 49)')
   await expect(buyButton).toHaveCSS('color', 'rgb(136, 136, 136)')
   
-  // Verify it's next to Contract Address label
-  const contractSection = page.locator('div').filter({ 
-    has: page.locator('div:has-text("Contract Address:")') 
-  }).filter({
+  // Verify it's in the header next to the Telegram button
+  const headerSection = page.locator('div.flex.items-center.gap-2').filter({
     has: buyButton
   }).first()
-  await expect(contractSection).toBeVisible()
+  await expect(headerSection).toBeVisible()
+  
+  // Check that Telegram button is also in the same container
+  const telegramButton = headerSection.locator('button').filter({
+    has: page.locator('svg')
+  }).last()
+  await expect(telegramButton).toBeVisible()
   
   // Listen for the popup event
   const popupPromise = context.waitForEvent('page')

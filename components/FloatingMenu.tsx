@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Settings, Award, BarChart2, Map, TrendingUp, Plus } from 'lucide-react'
 
 interface MenuItem {
@@ -11,6 +12,7 @@ interface MenuItem {
 
 export default function FloatingMenu() {
   const [isOpen, setIsOpen] = useState(false)
+  const router = useRouter()
 
   const menuItems: MenuItem[] = [
     {
@@ -41,7 +43,7 @@ export default function FloatingMenu() {
       label: 'Roadmap',
       icon: <Map size={20} />,
       onClick: () => {
-        console.log('Roadmap clicked')
+        router.push('/roadmap')
         setIsOpen(false)
       }
     },
