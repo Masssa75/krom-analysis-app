@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import TopEarlyCalls from '@/components/TopEarlyCalls'
 import RecentCalls from '@/components/RecentCalls'
+import FloatingMenu from '@/components/FloatingMenu'
 
 interface FilterState {
   tokenType: 'all' | 'meme' | 'utility'
@@ -291,6 +292,9 @@ export default function HomePage() {
         {/* Recent Calls Section */}
         <RecentCalls filters={filters} />
       </div>
+
+      {/* Floating Action Menu */}
+      <FloatingMenu />
     </div>
   )
 }
