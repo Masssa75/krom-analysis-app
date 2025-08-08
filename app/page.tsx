@@ -75,7 +75,7 @@ export default function HomePage() {
               <div className="text-[10px] text-[#666]">Contract Address:</div>
               <button
                 className="px-2 py-0.5 bg-[#2a2d31] hover:bg-[#3a3d41] text-[#888] hover:text-white text-[10px] font-semibold rounded transition-all border border-[#3a3d41]"
-                onClick={() => window.open('https://jup.ag/swap/SOL-9eCEK7ttNtroHsFLnW8jW7pS9MtSAPrPPrZ6QCUFpump', '_blank')}
+                onClick={() => window.open('https://raydium.io/swap/?inputMint=sol&outputMint=9eCEK7ttNtroHsFLnW8jW7pS9MtSAPrPPrZ6QCUFpump', '_blank')}
               >
                 BUY
               </button>

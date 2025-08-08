@@ -10,9 +10,9 @@ test('Buy button opens Jupiter exchange with correct swap parameters', async ({ 
   // Check the button is visible
   await expect(buyButton).toBeVisible()
   
-  // Check the button styling
-  await expect(buyButton).toHaveCSS('background-color', 'rgb(0, 255, 136)')
-  await expect(buyButton).toHaveCSS('color', 'rgb(0, 0, 0)')
+  // Check the button styling (grayscale)
+  await expect(buyButton).toHaveCSS('background-color', 'rgb(42, 45, 49)')
+  await expect(buyButton).toHaveCSS('color', 'rgb(136, 136, 136)')
   
   // Verify it's next to Contract Address label
   const contractSection = page.locator('div').filter({ 
