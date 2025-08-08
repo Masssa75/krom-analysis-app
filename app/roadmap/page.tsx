@@ -169,59 +169,72 @@ export default function RoadmapPage() {
             <div
               key={index}
               onClick={() => setExpandedItem(expandedItem === index ? null : index)}
-              className={`relative bg-[#111214] border-2 ${getItemBorderClass(item.status)} rounded-2xl p-7 cursor-pointer transition-all duration-300 hover:border-[#2a2d31] hover:translate-x-1`}
+              className={`relative bg-[#111214] border-2 ${getItemBorderClass(item.status)} rounded-2xl ${expandedItem === index ? 'p-7' : 'p-5'} cursor-pointer transition-all duration-300 hover:border-[#2a2d31] hover:translate-x-1`}
             >
               {/* Status Dot */}
-              <div className={`absolute -left-[11px] top-8 w-5 h-5 rounded-full border-[3px] border-[#0a0b0d] ${getStatusDotClass(item.status)}`} />
+              <div className={`absolute -left-[11px] ${expandedItem === index ? 'top-8' : 'top-6'} w-5 h-5 rounded-full border-[3px] border-[#0a0b0d] ${getStatusDotClass(item.status)}`} />
               
               {/* Connecting Line */}
               {index < roadmapItems.length - 1 && (
-                <div className="absolute left-[-1px] top-14 bottom-[-1.5rem] w-[2px] bg-gradient-to-b from-[#1a1c1f] to-transparent" />
+                <div className={`absolute left-[-1px] ${expandedItem === index ? 'top-14' : 'top-12'} bottom-[-1.5rem] w-[2px] bg-gradient-to-b from-[#1a1c1f] to-transparent`} />
               )}
 
               {/* Item Header */}
-              <div className="flex items-center gap-4 mb-4">
+              <div className={`flex items-center gap-4 ${expandedItem === index ? 'mb-4' : ''}`}>
                 <div className="text-[#00ff88] opacity-80 flex-shrink-0">
                   {item.icon}
                 </div>
                 <h3 className="text-[1.35rem] font-normal tracking-[0.02em] text-[#e0e0e0] flex-1">
                   {item.title}
                 </h3>
+                {/* Show quarter when collapsed */}
+                {expandedItem !== index && (
+                  <span className="text-[#555] text-sm mr-2">
+                    {item.quarter}
+                  </span>
+                )}
                 <div className="text-[#666] transition-transform duration-300">
                   {expandedItem === index ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                 </div>
               </div>
 
-              {/* Description */}
-              <p className="text-[#888] text-base leading-relaxed mb-5 pl-10">
-                {item.description}
-              </p>
-
-              {/* Expanded Details */}
-              {expandedItem === index && item.detailedDescription && (
-                <div className="pl-10 mb-5 pt-4 border-t border-[#1a1c1f] animate-fadeIn">
-                  <p className="text-[#aaa] leading-relaxed">
-                    {item.detailedDescription}
+              {/* Expanded Content */}
+              {expandedItem === index && (
+                <div className="animate-fadeIn">
+                  {/* Short Description */}
+                  <p className="text-[#888] text-base leading-relaxed mb-5 pl-10">
+                    {item.description}
                   </p>
+                  
+                  {/* Detailed Description */}
+                  {item.detailedDescription && (
+                    <div className="pl-10 mb-5 pt-4 border-t border-[#1a1c1f]">
+                      <p className="text-[#aaa] leading-relaxed">
+                        {item.detailedDescription}
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
 
-              {/* Meta Information */}
-              <div className="flex gap-4 items-center pl-10">
-                <div className="flex gap-2 flex-1 flex-wrap">
-                  {item.tags.map((tag, tagIndex) => (
-                    <span
-                      key={tagIndex}
-                      className="bg-[#1a1c1f] text-[#666] px-3 py-1.5 rounded-[10px] text-sm"
-                    >
-                      {tag}
-                    </span>
-                  ))}
+              {/* Meta Information - Only show when expanded */}
+              {expandedItem === index && (
+                <div className="flex gap-4 items-center pl-10">
+                  <div className="flex gap-2 flex-1 flex-wrap">
+                    {item.tags.map((tag, tagIndex) => (
+                      <span
+                        key={tagIndex}
+                        className="bg-[#1a1c1f] text-[#666] px-3 py-1.5 rounded-[10px] text-sm"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                  <span className="text-[#555] text-sm">
+                    {item.quarter}
+                  </span>
                 </div>
-                <span className="text-[#555] text-sm">
-                  {item.quarter}
-                </span>
-              </div>
+              )}
             </div>
           ))}
         </div>
