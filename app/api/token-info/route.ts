@@ -34,9 +34,12 @@ export async function GET(request: NextRequest) {
       })
     }
     
-    // Extract token info
+    // Extract token info - handle websites array properly
+    const websiteObj = pair.info?.websites?.[0]
+    const websiteUrl = typeof websiteObj === 'string' ? websiteObj : websiteObj?.url || null
+    
     const tokenInfo = {
-      website: pair.info?.websites?.[0] || null,
+      website: websiteUrl,
       twitter: pair.info?.socials?.find((s: any) => s.type === 'twitter')?.url || null,
       telegram: pair.info?.socials?.find((s: any) => s.type === 'telegram')?.url || null,
       discord: pair.info?.socials?.find((s: any) => s.type === 'discord')?.url || null,
