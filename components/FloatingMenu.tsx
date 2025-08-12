@@ -8,6 +8,7 @@ interface MenuItem {
   label: string
   icon: React.ReactNode
   onClick: () => void
+  isActive?: boolean
 }
 
 export default function FloatingMenu() {
@@ -21,7 +22,8 @@ export default function FloatingMenu() {
       onClick: () => {
         console.log('Settings clicked')
         setIsOpen(false)
-      }
+      },
+      isActive: false
     },
     {
       label: 'Leaderboard',
@@ -29,7 +31,8 @@ export default function FloatingMenu() {
       onClick: () => {
         console.log('Leaderboard clicked')
         setIsOpen(false)
-      }
+      },
+      isActive: false
     },
     {
       label: 'Analytics',
@@ -37,7 +40,8 @@ export default function FloatingMenu() {
       onClick: () => {
         console.log('Analytics clicked')
         setIsOpen(false)
-      }
+      },
+      isActive: false
     },
     {
       label: 'Roadmap',
@@ -45,7 +49,8 @@ export default function FloatingMenu() {
       onClick: () => {
         router.push('/roadmap')
         setIsOpen(false)
-      }
+      },
+      isActive: true
     },
     {
       label: 'Charts',
@@ -53,7 +58,8 @@ export default function FloatingMenu() {
       onClick: () => {
         console.log('Charts clicked')
         setIsOpen(false)
-      }
+      },
+      isActive: false
     }
   ]
 
@@ -82,16 +88,18 @@ export default function FloatingMenu() {
           {menuItems.map((item, index) => (
             <button 
               key={index}
-              onClick={item.onClick}
-              className="flex items-center justify-end gap-3 group"
+              onClick={item.isActive ? item.onClick : undefined}
+              className={`flex items-center justify-end gap-3 group ${!item.isActive ? 'cursor-not-allowed' : ''}`}
               style={{
-                animation: isOpen ? `slideIn 0.3s ease-out ${index * 0.05}s both` : 'none'
+                animation: isOpen ? `slideIn 0.3s ease-out ${index * 0.05}s both` : 'none',
+                opacity: item.isActive ? 1 : 0.4
               }}
+              disabled={!item.isActive}
             >
-              <span className="bg-[#1a1c1f] text-white px-3 py-2 rounded-md text-[13px] font-medium whitespace-nowrap shadow-[0_4px_12px_rgba(0,0,0,0.3)] border border-[#2a2d31] transition-all group-hover:bg-[#2a2d31]">
+              <span className={`bg-[#1a1c1f] text-white px-3 py-2 rounded-md text-[13px] font-medium whitespace-nowrap shadow-[0_4px_12px_rgba(0,0,0,0.3)] border border-[#2a2d31] transition-all ${item.isActive ? 'group-hover:bg-[#2a2d31]' : ''}`}>
                 {item.label}
               </span>
-              <div className="w-[50px] h-[50px] rounded-full bg-[#111214] border-2 border-[#2a2d31] text-[#00ff88] flex items-center justify-center transition-all shadow-[0_4px_12px_rgba(0,0,0,0.3)] group-hover:bg-[#1a1c1f] group-hover:scale-110 group-hover:border-[#00ff88]">
+              <div className={`w-[50px] h-[50px] rounded-full bg-[#111214] border-2 border-[#2a2d31] flex items-center justify-center transition-all shadow-[0_4px_12px_rgba(0,0,0,0.3)] ${item.isActive ? 'text-[#00ff88] group-hover:bg-[#1a1c1f] group-hover:scale-110 group-hover:border-[#00ff88]' : 'text-[#666]'}`}>
                 {item.icon}
               </div>
             </button>
