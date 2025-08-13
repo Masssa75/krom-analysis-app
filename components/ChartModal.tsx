@@ -459,9 +459,10 @@ export default function ChartModal({ isOpen, onClose, token }: ChartModalProps) 
               )}
               <button 
                 onClick={() => navigator.clipboard.writeText(token.contract_address)}
-                className="text-[10px] px-2 py-1 bg-[#1a1c1f] border border-[#2a2d31] rounded text-[#666] hover:border-[#00ff88] hover:text-[#00ff88] transition-all"
+                className="text-[10px] px-2.5 py-1 bg-[#1a1c1f] border border-[#2a2d31] rounded text-[#888] hover:border-[#00ff88] hover:text-[#00ff88] transition-all font-mono"
+                title="Click to copy contract address"
               >
-                Copy CA
+                {token.contract_address}
               </button>
             </div>
           </div>
