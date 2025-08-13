@@ -334,6 +334,14 @@ export default function RecentCalls({ filters = { tokenType: 'all' } }: RecentCa
                   </div>
                   
                   <div className="flex items-center gap-8">
+                    {/* Liquidity */}
+                    <div className="flex flex-col items-center">
+                      <span className="text-[#666] text-[10px]">LIQUIDITY</span>
+                      <span className="text-white text-sm font-medium">
+                        {call.liquidity_usd ? formatMarketCap(call.liquidity_usd) : 'N/A'}
+                      </span>
+                    </div>
+                    
                     {/* Market Cap Info */}
                     <div className="flex flex-col items-center">
                       <span className="text-[#666] text-[10px]">ENTRY MC</span>
