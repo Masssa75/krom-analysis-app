@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import ChartModal from './ChartModal'
 import { SortDropdown } from './sort-dropdown'
 import SearchInput from './SearchInput'
@@ -58,6 +58,9 @@ export default function RecentCalls({ filters = { tokenType: 'all' } }: RecentCa
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [searchQuery, setSearchQuery] = useState('')
   const itemsPerPage = 20
+  
+  // AbortController ref to cancel in-flight requests
+  const abortControllerRef = useRef<AbortController | null>(null)
 
   useEffect(() => {
     setCurrentPage(1)  // Reset to first page when filters change
@@ -65,9 +68,25 @@ export default function RecentCalls({ filters = { tokenType: 'all' } }: RecentCa
 
   useEffect(() => {
     fetchRecentCalls()
+    
+    // Cleanup function to cancel request on unmount
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
+    }
   }, [currentPage, sortBy, sortOrder, filters, searchQuery])
 
   const fetchRecentCalls = async () => {
+    // Cancel any in-flight request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+    
+    // Create new AbortController for this request
+    const abortController = new AbortController()
+    abortControllerRef.current = abortController
+    
     setLoading(true)
     try {
       const params = new URLSearchParams({
@@ -100,16 +119,30 @@ export default function RecentCalls({ filters = { tokenType: 'all' } }: RecentCa
       if (filters?.excludeRugs !== undefined) {
         params.set('excludeRugs', filters.excludeRugs.toString())
       }
-      const response = await fetch(`/api/recent-calls?${params}`)
-      const data = await response.json()
-      setCalls(data.data || [])
-      setTotalPages(data.totalPages || 1)
-      setTotalCount(data.totalCount || 0)
-    } catch (error) {
-      console.error('Error fetching recent calls:', error)
-      setCalls([])
+      
+      const response = await fetch(`/api/recent-calls?${params}`, {
+        signal: abortController.signal
+      })
+      
+      // Only proceed if the request wasn't aborted
+      if (!abortController.signal.aborted) {
+        const data = await response.json()
+        setCalls(data.data || [])
+        setTotalPages(data.totalPages || 1)
+        setTotalCount(data.totalCount || 0)
+      }
+    } catch (error: any) {
+      // Ignore abort errors
+      if (error.name !== 'AbortError') {
+        console.error('Error fetching recent calls:', error)
+        setCalls([])
+      }
+    } finally {
+      // Only set loading to false if this is the current request
+      if (abortController === abortControllerRef.current) {
+        setLoading(false)
+      }
     }
-    setLoading(false)
   }
 
   const formatPrice = (price: number | null | undefined) => {

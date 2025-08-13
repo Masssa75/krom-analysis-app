@@ -4,6 +4,7 @@ import { useState } from 'react'
 import TopEarlyCalls from '@/components/TopEarlyCalls'
 import RecentCalls from '@/components/RecentCalls'
 import FloatingMenu from '@/components/FloatingMenu'
+import { useDebounce } from '@/lib/useDebounce'
 
 interface FilterState {
   tokenType: 'all' | 'meme' | 'utility'
@@ -33,6 +34,9 @@ export default function HomePage() {
   const [liquidityMax, setLiquidityMax] = useState<string>('')
   const [marketCapMin, setMarketCapMin] = useState<string>('')
   const [marketCapMax, setMarketCapMax] = useState<string>('')
+  
+  // Debounce all filters with 400ms delay
+  const debouncedFilters = useDebounce(filters, 400)
 
   const handleTokenTypeChange = (utilityChecked: boolean, memeChecked: boolean) => {
     let newType: FilterState['tokenType'] = 'all'
@@ -353,7 +357,7 @@ export default function HomePage() {
         <TopEarlyCalls />
 
         {/* Recent Calls Section */}
-        <RecentCalls filters={filters} />
+        <RecentCalls filters={debouncedFilters} />
       </div>
 
       {/* Floating Action Menu */}
