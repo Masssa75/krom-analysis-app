@@ -20,6 +20,7 @@ export async function GET(request: NextRequest) {
     const marketCapMin = searchParams.get('marketCapMin') ? parseFloat(searchParams.get('marketCapMin')!) : undefined
     const marketCapMax = searchParams.get('marketCapMax') ? parseFloat(searchParams.get('marketCapMax')!) : undefined
     const excludeRugs = searchParams.get('excludeRugs') === 'true'
+    const searchQuery = searchParams.get('search') || ''
     
     const supabase = createClient(supabaseUrl, supabaseKey)
     
@@ -41,6 +42,12 @@ export async function GET(request: NextRequest) {
       .from('crypto_calls')
       .select('*', { count: 'exact', head: true })
       .or('is_invalidated.is.null,is_invalidated.eq.false')
+    
+    // Apply search filter
+    if (searchQuery) {
+      // Search by ticker (case-insensitive) or contract address
+      countQuery = countQuery.or(`ticker.ilike.%${searchQuery}%,contract_address.ilike.%${searchQuery}%`)
+    }
     
     // Apply networks filter
     if (networks.length > 0) {
@@ -138,6 +145,12 @@ export async function GET(request: NextRequest) {
         raw_data
       `)
       .or('is_invalidated.is.null,is_invalidated.eq.false')
+    
+    // Apply search filter
+    if (searchQuery) {
+      // Search by ticker (case-insensitive) or contract address
+      query = query.or(`ticker.ilike.%${searchQuery}%,contract_address.ilike.%${searchQuery}%`)
+    }
     
     // Apply networks filter
     if (networks.length > 0) {

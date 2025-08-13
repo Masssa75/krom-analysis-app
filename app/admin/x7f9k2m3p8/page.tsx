@@ -1341,7 +1341,13 @@ export default function HomePage() {
                                       athMarketCap: call.ath_market_cap,
                                       athFdv: call.ath_fdv
                                     },
-                                    callTimestamp: call.call_timestamp || call.buy_timestamp
+                                    callTimestamp: call.call_timestamp || call.buy_timestamp,
+                                    socialData: {
+                                      website: call.website_url,
+                                      twitter: call.twitter_url,
+                                      telegram: call.telegram_url,
+                                      discord: call.discord_url
+                                    }
                                   })}
                                   className="font-mono text-sm hover:underline text-left"
                                 >

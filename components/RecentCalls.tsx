@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import ChartModal from './ChartModal'
 import { SortDropdown } from './sort-dropdown'
+import SearchInput from './SearchInput'
 
 interface RecentCall {
   id: string
@@ -55,15 +56,16 @@ export default function RecentCalls({ filters = { tokenType: 'all' } }: RecentCa
   const [totalCount, setTotalCount] = useState(0)
   const [sortBy, setSortBy] = useState('buy_timestamp')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
+  const [searchQuery, setSearchQuery] = useState('')
   const itemsPerPage = 20
 
   useEffect(() => {
     setCurrentPage(1)  // Reset to first page when filters change
-  }, [filters])
+  }, [filters, searchQuery])
 
   useEffect(() => {
     fetchRecentCalls()
-  }, [currentPage, sortBy, sortOrder, filters])
+  }, [currentPage, sortBy, sortOrder, filters, searchQuery])
 
   const fetchRecentCalls = async () => {
     setLoading(true)
@@ -76,6 +78,11 @@ export default function RecentCalls({ filters = { tokenType: 'all' } }: RecentCa
         tokenType: filters?.tokenType || 'all',
         networks: filters?.networks?.join(',') || 'ethereum,solana,bsc,base'
       })
+      
+      // Add search query if present
+      if (searchQuery) {
+        params.set('search', searchQuery)
+      }
       
       // Add optional range filters
       if (filters?.liquidityMin !== undefined) {
@@ -224,7 +231,10 @@ export default function RecentCalls({ filters = { tokenType: 'all' } }: RecentCa
     <div className="py-8 px-0 bg-[#0a0b0d]">
       <div className="max-w-[1200px] mx-auto">
         <div className="flex justify-between items-center mb-8 px-10">
-          <h2 className="text-xl text-[#00ff88] tracking-[3px] font-extralight m-0">RECENT CALLS</h2>
+          <div className="flex items-center">
+            <h2 className="text-xl text-[#00ff88] tracking-[3px] font-extralight m-0">RECENT CALLS</h2>
+            <SearchInput onSearch={setSearchQuery} />
+          </div>
           <SortDropdown onSortChange={handleSortChange} />
         </div>
         
@@ -244,7 +254,7 @@ export default function RecentCalls({ filters = { tokenType: 'all' } }: RecentCa
             ))
           ) : calls.length === 0 ? (
             <div className="text-center py-8 text-[#666]">
-              No recent calls found
+              {searchQuery ? `No tokens found matching "${searchQuery}"` : 'No recent calls found'}
             </div>
           ) : (
             calls.map(call => {

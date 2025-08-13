@@ -39,6 +39,12 @@ interface GeckoTerminalPanelProps {
       athFdv?: number | null
     }
     callTimestamp?: string | null
+    socialData?: {
+      website?: string | null
+      twitter?: string | null
+      telegram?: string | null
+      discord?: string | null
+    }
   }
   onClose: () => void
 }
@@ -53,7 +59,14 @@ export function GeckoTerminalPanel({ token, onClose }: GeckoTerminalPanelProps) 
   const [priceData, setPriceData] = useState(token.priceData || null)
   const [loading, setLoading] = useState(false)
   const [isInfoExpanded, setIsInfoExpanded] = useState(false)
-  const [dexScreenerData, setDexScreenerData] = useState<DexScreenerData | null>(null)
+  // Use social data from props if available, otherwise null
+  const [dexScreenerData, setDexScreenerData] = useState<DexScreenerData | null>(
+    token.socialData ? {
+      website: token.socialData.website || undefined,
+      twitter: token.socialData.twitter || undefined,
+      telegram: token.socialData.telegram || undefined
+    } : null
+  )
   const [dexLoading, setDexLoading] = useState(false)
   
   useEffect(() => {
@@ -87,9 +100,9 @@ export function GeckoTerminalPanel({ token, onClose }: GeckoTerminalPanelProps) 
     fetchPriceData()
   }, [token.contract, token.ticker, token.kromId])
   
-  // Fetch DexScreener data when info is expanded
+  // Only fetch DexScreener data if we don't have social data from props
   useEffect(() => {
-    if (!isInfoExpanded || !token.contract || dexScreenerData) return
+    if (!isInfoExpanded || !token.contract || dexScreenerData || token.socialData) return
     
     const fetchDexScreenerData = async () => {
       setDexLoading(true)
@@ -125,7 +138,7 @@ export function GeckoTerminalPanel({ token, onClose }: GeckoTerminalPanelProps) 
     }
     
     fetchDexScreenerData()
-  }, [isInfoExpanded, token.contract, dexScreenerData])
+  }, [isInfoExpanded, token.contract, dexScreenerData, token.socialData])
   
   if (!token.contract) {
     return (
