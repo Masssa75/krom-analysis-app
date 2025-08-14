@@ -25,7 +25,7 @@ export interface FilterValues {
   minBuyMcap: number | null
   maxBuyMcap: number | null
   includeDeadTokens: boolean
-  socialFilter: 'any' | 'has_website' | 'has_twitter' | 'has_telegram' | 'has_all' | 'has_none'
+  socialFilters: string[]
 }
 
 export function FilterPanel({ onFiltersChange }: FilterPanelProps) {
@@ -45,7 +45,7 @@ export function FilterPanel({ onFiltersChange }: FilterPanelProps) {
     minBuyMcap: null,
     maxBuyMcap: null,
     includeDeadTokens: false,
-    socialFilter: 'any'
+    socialFilters: []
   })
 
   useEffect(() => {
@@ -90,7 +90,7 @@ export function FilterPanel({ onFiltersChange }: FilterPanelProps) {
       minBuyMcap: null,
       maxBuyMcap: null,
       includeDeadTokens: false,
-      socialFilter: 'any'
+      socialFilters: []
     }
     setFilters(defaultFilters)
     onFiltersChange(defaultFilters)
@@ -109,7 +109,7 @@ export function FilterPanel({ onFiltersChange }: FilterPanelProps) {
     filters.minBuyMcap !== null ||
     filters.maxBuyMcap !== null ||
     filters.includeDeadTokens ||
-    filters.socialFilter !== 'any'
+    filters.socialFilters.length > 0
 
   return (
     <Card className="mb-4">

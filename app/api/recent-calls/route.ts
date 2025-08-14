@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     const marketCapMax = searchParams.get('marketCapMax') ? parseFloat(searchParams.get('marketCapMax')!) : undefined
     const excludeRugs = searchParams.get('excludeRugs') === 'true'
     const searchQuery = searchParams.get('search') || ''
-    const socialFilter = searchParams.get('socialFilter') || 'any'
+    const socialFilters = searchParams.get('socialFilters')?.split(',').filter(Boolean) || []
     
     const supabase = createClient(supabaseUrl, supabaseKey)
     
@@ -96,29 +96,24 @@ export async function GET(request: NextRequest) {
       )
     }
     
-    // Apply social media filter
-    if (socialFilter && socialFilter !== 'any') {
-      switch (socialFilter) {
-        case 'has_website':
-          countQuery = countQuery.not('website_url', 'is', null)
-          break
-        case 'has_twitter':
-          countQuery = countQuery.not('twitter_url', 'is', null)
-          break
-        case 'has_telegram':
-          countQuery = countQuery.not('telegram_url', 'is', null)
-          break
-        case 'has_any':
-          countQuery = countQuery.or('website_url.not.is.null,twitter_url.not.is.null,telegram_url.not.is.null')
-          break
-        case 'has_all':
-          countQuery = countQuery
-            .not('website_url', 'is', null)
-            .not('twitter_url', 'is', null)
-            .not('telegram_url', 'is', null)
-          break
+    // Apply social media filters
+    if (socialFilters.length > 0 && socialFilters.length < 3) {
+      // If not all 3 are selected, filter by the selected ones
+      const conditions: string[] = []
+      if (socialFilters.includes('website')) {
+        conditions.push('website_url.not.is.null')
+      }
+      if (socialFilters.includes('twitter')) {
+        conditions.push('twitter_url.not.is.null')
+      }
+      if (socialFilters.includes('telegram')) {
+        conditions.push('telegram_url.not.is.null')
+      }
+      if (conditions.length > 0) {
+        countQuery = countQuery.or(conditions.join(','))
       }
     }
+    // If all 3 are selected or none selected, don't filter (show all)
     
     // Apply same filters for count when sorting by ATH ROI
     if (isAthRoiSort) {
@@ -223,29 +218,24 @@ export async function GET(request: NextRequest) {
       )
     }
     
-    // Apply social media filter
-    if (socialFilter && socialFilter !== 'any') {
-      switch (socialFilter) {
-        case 'has_website':
-          query = query.not('website_url', 'is', null)
-          break
-        case 'has_twitter':
-          query = query.not('twitter_url', 'is', null)
-          break
-        case 'has_telegram':
-          query = query.not('telegram_url', 'is', null)
-          break
-        case 'has_any':
-          query = query.or('website_url.not.is.null,twitter_url.not.is.null,telegram_url.not.is.null')
-          break
-        case 'has_all':
-          query = query
-            .not('website_url', 'is', null)
-            .not('twitter_url', 'is', null)
-            .not('telegram_url', 'is', null)
-          break
+    // Apply social media filters
+    if (socialFilters.length > 0 && socialFilters.length < 3) {
+      // If not all 3 are selected, filter by the selected ones
+      const conditions: string[] = []
+      if (socialFilters.includes('website')) {
+        conditions.push('website_url.not.is.null')
+      }
+      if (socialFilters.includes('twitter')) {
+        conditions.push('twitter_url.not.is.null')
+      }
+      if (socialFilters.includes('telegram')) {
+        conditions.push('telegram_url.not.is.null')
+      }
+      if (conditions.length > 0) {
+        query = query.or(conditions.join(','))
       }
     }
+    // If all 3 are selected or none selected, don't filter (show all)
     
     // When sorting by ATH ROI, only include tokens with ATH ROI > 0
     if (isAthRoiSort) {

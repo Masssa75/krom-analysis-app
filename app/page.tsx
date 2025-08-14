@@ -14,7 +14,7 @@ interface FilterState {
   marketCapMin?: number
   marketCapMax?: number
   excludeRugs?: boolean
-  socialFilter?: 'any' | 'has_website' | 'has_twitter' | 'has_telegram' | 'has_any' | 'has_all'
+  socialFilters?: string[]
 }
 
 export default function HomePage() {
@@ -22,7 +22,7 @@ export default function HomePage() {
     tokenType: 'all',
     networks: ['ethereum', 'solana', 'bsc', 'base'],
     excludeRugs: true,
-    socialFilter: 'any'
+    socialFilters: ['website', 'twitter', 'telegram']
   })
   const [isTokenTypeCollapsed, setIsTokenTypeCollapsed] = useState(false)
   const [includeUtility, setIncludeUtility] = useState(true)
@@ -37,7 +37,7 @@ export default function HomePage() {
   const [marketCapMin, setMarketCapMin] = useState<string>('')
   const [marketCapMax, setMarketCapMax] = useState<string>('')
   const [isSocialCollapsed, setIsSocialCollapsed] = useState(true)
-  const [socialFilter, setSocialFilter] = useState<FilterState['socialFilter']>('any')
+  const [selectedSocials, setSelectedSocials] = useState<string[]>(['website', 'twitter', 'telegram'])
   
   // Debounce all filters with 400ms delay
   const debouncedFilters = useDebounce(filters, 400)
@@ -271,108 +271,34 @@ export default function HomePage() {
           </div>
           <div className={`bg-[#0a0b0d] overflow-hidden transition-all ${isSocialCollapsed ? 'max-h-0 opacity-0' : 'max-h-[500px] opacity-100 p-5'}`}>
             <div className="flex flex-col gap-3">
-              <label 
-                className="flex items-center gap-2.5 cursor-pointer text-sm text-[#ccc] hover:text-white transition-colors"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div 
-                  className={`w-5 h-5 border-2 rounded-[5px] transition-all flex items-center justify-center ${
-                    socialFilter === 'any' ? 'bg-[#00ff88] border-[#00ff88]' : 'border-[#333]'
-                  }`}
-                  onClick={() => {
-                    setSocialFilter('any')
-                    setFilters(prev => ({ ...prev, socialFilter: 'any' }))
-                  }}
+              {[
+                { id: 'website', label: 'Has Website' },
+                { id: 'twitter', label: 'Has Twitter/X' },
+                { id: 'telegram', label: 'Has Telegram' }
+              ].map(social => (
+                <label 
+                  key={social.id}
+                  className="flex items-center gap-2.5 cursor-pointer text-sm text-[#ccc] hover:text-white transition-colors"
+                  onClick={(e) => e.stopPropagation()}
                 >
-                  {socialFilter === 'any' && <span className="text-black font-bold text-xs">✓</span>}
-                </div>
-                <span>Any (no filter)</span>
-              </label>
-              <label 
-                className="flex items-center gap-2.5 cursor-pointer text-sm text-[#ccc] hover:text-white transition-colors"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div 
-                  className={`w-5 h-5 border-2 rounded-[5px] transition-all flex items-center justify-center ${
-                    socialFilter === 'has_website' ? 'bg-[#00ff88] border-[#00ff88]' : 'border-[#333]'
-                  }`}
-                  onClick={() => {
-                    setSocialFilter('has_website')
-                    setFilters(prev => ({ ...prev, socialFilter: 'has_website' }))
-                  }}
-                >
-                  {socialFilter === 'has_website' && <span className="text-black font-bold text-xs">✓</span>}
-                </div>
-                <span>Has Website</span>
-              </label>
-              <label 
-                className="flex items-center gap-2.5 cursor-pointer text-sm text-[#ccc] hover:text-white transition-colors"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div 
-                  className={`w-5 h-5 border-2 rounded-[5px] transition-all flex items-center justify-center ${
-                    socialFilter === 'has_twitter' ? 'bg-[#00ff88] border-[#00ff88]' : 'border-[#333]'
-                  }`}
-                  onClick={() => {
-                    setSocialFilter('has_twitter')
-                    setFilters(prev => ({ ...prev, socialFilter: 'has_twitter' }))
-                  }}
-                >
-                  {socialFilter === 'has_twitter' && <span className="text-black font-bold text-xs">✓</span>}
-                </div>
-                <span>Has Twitter/X</span>
-              </label>
-              <label 
-                className="flex items-center gap-2.5 cursor-pointer text-sm text-[#ccc] hover:text-white transition-colors"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div 
-                  className={`w-5 h-5 border-2 rounded-[5px] transition-all flex items-center justify-center ${
-                    socialFilter === 'has_telegram' ? 'bg-[#00ff88] border-[#00ff88]' : 'border-[#333]'
-                  }`}
-                  onClick={() => {
-                    setSocialFilter('has_telegram')
-                    setFilters(prev => ({ ...prev, socialFilter: 'has_telegram' }))
-                  }}
-                >
-                  {socialFilter === 'has_telegram' && <span className="text-black font-bold text-xs">✓</span>}
-                </div>
-                <span>Has Telegram</span>
-              </label>
-              <label 
-                className="flex items-center gap-2.5 cursor-pointer text-sm text-[#ccc] hover:text-white transition-colors"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div 
-                  className={`w-5 h-5 border-2 rounded-[5px] transition-all flex items-center justify-center ${
-                    socialFilter === 'has_any' ? 'bg-[#00ff88] border-[#00ff88]' : 'border-[#333]'
-                  }`}
-                  onClick={() => {
-                    setSocialFilter('has_any')
-                    setFilters(prev => ({ ...prev, socialFilter: 'has_any' }))
-                  }}
-                >
-                  {socialFilter === 'has_any' && <span className="text-black font-bold text-xs">✓</span>}
-                </div>
-                <span>Has Any Social</span>
-              </label>
-              <label 
-                className="flex items-center gap-2.5 cursor-pointer text-sm text-[#ccc] hover:text-white transition-colors"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div 
-                  className={`w-5 h-5 border-2 rounded-[5px] transition-all flex items-center justify-center ${
-                    socialFilter === 'has_all' ? 'bg-[#00ff88] border-[#00ff88]' : 'border-[#333]'
-                  }`}
-                  onClick={() => {
-                    setSocialFilter('has_all')
-                    setFilters(prev => ({ ...prev, socialFilter: 'has_all' }))
-                  }}
-                >
-                  {socialFilter === 'has_all' && <span className="text-black font-bold text-xs">✓</span>}
-                </div>
-                <span>Has All Socials</span>
-              </label>
+                  <div 
+                    className={`w-5 h-5 border-2 rounded-[5px] transition-all flex items-center justify-center ${
+                      selectedSocials.includes(social.id) ? 'bg-[#00ff88] border-[#00ff88]' : 'border-[#333]'
+                    }`}
+                    onClick={() => {
+                      const newSocials = selectedSocials.includes(social.id)
+                        ? selectedSocials.filter(s => s !== social.id)
+                        : [...selectedSocials, social.id]
+                      
+                      setSelectedSocials(newSocials)
+                      setFilters(prev => ({ ...prev, socialFilters: newSocials }))
+                    }}
+                  >
+                    {selectedSocials.includes(social.id) && <span className="text-black font-bold text-xs">✓</span>}
+                  </div>
+                  <span>{social.label}</span>
+                </label>
+              ))}
             </div>
           </div>
         </div>

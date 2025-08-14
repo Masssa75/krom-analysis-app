@@ -76,7 +76,7 @@ export default function HomePage() {
     minBuyMcap: null,
     maxBuyMcap: null,
     includeDeadTokens: false,
-    socialFilter: 'any'
+    socialFilters: []
   })
   
   // Sort state
