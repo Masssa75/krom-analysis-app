@@ -14,13 +14,15 @@ interface FilterState {
   marketCapMin?: number
   marketCapMax?: number
   excludeRugs?: boolean
+  socialFilter?: 'any' | 'has_website' | 'has_twitter' | 'has_telegram' | 'has_any' | 'has_all'
 }
 
 export default function HomePage() {
   const [filters, setFilters] = useState<FilterState>({ 
     tokenType: 'all',
     networks: ['ethereum', 'solana', 'bsc', 'base'],
-    excludeRugs: true
+    excludeRugs: true,
+    socialFilter: 'any'
   })
   const [isTokenTypeCollapsed, setIsTokenTypeCollapsed] = useState(false)
   const [includeUtility, setIncludeUtility] = useState(true)
@@ -34,6 +36,8 @@ export default function HomePage() {
   const [liquidityMax, setLiquidityMax] = useState<string>('')
   const [marketCapMin, setMarketCapMin] = useState<string>('')
   const [marketCapMax, setMarketCapMax] = useState<string>('')
+  const [isSocialCollapsed, setIsSocialCollapsed] = useState(true)
+  const [socialFilter, setSocialFilter] = useState<FilterState['socialFilter']>('any')
   
   // Debounce all filters with 400ms delay
   const debouncedFilters = useDebounce(filters, 400)
@@ -248,6 +252,127 @@ export default function HomePage() {
                   </span>
                 </label>
               ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Social Media Filter */}
+        <div className={`border-b border-[#1a1c1f] ${isSocialCollapsed ? 'collapsed' : ''}`}>
+          <div 
+            className="px-5 py-5 cursor-pointer flex justify-between items-center bg-[#111214] hover:bg-[#1a1c1f] hover:pl-6 transition-all"
+            onClick={() => setIsSocialCollapsed(!isSocialCollapsed)}
+          >
+            <h3 className={`text-[13px] uppercase tracking-[1px] font-semibold transition-colors ${!isSocialCollapsed ? 'text-[#00ff88]' : 'text-[#888]'}`}>
+              Social Media
+            </h3>
+            <span className={`text-xs transition-all ${!isSocialCollapsed ? 'text-[#00ff88]' : 'text-[#666]'} ${isSocialCollapsed ? 'rotate-[-90deg]' : ''}`}>
+              ▼
+            </span>
+          </div>
+          <div className={`bg-[#0a0b0d] overflow-hidden transition-all ${isSocialCollapsed ? 'max-h-0 opacity-0' : 'max-h-[500px] opacity-100 p-5'}`}>
+            <div className="flex flex-col gap-3">
+              <label 
+                className="flex items-center gap-2.5 cursor-pointer text-sm text-[#ccc] hover:text-white transition-colors"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div 
+                  className={`w-5 h-5 border-2 rounded-[5px] transition-all flex items-center justify-center ${
+                    socialFilter === 'any' ? 'bg-[#00ff88] border-[#00ff88]' : 'border-[#333]'
+                  }`}
+                  onClick={() => {
+                    setSocialFilter('any')
+                    setFilters(prev => ({ ...prev, socialFilter: 'any' }))
+                  }}
+                >
+                  {socialFilter === 'any' && <span className="text-black font-bold text-xs">✓</span>}
+                </div>
+                <span>Any (no filter)</span>
+              </label>
+              <label 
+                className="flex items-center gap-2.5 cursor-pointer text-sm text-[#ccc] hover:text-white transition-colors"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div 
+                  className={`w-5 h-5 border-2 rounded-[5px] transition-all flex items-center justify-center ${
+                    socialFilter === 'has_website' ? 'bg-[#00ff88] border-[#00ff88]' : 'border-[#333]'
+                  }`}
+                  onClick={() => {
+                    setSocialFilter('has_website')
+                    setFilters(prev => ({ ...prev, socialFilter: 'has_website' }))
+                  }}
+                >
+                  {socialFilter === 'has_website' && <span className="text-black font-bold text-xs">✓</span>}
+                </div>
+                <span>Has Website</span>
+              </label>
+              <label 
+                className="flex items-center gap-2.5 cursor-pointer text-sm text-[#ccc] hover:text-white transition-colors"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div 
+                  className={`w-5 h-5 border-2 rounded-[5px] transition-all flex items-center justify-center ${
+                    socialFilter === 'has_twitter' ? 'bg-[#00ff88] border-[#00ff88]' : 'border-[#333]'
+                  }`}
+                  onClick={() => {
+                    setSocialFilter('has_twitter')
+                    setFilters(prev => ({ ...prev, socialFilter: 'has_twitter' }))
+                  }}
+                >
+                  {socialFilter === 'has_twitter' && <span className="text-black font-bold text-xs">✓</span>}
+                </div>
+                <span>Has Twitter/X</span>
+              </label>
+              <label 
+                className="flex items-center gap-2.5 cursor-pointer text-sm text-[#ccc] hover:text-white transition-colors"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div 
+                  className={`w-5 h-5 border-2 rounded-[5px] transition-all flex items-center justify-center ${
+                    socialFilter === 'has_telegram' ? 'bg-[#00ff88] border-[#00ff88]' : 'border-[#333]'
+                  }`}
+                  onClick={() => {
+                    setSocialFilter('has_telegram')
+                    setFilters(prev => ({ ...prev, socialFilter: 'has_telegram' }))
+                  }}
+                >
+                  {socialFilter === 'has_telegram' && <span className="text-black font-bold text-xs">✓</span>}
+                </div>
+                <span>Has Telegram</span>
+              </label>
+              <label 
+                className="flex items-center gap-2.5 cursor-pointer text-sm text-[#ccc] hover:text-white transition-colors"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div 
+                  className={`w-5 h-5 border-2 rounded-[5px] transition-all flex items-center justify-center ${
+                    socialFilter === 'has_any' ? 'bg-[#00ff88] border-[#00ff88]' : 'border-[#333]'
+                  }`}
+                  onClick={() => {
+                    setSocialFilter('has_any')
+                    setFilters(prev => ({ ...prev, socialFilter: 'has_any' }))
+                  }}
+                >
+                  {socialFilter === 'has_any' && <span className="text-black font-bold text-xs">✓</span>}
+                </div>
+                <span>Has Any Social</span>
+              </label>
+              <label 
+                className="flex items-center gap-2.5 cursor-pointer text-sm text-[#ccc] hover:text-white transition-colors"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div 
+                  className={`w-5 h-5 border-2 rounded-[5px] transition-all flex items-center justify-center ${
+                    socialFilter === 'has_all' ? 'bg-[#00ff88] border-[#00ff88]' : 'border-[#333]'
+                  }`}
+                  onClick={() => {
+                    setSocialFilter('has_all')
+                    setFilters(prev => ({ ...prev, socialFilter: 'has_all' }))
+                  }}
+                >
+                  {socialFilter === 'has_all' && <span className="text-black font-bold text-xs">✓</span>}
+                </div>
+                <span>Has All Socials</span>
+              </label>
             </div>
           </div>
         </div>

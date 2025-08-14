@@ -43,6 +43,7 @@ interface RecentCallsProps {
     marketCapMin?: number
     marketCapMax?: number
     excludeRugs?: boolean
+    socialFilter?: 'any' | 'has_website' | 'has_twitter' | 'has_telegram' | 'has_any' | 'has_all'
   }
 }
 
@@ -118,6 +119,9 @@ export default function RecentCalls({ filters = { tokenType: 'all' } }: RecentCa
       }
       if (filters?.excludeRugs !== undefined) {
         params.set('excludeRugs', filters.excludeRugs.toString())
+      }
+      if (filters?.socialFilter && filters.socialFilter !== 'any') {
+        params.set('socialFilter', filters.socialFilter)
       }
       
       const response = await fetch(`/api/recent-calls?${params}`, {
