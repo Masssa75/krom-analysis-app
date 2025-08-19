@@ -1,0 +1,86 @@
+'use client';
+
+import React from 'react';
+
+interface WebsiteAnalysisTooltipProps {
+  fullAnalysis: {
+    exceptional_signals?: string[];
+    missing_elements?: string[];
+    quick_assessment?: string;
+    category_scores?: Record<string, number>;
+    proceed_to_stage_2?: boolean;
+  } | null;
+  children: React.ReactNode;
+}
+
+export function WebsiteAnalysisTooltip({ fullAnalysis, children }: WebsiteAnalysisTooltipProps) {
+  const [showTooltip, setShowTooltip] = React.useState(false);
+
+  if (!fullAnalysis) {
+    return <>{children}</>;
+  }
+
+  const { exceptional_signals = [], missing_elements = [] } = fullAnalysis;
+
+  // Don't show tooltip if no data
+  if (exceptional_signals.length === 0 && missing_elements.length === 0) {
+    return <>{children}</>;
+  }
+
+  return (
+    <div 
+      className="relative inline-block"
+      onMouseEnter={() => setShowTooltip(true)}
+      onMouseLeave={() => setShowTooltip(false)}
+    >
+      {children}
+      
+      {showTooltip && (
+        <div className="absolute z-50 bottom-full left-1/2 transform -translate-x-1/2 mb-2 pointer-events-none">
+          <div className="bg-white rounded-lg shadow-xl border border-gray-200 p-4 min-w-[320px] max-w-[400px]">
+            {/* PROS Section */}
+            {exceptional_signals.length > 0 && (
+              <div className="mb-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-green-600 font-bold text-sm">✅ PROS</span>
+                </div>
+                <ul className="space-y-1">
+                  {exceptional_signals.slice(0, 4).map((signal, idx) => (
+                    <li key={idx} className="text-xs text-gray-700 flex items-start">
+                      <span className="text-green-500 mr-2">•</span>
+                      <span>{signal}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* CONS Section */}
+            {missing_elements.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-red-600 font-bold text-sm">❌ CONS</span>
+                </div>
+                <ul className="space-y-1">
+                  {missing_elements.slice(0, 4).map((element, idx) => (
+                    <li key={idx} className="text-xs text-gray-700 flex items-start">
+                      <span className="text-red-500 mr-2">•</span>
+                      <span>{element}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Arrow pointing down */}
+            <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-0 
+              border-l-[8px] border-l-transparent
+              border-t-[8px] border-t-white
+              border-r-[8px] border-r-transparent">
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

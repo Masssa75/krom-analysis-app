@@ -5,6 +5,7 @@ import ChartModal from './ChartModal'
 import { SortDropdown } from './sort-dropdown'
 import SearchInput from './SearchInput'
 import ColumnSettings, { ColumnVisibility } from './ColumnSettings'
+import { WebsiteAnalysisTooltip } from './WebsiteAnalysisTooltip'
 
 interface RecentCall {
   id: string
@@ -31,6 +32,7 @@ interface RecentCall {
   website_tier?: string
   website_token_type?: string
   website_analysis_reasoning?: string
+  website_analysis_full?: any
   pool_address?: string
   volume_24h?: number
   liquidity_usd?: number
@@ -376,14 +378,16 @@ export default function RecentCalls({ filters = { tokenType: 'all' } }: RecentCa
                         )}
                         
                         {columnVisibility.websiteAnalysis && call.website_score !== undefined && call.website_score !== null && (
-                          <div className="flex flex-col items-center">
-                            <span className="text-[9px] text-[#666]">WEB</span>
-                            <div className="text-lg font-semibold text-white">
-                              {call.website_score === 0 && call.website_analysis_reasoning?.includes('ERROR') 
-                                ? '❌' 
-                                : (call.website_score / 21 * 10).toFixed(1)}
+                          <WebsiteAnalysisTooltip fullAnalysis={call.website_analysis_full}>
+                            <div className="flex flex-col items-center cursor-help">
+                              <span className="text-[9px] text-[#666]">WEB</span>
+                              <div className="text-lg font-semibold text-white">
+                                {call.website_score === 0 && call.website_analysis_reasoning?.includes('ERROR') 
+                                  ? '❌' 
+                                  : (call.website_score / 21 * 10).toFixed(1)}
+                              </div>
                             </div>
-                          </div>
+                          </WebsiteAnalysisTooltip>
                         )}
                       </div>
                     )}
@@ -408,15 +412,17 @@ export default function RecentCalls({ filters = { tokenType: 'all' } }: RecentCa
                           </span>
                         )}
                         {columnVisibility.websiteAnalysis && call.website_tier && (
-                          <span 
-                            className="text-[9px] px-1.5 py-0.5 rounded font-semibold"
-                            style={{ 
-                              backgroundColor: (call.website_score === 0 && call.website_analysis_reasoning?.includes('ERROR')) ? '#ff666622' : getTierColor(call.website_tier).bg, 
-                              color: (call.website_score === 0 && call.website_analysis_reasoning?.includes('ERROR')) ? '#ff6666' : getTierColor(call.website_tier).text 
-                            }}
-                          >
-                            W: {(call.website_score === 0 && call.website_analysis_reasoning?.includes('ERROR')) ? 'FAILED' : call.website_tier}
-                          </span>
+                          <WebsiteAnalysisTooltip fullAnalysis={call.website_analysis_full}>
+                            <span 
+                              className="text-[9px] px-1.5 py-0.5 rounded font-semibold cursor-help"
+                              style={{ 
+                                backgroundColor: (call.website_score === 0 && call.website_analysis_reasoning?.includes('ERROR')) ? '#ff666622' : getTierColor(call.website_tier).bg, 
+                                color: (call.website_score === 0 && call.website_analysis_reasoning?.includes('ERROR')) ? '#ff6666' : getTierColor(call.website_tier).text 
+                              }}
+                            >
+                              W: {(call.website_score === 0 && call.website_analysis_reasoning?.includes('ERROR')) ? 'FAILED' : call.website_tier}
+                            </span>
+                          </WebsiteAnalysisTooltip>
                         )}
                       </div>
                     )}

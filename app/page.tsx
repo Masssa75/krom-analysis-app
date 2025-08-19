@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import TopEarlyCalls from '@/components/TopEarlyCalls'
 import RecentCalls from '@/components/RecentCalls'
 import FloatingMenu from '@/components/FloatingMenu'
@@ -15,32 +15,114 @@ interface FilterState {
   marketCapMax?: number
   excludeRugs?: boolean
   socialFilters?: string[]
+  minCallScore?: number
+  minXScore?: number
+  minWebsiteScore?: number
 }
 
 export default function HomePage() {
-  const [filters, setFilters] = useState<FilterState>({ 
-    tokenType: 'all',
-    networks: ['ethereum', 'solana', 'bsc', 'base'],
-    excludeRugs: true,
-    socialFilters: []  // Default to empty (show all)
-  })
+  // Load saved filter state from localStorage
+  const getInitialFilterState = (): FilterState => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('kromFilters')
+      if (saved) {
+        try {
+          return JSON.parse(saved)
+        } catch (e) {
+          console.error('Failed to parse saved filters:', e)
+        }
+      }
+    }
+    // Default state
+    return {
+      tokenType: 'all',
+      networks: ['ethereum', 'solana', 'bsc', 'base'],
+      excludeRugs: true,
+      socialFilters: []
+    }
+  }
+
+  const [filters, setFilters] = useState<FilterState>(getInitialFilterState)
   const [isTokenTypeCollapsed, setIsTokenTypeCollapsed] = useState(false)
-  const [includeUtility, setIncludeUtility] = useState(true)
-  const [includeMeme, setIncludeMeme] = useState(true)
+  const [includeUtility, setIncludeUtility] = useState(() => {
+    const initial = getInitialFilterState()
+    return initial.tokenType === 'all' || initial.tokenType === 'utility'
+  })
+  const [includeMeme, setIncludeMeme] = useState(() => {
+    const initial = getInitialFilterState()
+    return initial.tokenType === 'all' || initial.tokenType === 'meme'
+  })
   const [isNetworksCollapsed, setIsNetworksCollapsed] = useState(true)
-  const [selectedNetworks, setSelectedNetworks] = useState<string[]>(['ethereum', 'solana', 'bsc', 'base'])
+  const [selectedNetworks, setSelectedNetworks] = useState<string[]>(() => {
+    const initial = getInitialFilterState()
+    return initial.networks || ['ethereum', 'solana', 'bsc', 'base']
+  })
   const [isRugsCollapsed, setIsRugsCollapsed] = useState(true)
-  const [excludeRugs, setExcludeRugs] = useState(true)
+  const [excludeRugs, setExcludeRugs] = useState(() => {
+    const initial = getInitialFilterState()
+    return initial.excludeRugs !== undefined ? initial.excludeRugs : true
+  })
   const [isRangeFiltersCollapsed, setIsRangeFiltersCollapsed] = useState(true)
-  const [liquidityMin, setLiquidityMin] = useState<string>('')
-  const [liquidityMax, setLiquidityMax] = useState<string>('')
-  const [marketCapMin, setMarketCapMin] = useState<string>('')
-  const [marketCapMax, setMarketCapMax] = useState<string>('')
+  const [liquidityMin, setLiquidityMin] = useState<string>(() => {
+    const initial = getInitialFilterState()
+    return initial.liquidityMin?.toString() || ''
+  })
+  const [liquidityMax, setLiquidityMax] = useState<string>(() => {
+    const initial = getInitialFilterState()
+    return initial.liquidityMax?.toString() || ''
+  })
+  const [marketCapMin, setMarketCapMin] = useState<string>(() => {
+    const initial = getInitialFilterState()
+    return initial.marketCapMin?.toString() || ''
+  })
+  const [marketCapMax, setMarketCapMax] = useState<string>(() => {
+    const initial = getInitialFilterState()
+    return initial.marketCapMax?.toString() || ''
+  })
   const [isSocialCollapsed, setIsSocialCollapsed] = useState(true)
-  const [selectedSocials, setSelectedSocials] = useState<string[]>([])  // Default to empty (all unchecked = show all)
+  const [selectedSocials, setSelectedSocials] = useState<string[]>(() => {
+    const initial = getInitialFilterState()
+    return initial.socialFilters || []
+  })
   
   // Debounce all filters with 400ms delay
   const debouncedFilters = useDebounce(filters, 400)
+
+  // Save filters to localStorage whenever they change
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('kromFilters', JSON.stringify(filters))
+    }
+  }, [filters])
+
+  // Clear all filters and reset to defaults
+  const clearAllFilters = () => {
+    const defaultState = {
+      tokenType: 'all' as const,
+      networks: ['ethereum', 'solana', 'bsc', 'base'],
+      excludeRugs: true,
+      socialFilters: []
+    }
+    
+    // Update all individual states
+    setIncludeUtility(true)
+    setIncludeMeme(true)
+    setSelectedNetworks(['ethereum', 'solana', 'bsc', 'base'])
+    setExcludeRugs(true)
+    setLiquidityMin('')
+    setLiquidityMax('')
+    setMarketCapMin('')
+    setMarketCapMax('')
+    setSelectedSocials([])
+    
+    // Update main filter state
+    setFilters(defaultState)
+    
+    // Clear localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('kromFilters')
+    }
+  }
 
   const handleTokenTypeChange = (utilityChecked: boolean, memeChecked: boolean) => {
     let newType: FilterState['tokenType'] = 'all'
@@ -99,8 +181,14 @@ export default function HomePage() {
         </div>
 
         {/* Filters Title */}
-        <div className="px-5 pt-5 pb-2">
+        <div className="px-5 pt-5 pb-2 flex justify-between items-center">
           <h2 className="text-sm uppercase tracking-[2px] text-[#666] font-semibold">FILTERS</h2>
+          <button
+            onClick={clearAllFilters}
+            className="text-xs text-[#666] hover:text-[#00ff88] transition-colors uppercase tracking-[1px] font-medium"
+          >
+            Clear
+          </button>
         </div>
 
         {/* Token Type Filter */}
