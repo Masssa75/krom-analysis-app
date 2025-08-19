@@ -1,0 +1,77 @@
+# Page snapshot
+
+```yaml
+- main:
+  - heading "KROM" [level=1]
+  - button "BUY"
+  - button:
+    - img
+  - paragraph: Advanced AI Powered Token Discovery
+  - text: "Contract Address: 9eCEK7ttNtroHsFLnW8jW7pS9MtSAPrPPrZ6QCUFpump"
+  - heading "FILTERS" [level=2]
+  - heading "Token Type" [level=3]
+  - text: ▼ ✓ Utility Tokens ✓ Meme Tokens
+  - heading "Rugs" [level=3]
+  - text: "▼ Include Rugs When unchecked, hides tokens with:"
+  - list:
+    - listitem: ATH ROI < 20% AND
+    - listitem: Current ROI < -75% AND
+    - listitem: Liquidity & Market Cap both < $50K
+  - heading "Networks" [level=3]
+  - text: ▼ ✓ Ethereum ✓ Solana ✓ BSC ✓ Base
+  - heading "Social Media" [level=3]
+  - text: ▼ ✓ Has Website ✓ Has Twitter/X ✓ Has Telegram
+  - heading "Liquidity & Market Cap" [level=3]
+  - text: ▼ Liquidity (USD)
+  - spinbutton
+  - text: "-"
+  - spinbutton
+  - text: Market Cap (USD)
+  - spinbutton
+  - text: "-"
+  - spinbutton
+  - button "Clear Range Filters"
+  - text: TOP EARLY CALLS
+  - button "24H"
+  - button "7D"
+  - button "90D"
+  - button "ALL TIME"
+  - text: "[BADGER:9806x] [USAI:334x] [ANI:233x] [MASK:198x] [ZEUS:171x] [AOL:164x] [TACO:161x] [SUPERGROK:142x] [MANYU:131x]"
+  - heading "RECENT CALLS" [level=2]
+  - button "Column Settings":
+    - img
+  - button "Search":
+    - img
+  - text: "Sort by:"
+  - combobox: Date Called
+  - button "Sort descending":
+    - img
+  - text: "HALO2 🎮 MEME SOL MEME CALL 3.0 X 3.0 C: BASIC X: TRASH LIQUIDITY $93K ENTRY MC $300K ATH MC $469K NOW MC $342K ROI +14% ATH ROI +56% Veigarcalls 30m ago PNDTLK 🎮 MEME SOL MEME CALL 1.0 X 1.0 C: TRASH X: TRASH LIQUIDITY $27K ENTRY MC $191K ATH MC $204K NOW MC $51K ROI -73% ATH ROI +7% chengambles 1h ago PNDTLK 🎮 MEME SOL MEME CALL 6.0 X 2.0 C: SOLID X: TRASH LIQUIDITY $27K ENTRY MC $251K ATH MC $251K NOW MC $51K ROI -80% ATH ROI +0% kulture_kall 1h ago SPL TOKEN 🎮 MEME SOL MEME CALL 1.0 X 2.0 C: TRASH X: TRASH LIQUIDITY $14K ENTRY MC $19K ATH MC $34K NOW MC $8K ROI -59% ATH ROI +78% LuigisGambles 1h ago IRIS ⚙️ UTILITY ETH UTILITY CALL 6.0 X 4.0 C: SOLID X: BASIC LIQUIDITY $42K ENTRY MC $105K ATH MC $114K NOW MC $99K ROI -6% ATH ROI +9% chiggajogambles 2h ago IRIS ⚙️ UTILITY ETH UTILITY CALL 2.0 X 7.0 C: TRASH X: SOLID LIQUIDITY $42K ENTRY MC $105K ATH MC $114K NOW MC $99K ROI -6% ATH ROI +9% TopCallersChannel 2h ago JAKPOT ⚙️ UTILITY SOL UTILITY CALL 2.0 X 3.0 C: TRASH X: TRASH LIQUIDITY $176K ENTRY MC $2.6M ATH MC $2.6M NOW MC $2.0M ROI -25% ATH ROI +0% gubbinscalls 3h ago PICKLE 🎮 MEME SOL MEME CALL 2.0 X 2.0 C: TRASH X: TRASH LIQUIDITY $105K ENTRY MC $495K ATH MC $820K NOW MC $757K ROI +53% ATH ROI +66% Veigarcalls 3h ago YZY 🎮 MEME SOL MEME CALL 3.0 X 3.0 C: BASIC X: TRASH LIQUIDITY $173K ENTRY MC $5.1M ATH MC $5.1M NOW MC $1.4M ROI -72% ATH ROI +0% kweensjournal 3h ago BORIS 🎮 MEME ETH MEME CALL 2.0 X 2.0 C: TRASH X: TRASH LIQUIDITY $41K ENTRY MC $239K ATH MC $278K NOW MC $187K ROI -22% ATH ROI +16% chengambles 4h ago BUSTIN 🎮 MEME SOL MEME CALL 2.0 X 2.0 C: TRASH X: TRASH LIQUIDITY $40K ENTRY MC $339K ATH MC $453K NOW MC $101K ROI -70% ATH ROI +34% mewgambles 4h ago PUMPKABU 🎮 MEME SOL MEME CALL 3.0 X 2.0 C: BASIC X: TRASH LIQUIDITY $17K ENTRY MC $78K ATH MC $176K NOW MC $20K ROI -74% ATH ROI +126% Veigarcalls 4h ago BUSTIN 🎮 MEME SOL MEME CALL 2.0 X 2.0 C: TRASH X: TRASH LIQUIDITY $39K ENTRY MC $239K ATH MC $439K NOW MC $101K ROI -58% ATH ROI +84% kweensjournal 4h ago DUST 🎮 MEME SOL MEME CALL 3.0 X 3.0 C: BASIC X: TRASH LIQUIDITY $33K ENTRY MC $60K ATH MC $102K NOW MC $44K ROI -26% ATH ROI +72% kulture_kall 5h ago PEPE 🎮 MEME ETH MEME CALL 2.0 X 2.0 C: TRASH X: TRASH LIQUIDITY $30K ENTRY MC $111K ATH MC $130K NOW MC $77K ROI -31% ATH ROI +17% Veigarcalls 6h ago BHOO 🎮 MEME SOL MEME CALL 1.0 X 2.0 C: TRASH X: TRASH LIQUIDITY $249K ENTRY MC $1.2M ATH MC $2.7M NOW MC $2.5M ROI +112% ATH ROI +134% kweensjournal 6h ago UNLEASHED 🎮 MEME SOL MEME CALL 2.0 X 2.0 C: TRASH X: TRASH LIQUIDITY $21K ENTRY MC $38K ATH MC $50K NOW MC $33K ROI -14% ATH ROI +32% Insider_ECA 7h ago XQUEEN 🎮 MEME SOL MEME CALL 2.0 X 3.0 C: TRASH X: TRASH LIQUIDITY $28K ENTRY MC $31K ATH MC $91K NOW MC $55K ROI +80% ATH ROI +195% Insider_ECA 7h ago KAI 🎮 MEME SOL MEME CALL 2.0 X 2.0 C: TRASH X: TRASH LIQUIDITY $25K ENTRY MC $88K ATH MC $88K NOW MC $49K ROI -44% ATH ROI +0% shitcoinneverland 8h ago VANTUM ⚙️ UTILITY SOL UTILITY CALL 5.0 X 3.0 C: SOLID X: TRASH LIQUIDITY $66K ENTRY MC $282K ATH MC $333K NOW MC $316K ROI +12% ATH ROI +18% TopCallersChannel 8h ago Showing 1-20 of 5437 calls"
+  - button "««" [disabled]
+  - button "‹" [disabled]
+  - button "1"
+  - button "2"
+  - button "3"
+  - button "4"
+  - button "5"
+  - button "›"
+  - button "»»"
+  - button "Settings" [disabled]:
+    - text: Settings
+    - img
+  - button "Leaderboard" [disabled]:
+    - text: Leaderboard
+    - img
+  - button "Analytics" [disabled]:
+    - text: Analytics
+    - img
+  - button "Roadmap":
+    - text: Roadmap
+    - img
+  - button "Charts" [disabled]:
+    - text: Charts
+    - img
+  - button:
+    - img
+- alert
+```

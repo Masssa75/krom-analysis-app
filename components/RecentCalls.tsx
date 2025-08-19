@@ -328,18 +328,14 @@ export default function RecentCalls({ filters = { tokenType: 'all' } }: RecentCa
                       {(() => {
                         const tokenType = call.website_token_type || call.analysis_token_type || call.x_analysis_token_type;
                         if (!tokenType) return null;
-                        const isMeme = tokenType === 'meme';
+                        
                         return (
-                          <span 
-                            className="text-[9px] px-1.5 py-0.5 rounded font-semibold"
-                            style={{ 
-                              backgroundColor: isMeme ? '#ff6b6b20' : '#4dabf720',
-                              color: isMeme ? '#ff6b6b' : '#4dabf7',
-                              border: `1px solid ${isMeme ? '#ff6b6b40' : '#4dabf740'}`
-                            }}
-                            title={`Classified as ${tokenType} token`}
-                          >
-                            {isMeme ? '🎮' : '⚙️'} {tokenType.toUpperCase()}
+                          <span className={`text-[9px] px-1.5 py-0.5 rounded-sm font-semibold ${
+                            tokenType === 'utility' 
+                              ? 'bg-[#00a8ff22] text-[#00a8ff]' 
+                              : 'bg-[#ff00ff22] text-[#ff00ff]'
+                          }`}>
+                            {tokenType.toUpperCase()}
                           </span>
                         );
                       })()}
@@ -352,24 +348,6 @@ export default function RecentCalls({ filters = { tokenType: 'all' } }: RecentCa
                       >
                         {getNetworkLabel(call.network)}
                       </span>
-                      {(() => {
-                        // If either analysis says utility, show utility
-                        const tokenType = (call.analysis_token_type === 'utility' || call.x_analysis_token_type === 'utility') 
-                          ? 'utility' 
-                          : (call.analysis_token_type || call.x_analysis_token_type || null)
-                        
-                        if (!tokenType) return null
-                        
-                        return (
-                          <span className={`text-[9px] px-1.5 py-0.5 rounded-sm font-semibold ${
-                            tokenType === 'utility' 
-                              ? 'bg-[#00a8ff22] text-[#00a8ff]' 
-                              : 'bg-[#ff00ff22] text-[#ff00ff]'
-                          }`}>
-                            {tokenType.toUpperCase()}
-                          </span>
-                        )
-                      })()}
                     </div>
                     
                     {/* Analysis Scores - Only show if enabled */}
