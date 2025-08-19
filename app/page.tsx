@@ -22,7 +22,7 @@ export default function HomePage() {
     tokenType: 'all',
     networks: ['ethereum', 'solana', 'bsc', 'base'],
     excludeRugs: true,
-    socialFilters: ['website', 'twitter', 'telegram']
+    socialFilters: []  // Default to empty (show all)
   })
   const [isTokenTypeCollapsed, setIsTokenTypeCollapsed] = useState(false)
   const [includeUtility, setIncludeUtility] = useState(true)
@@ -37,7 +37,7 @@ export default function HomePage() {
   const [marketCapMin, setMarketCapMin] = useState<string>('')
   const [marketCapMax, setMarketCapMax] = useState<string>('')
   const [isSocialCollapsed, setIsSocialCollapsed] = useState(true)
-  const [selectedSocials, setSelectedSocials] = useState<string[]>(['website', 'twitter', 'telegram'])
+  const [selectedSocials, setSelectedSocials] = useState<string[]>([])  // Default to empty (all unchecked = show all)
   
   // Debounce all filters with 400ms delay
   const debouncedFilters = useDebounce(filters, 400)
