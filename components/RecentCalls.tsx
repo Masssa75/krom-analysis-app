@@ -263,6 +263,16 @@ export default function RecentCalls({ filters = { tokenType: 'all' } }: RecentCa
     return colors[tier] || { bg: '#88888822', text: '#888' }
   }
 
+  // Map website tiers to standard tiers
+  const mapWebsiteTier = (tier: string): string => {
+    const mapping: { [key: string]: string } = {
+      'HIGH': 'SOLID',    // 15-21 points maps to SOLID
+      'MEDIUM': 'BASIC',  // 8-14 points maps to BASIC  
+      'LOW': 'TRASH'      // 0-7 points maps to TRASH
+    }
+    return mapping[tier] || tier
+  }
+
   const handleTokenClick = (call: RecentCall) => {
     setSelectedToken(call)
     setIsModalOpen(true)
@@ -374,8 +384,7 @@ export default function RecentCalls({ filters = { tokenType: 'all' } }: RecentCa
                         <div className="flex flex-col items-center">
                           <span className="text-[9px] text-[#666]">WEB</span>
                           <div className="text-lg font-semibold text-white">
-                            {call.website_score}
-                            <span className="text-[10px] text-[#666]">/21</span>
+                            {(call.website_score / 21 * 10).toFixed(1)}
                           </div>
                         </div>
                       )}
@@ -403,11 +412,11 @@ export default function RecentCalls({ filters = { tokenType: 'all' } }: RecentCa
                         <span 
                           className="text-[9px] px-1.5 py-0.5 rounded font-semibold"
                           style={{ 
-                            backgroundColor: getTierColor(call.website_tier).bg, 
-                            color: getTierColor(call.website_tier).text 
+                            backgroundColor: getTierColor(mapWebsiteTier(call.website_tier)).bg, 
+                            color: getTierColor(mapWebsiteTier(call.website_tier)).text 
                           }}
                         >
-                          W: {call.website_tier}
+                          W: {mapWebsiteTier(call.website_tier)}
                         </span>
                       )}
                     </div>
