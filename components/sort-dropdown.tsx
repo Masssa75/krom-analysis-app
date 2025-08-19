@@ -29,6 +29,7 @@ export function SortDropdown({ onSortChange }: SortDropdownProps) {
     switch (value) {
       case 'analysis_score': return 'Call Score'
       case 'x_analysis_score': return 'X Score'
+      case 'website_score': return 'Website Score'
       case 'roi_percent': return 'ROI %'
       case 'ath_roi_percent': return 'ATH ROI %'
       case 'current_market_cap': return 'Current Market Cap'
@@ -53,6 +54,7 @@ export function SortDropdown({ onSortChange }: SortDropdownProps) {
           <SelectItem value="created_at" className="text-[#ccc] focus:bg-[#222426] focus:text-white">Date Called</SelectItem>
           <SelectItem value="analysis_score" className="text-[#ccc] focus:bg-[#222426] focus:text-white">Call Score</SelectItem>
           <SelectItem value="x_analysis_score" className="text-[#ccc] focus:bg-[#222426] focus:text-white">X Score</SelectItem>
+          <SelectItem value="website_score" className="text-[#ccc] focus:bg-[#222426] focus:text-white">Website Score</SelectItem>
           <SelectItem value="roi_percent" className="text-[#ccc] focus:bg-[#222426] focus:text-white">ROI %</SelectItem>
           <SelectItem value="ath_roi_percent" className="text-[#ccc] focus:bg-[#222426] focus:text-white">ATH ROI %</SelectItem>
           <SelectItem value="volume_24h" className="text-[#ccc] focus:bg-[#222426] focus:text-white">24h Volume</SelectItem>

@@ -274,7 +274,7 @@ Respond with JSON only.`;
         results.push({
           token: call.ticker || 'Unknown',
           contract: null,
-          score: 5,
+          score: 1,
           legitimacy_factor: 'Unknown',
           reasoning: 'Analysis failed',
           krom_id: call.krom_id,
