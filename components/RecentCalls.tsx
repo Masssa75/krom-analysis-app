@@ -379,7 +379,9 @@ export default function RecentCalls({ filters = { tokenType: 'all' } }: RecentCa
                           <div className="flex flex-col items-center">
                             <span className="text-[9px] text-[#666]">WEB</span>
                             <div className="text-lg font-semibold text-white">
-                              {(call.website_score / 21 * 10).toFixed(1)}
+                              {call.website_score === 0 && call.website_analysis_reasoning?.includes('ERROR') 
+                                ? '❌' 
+                                : (call.website_score / 21 * 10).toFixed(1)}
                             </div>
                           </div>
                         )}
@@ -409,11 +411,11 @@ export default function RecentCalls({ filters = { tokenType: 'all' } }: RecentCa
                           <span 
                             className="text-[9px] px-1.5 py-0.5 rounded font-semibold"
                             style={{ 
-                              backgroundColor: call.website_score === -1 ? '#ff666622' : getTierColor(call.website_tier).bg, 
-                              color: call.website_score === -1 ? '#ff6666' : getTierColor(call.website_tier).text 
+                              backgroundColor: (call.website_score === 0 && call.website_analysis_reasoning?.includes('ERROR')) ? '#ff666622' : getTierColor(call.website_tier).bg, 
+                              color: (call.website_score === 0 && call.website_analysis_reasoning?.includes('ERROR')) ? '#ff6666' : getTierColor(call.website_tier).text 
                             }}
                           >
-                            W: {call.website_score === -1 ? 'FAILED' : call.website_tier}
+                            W: {(call.website_score === 0 && call.website_analysis_reasoning?.includes('ERROR')) ? 'FAILED' : call.website_tier}
                           </span>
                         )}
                       </div>
