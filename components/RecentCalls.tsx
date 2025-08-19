@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import ChartModal from './ChartModal'
 import { SortDropdown } from './sort-dropdown'
 import SearchInput from './SearchInput'
+import ColumnSettings, { ColumnVisibility } from './ColumnSettings'
 
 interface RecentCall {
   id: string
@@ -26,6 +27,10 @@ interface RecentCall {
   x_best_tweet?: string
   analysis_token_type: string
   x_analysis_token_type?: string
+  website_score?: number
+  website_tier?: string
+  website_token_type?: string
+  website_analysis_reasoning?: string
   pool_address?: string
   volume_24h?: number
   liquidity_usd?: number
@@ -58,6 +63,11 @@ export default function RecentCalls({ filters = { tokenType: 'all' } }: RecentCa
   const [sortBy, setSortBy] = useState('buy_timestamp')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [searchQuery, setSearchQuery] = useState('')
+  const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>({
+    callAnalysis: true,
+    xAnalysis: true,
+    websiteAnalysis: false
+  })
   const itemsPerPage = 20
   
   // AbortController ref to cancel in-flight requests
@@ -270,6 +280,7 @@ export default function RecentCalls({ filters = { tokenType: 'all' } }: RecentCa
         <div className="flex justify-between items-center mb-8 px-10">
           <div className="flex items-center">
             <h2 className="text-xl text-[#00ff88] tracking-[3px] font-extralight m-0">RECENT CALLS</h2>
+            <ColumnSettings onSettingsChange={setColumnVisibility} />
             <SearchInput onSearch={setSearchQuery} />
           </div>
           <SortDropdown onSortChange={handleSortChange} />
@@ -313,6 +324,25 @@ export default function RecentCalls({ filters = { tokenType: 'all' } }: RecentCa
                       >
                         {call.ticker}
                       </span>
+                      {/* Token Type Badge - Show website type if available, otherwise use call/X type */}
+                      {(() => {
+                        const tokenType = call.website_token_type || call.analysis_token_type || call.x_analysis_token_type;
+                        if (!tokenType) return null;
+                        const isMeme = tokenType === 'meme';
+                        return (
+                          <span 
+                            className="text-[9px] px-1.5 py-0.5 rounded font-semibold"
+                            style={{ 
+                              backgroundColor: isMeme ? '#ff6b6b20' : '#4dabf720',
+                              color: isMeme ? '#ff6b6b' : '#4dabf7',
+                              border: `1px solid ${isMeme ? '#ff6b6b40' : '#4dabf740'}`
+                            }}
+                            title={`Classified as ${tokenType} token`}
+                          >
+                            {isMeme ? '🎮' : '⚙️'} {tokenType.toUpperCase()}
+                          </span>
+                        );
+                      })()}
                       <span 
                         className="text-[10px] px-1 py-0.5 rounded-sm font-medium"
                         style={{ 
@@ -342,29 +372,64 @@ export default function RecentCalls({ filters = { tokenType: 'all' } }: RecentCa
                       })()}
                     </div>
                     
-                    {/* Scores */}
-                    {call.analysis_score && (
-                      <div className="text-xl font-semibold text-white">
-                        {call.analysis_score.toFixed(1)}
-                      </div>
-                    )}
+                    {/* Analysis Scores - Only show if enabled */}
+                    <div className="flex items-center gap-2">
+                      {columnVisibility.callAnalysis && call.analysis_score && (
+                        <div className="flex flex-col items-center">
+                          <span className="text-[9px] text-[#666]">CALL</span>
+                          <div className="text-lg font-semibold text-white">
+                            {call.analysis_score.toFixed(1)}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {columnVisibility.xAnalysis && call.x_analysis_score && (
+                        <div className="flex flex-col items-center">
+                          <span className="text-[9px] text-[#666]">X</span>
+                          <div className="text-lg font-semibold text-white">
+                            {call.x_analysis_score.toFixed(1)}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {columnVisibility.websiteAnalysis && call.website_score !== undefined && call.website_score !== null && (
+                        <div className="flex flex-col items-center">
+                          <span className="text-[9px] text-[#666]">WEB</span>
+                          <div className="text-lg font-semibold text-white">
+                            {call.website_score}
+                            <span className="text-[10px] text-[#666]">/21</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                     
-                    {/* Tier Badges */}
+                    {/* Tier Badges - Show based on visibility settings */}
                     <div className="flex gap-1.5">
-                      {call.analysis_tier && (
+                      {columnVisibility.callAnalysis && call.analysis_tier && (
                         <span 
                           className="text-[10px] px-1.5 py-0.5 rounded font-semibold"
                           style={{ backgroundColor: callTier.bg, color: callTier.text }}
                         >
-                          {call.analysis_tier}
+                          C: {call.analysis_tier}
                         </span>
                       )}
-                      {call.x_analysis_tier && call.x_analysis_tier !== call.analysis_tier && (
+                      {columnVisibility.xAnalysis && call.x_analysis_tier && (
                         <span 
                           className="text-[9px] px-1.5 py-0.5 rounded font-semibold"
                           style={{ backgroundColor: xTier.bg, color: xTier.text }}
                         >
                           X: {call.x_analysis_tier}
+                        </span>
+                      )}
+                      {columnVisibility.websiteAnalysis && call.website_tier && (
+                        <span 
+                          className="text-[9px] px-1.5 py-0.5 rounded font-semibold"
+                          style={{ 
+                            backgroundColor: getTierColor(call.website_tier).bg, 
+                            color: getTierColor(call.website_tier).text 
+                          }}
+                        >
+                          W: {call.website_tier}
                         </span>
                       )}
                     </div>

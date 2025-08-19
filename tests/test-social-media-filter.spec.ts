@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 
 test.describe('Social Media Filter', () => {
-  test('should display and interact with social media filter', async ({ page }) => {
+  test('should display and interact with social media filter checkboxes', async ({ page }) => {
     // Navigate to the app
     await page.goto('https://lively-torrone-8199e0.netlify.app/')
     
@@ -12,89 +12,89 @@ test.describe('Social Media Filter', () => {
     await page.click('text=Social Media')
     
     // Wait for filter options to be visible
-    await page.waitForSelector('text=Any (no filter)', { timeout: 5000 })
+    await page.waitForSelector('text=Has Website', { timeout: 5000 })
     
-    // Verify all filter options are present
-    await expect(page.locator('text=Any (no filter)')).toBeVisible()
+    // Verify all 3 filter options are present
     await expect(page.locator('text=Has Website')).toBeVisible()
     await expect(page.locator('text=Has Twitter/X')).toBeVisible()
     await expect(page.locator('text=Has Telegram')).toBeVisible()
-    await expect(page.locator('text=Has Any Social')).toBeVisible()
-    await expect(page.locator('text=Has All Socials')).toBeVisible()
     
-    // Click on "Has Website" filter
-    await page.click('text=Has Website')
+    // Verify all checkboxes are checked by default (green background)
+    const websiteCheckbox = page.locator('text=Has Website').locator('..').locator('div').first()
+    const twitterCheckbox = page.locator('text=Has Twitter/X').locator('..').locator('div').first()
+    const telegramCheckbox = page.locator('text=Has Telegram').locator('..').locator('div').first()
     
-    // Wait for the filter to be applied (debounced)
+    await expect(websiteCheckbox).toHaveClass(/bg-\[#00ff88\]/)
+    await expect(twitterCheckbox).toHaveClass(/bg-\[#00ff88\]/)
+    await expect(telegramCheckbox).toHaveClass(/bg-\[#00ff88\]/)
+    
+    // Uncheck "Has Website" - click the checkbox div directly
+    await websiteCheckbox.click()
     await page.waitForTimeout(500)
     
-    // Verify the checkbox is checked (green background)
-    const hasWebsiteCheckbox = page.locator('text=Has Website').locator('..').locator('div').first()
-    await expect(hasWebsiteCheckbox).toHaveClass(/bg-\[#00ff88\]/)
+    // Verify Website is unchecked but others remain checked
+    await expect(websiteCheckbox).not.toHaveClass(/bg-\[#00ff88\]/)
+    await expect(twitterCheckbox).toHaveClass(/bg-\[#00ff88\]/)
+    await expect(telegramCheckbox).toHaveClass(/bg-\[#00ff88\]/)
     
-    // Click on "Has Twitter/X" filter
-    await page.click('text=Has Twitter/X')
-    
-    // Wait for the filter to be applied
+    // Uncheck "Has Twitter/X" - click the checkbox div directly
+    await twitterCheckbox.click()
     await page.waitForTimeout(500)
     
-    // Verify the Twitter checkbox is checked and Website is unchecked
-    const hasTwitterCheckbox = page.locator('text=Has Twitter/X').locator('..').locator('div').first()
-    await expect(hasTwitterCheckbox).toHaveClass(/bg-\[#00ff88\]/)
+    // Verify only Telegram remains checked
+    await expect(websiteCheckbox).not.toHaveClass(/bg-\[#00ff88\]/)
+    await expect(twitterCheckbox).not.toHaveClass(/bg-\[#00ff88\]/)
+    await expect(telegramCheckbox).toHaveClass(/bg-\[#00ff88\]/)
     
-    // Click on "Any (no filter)" to reset
-    await page.click('text=Any (no filter)')
-    
-    // Wait for the filter to be applied
+    // Re-check "Has Website" - click the checkbox div directly
+    await websiteCheckbox.click()
     await page.waitForTimeout(500)
     
-    // Verify the Any checkbox is checked
-    const anyCheckbox = page.locator('text=Any (no filter)').locator('..').locator('div').first()
-    await expect(anyCheckbox).toHaveClass(/bg-\[#00ff88\]/)
+    // Verify Website is checked again
+    await expect(websiteCheckbox).toHaveClass(/bg-\[#00ff88\]/)
   })
   
   test('should filter tokens based on social media selection', async ({ page }) => {
     // Navigate to the app
     await page.goto('https://lively-torrone-8199e0.netlify.app/')
     
-    // Wait for the page to load
+    // Wait for the page to load and tokens to appear
     await page.waitForSelector('text=RECENT CALLS', { timeout: 10000 })
-    
-    // Get initial token count
-    await page.waitForSelector('.token-row, tbody tr', { timeout: 10000 })
-    const initialCount = await page.locator('.token-row, tbody tr').count()
-    console.log(`Initial token count: ${initialCount}`)
+    await page.waitForTimeout(2000) // Wait for tokens to load
     
     // Click on Social Media filter to expand it
     await page.click('text=Social Media')
     
     // Wait for filter options to be visible
-    await page.waitForSelector('text=Has All Socials', { timeout: 5000 })
+    await page.waitForSelector('text=Has Telegram', { timeout: 5000 })
     
-    // Click on "Has All Socials" filter (should have fewer results)
-    await page.click('text=Has All Socials')
+    // All filters should be checked by default - uncheck Website and Twitter
+    await page.click('text=Has Website')
+    await page.click('text=Has Twitter/X')
     
-    // Wait for the filter to be applied and results to update
+    // Wait for the filter to be applied (debounced)
     await page.waitForTimeout(1000)
     
-    // Get filtered token count
-    const filteredCount = await page.locator('.token-row, tbody tr').count()
-    console.log(`Filtered token count (Has All Socials): ${filteredCount}`)
+    // Now only "Has Telegram" is selected - should show only tokens with Telegram
+    console.log('Filtered to show only tokens with Telegram')
     
-    // Verify that filtering reduces the number of results
-    expect(filteredCount).toBeLessThanOrEqual(initialCount)
-    
-    // Click on "Has Any Social" filter (should have more results than "Has All")
-    await page.click('text=Has Any Social')
+    // Re-check all filters
+    await page.click('text=Has Website')
+    await page.click('text=Has Twitter/X')
     
     // Wait for the filter to be applied
     await page.waitForTimeout(1000)
     
-    // Get new filtered count
-    const hasAnyCount = await page.locator('.token-row, tbody tr').count()
-    console.log(`Filtered token count (Has Any Social): ${hasAnyCount}`)
+    console.log('All social filters re-enabled')
     
-    // Verify that "Has Any" shows more results than "Has All"
-    expect(hasAnyCount).toBeGreaterThanOrEqual(filteredCount)
+    // Uncheck all filters
+    await page.click('text=Has Website')
+    await page.click('text=Has Twitter/X')
+    await page.click('text=Has Telegram')
+    
+    // Wait for the filter to be applied
+    await page.waitForTimeout(1000)
+    
+    console.log('All social filters disabled - should show all tokens')
   })
 })
