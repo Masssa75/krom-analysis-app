@@ -42,8 +42,33 @@ export default function HomePage() {
     }
   }
 
+  // Load saved section states from localStorage
+  const getSectionStates = () => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('kromFilterSections')
+      if (saved) {
+        try {
+          return JSON.parse(saved)
+        } catch (e) {
+          console.error('Failed to parse saved section states:', e)
+        }
+      }
+    }
+    // Default: all collapsed except token type
+    return {
+      tokenType: false,
+      networks: true,
+      rugs: true,
+      rangeFilters: true,
+      social: true,
+      scores: true
+    }
+  }
+
+  const sectionStates = getSectionStates()
+
   const [filters, setFilters] = useState<FilterState>(getInitialFilterState)
-  const [isTokenTypeCollapsed, setIsTokenTypeCollapsed] = useState(false)
+  const [isTokenTypeCollapsed, setIsTokenTypeCollapsed] = useState(sectionStates.tokenType)
   const [includeUtility, setIncludeUtility] = useState(() => {
     const initial = getInitialFilterState()
     return initial.tokenType === 'all' || initial.tokenType === 'utility'
@@ -52,17 +77,17 @@ export default function HomePage() {
     const initial = getInitialFilterState()
     return initial.tokenType === 'all' || initial.tokenType === 'meme'
   })
-  const [isNetworksCollapsed, setIsNetworksCollapsed] = useState(true)
+  const [isNetworksCollapsed, setIsNetworksCollapsed] = useState(sectionStates.networks)
   const [selectedNetworks, setSelectedNetworks] = useState<string[]>(() => {
     const initial = getInitialFilterState()
     return initial.networks || ['ethereum', 'solana', 'bsc', 'base']
   })
-  const [isRugsCollapsed, setIsRugsCollapsed] = useState(true)
+  const [isRugsCollapsed, setIsRugsCollapsed] = useState(sectionStates.rugs)
   const [excludeRugs, setExcludeRugs] = useState(() => {
     const initial = getInitialFilterState()
     return initial.excludeRugs !== undefined ? initial.excludeRugs : true
   })
-  const [isRangeFiltersCollapsed, setIsRangeFiltersCollapsed] = useState(true)
+  const [isRangeFiltersCollapsed, setIsRangeFiltersCollapsed] = useState(sectionStates.rangeFilters)
   const [liquidityMin, setLiquidityMin] = useState<string>(() => {
     const initial = getInitialFilterState()
     return initial.liquidityMin?.toString() || ''
@@ -79,10 +104,23 @@ export default function HomePage() {
     const initial = getInitialFilterState()
     return initial.marketCapMax?.toString() || ''
   })
-  const [isSocialCollapsed, setIsSocialCollapsed] = useState(true)
+  const [isSocialCollapsed, setIsSocialCollapsed] = useState(sectionStates.social)
   const [selectedSocials, setSelectedSocials] = useState<string[]>(() => {
     const initial = getInitialFilterState()
     return initial.socialFilters || []
+  })
+  const [isScoresCollapsed, setIsScoresCollapsed] = useState(sectionStates.scores)
+  const [minCallScore, setMinCallScore] = useState<number>(() => {
+    const initial = getInitialFilterState()
+    return initial.minCallScore || 1
+  })
+  const [minXScore, setMinXScore] = useState<number>(() => {
+    const initial = getInitialFilterState()
+    return initial.minXScore || 1
+  })
+  const [minWebsiteScore, setMinWebsiteScore] = useState<number>(() => {
+    const initial = getInitialFilterState()
+    return initial.minWebsiteScore || 1
   })
   
   // Debounce all filters with 400ms delay
@@ -95,13 +133,31 @@ export default function HomePage() {
     }
   }, [filters])
 
-  // Clear all filters and reset to defaults
-  const clearAllFilters = () => {
+  // Save section states to localStorage whenever they change
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const sectionStates = {
+        tokenType: isTokenTypeCollapsed,
+        networks: isNetworksCollapsed,
+        rugs: isRugsCollapsed,
+        rangeFilters: isRangeFiltersCollapsed,
+        social: isSocialCollapsed,
+        scores: isScoresCollapsed
+      }
+      localStorage.setItem('kromFilterSections', JSON.stringify(sectionStates))
+    }
+  }, [isTokenTypeCollapsed, isNetworksCollapsed, isRugsCollapsed, isRangeFiltersCollapsed, isSocialCollapsed, isScoresCollapsed])
+
+  // Reset all filters and collapse all sections
+  const resetAllFilters = () => {
     const defaultState = {
       tokenType: 'all' as const,
       networks: ['ethereum', 'solana', 'bsc', 'base'],
       excludeRugs: true,
-      socialFilters: []
+      socialFilters: [],
+      minCallScore: 1,
+      minXScore: 1,
+      minWebsiteScore: 1
     }
     
     // Update all individual states
@@ -114,6 +170,17 @@ export default function HomePage() {
     setMarketCapMin('')
     setMarketCapMax('')
     setSelectedSocials([])
+    setMinCallScore(1)
+    setMinXScore(1)
+    setMinWebsiteScore(1)
+    
+    // Reset all sections to collapsed (except token type)
+    setIsTokenTypeCollapsed(false)
+    setIsNetworksCollapsed(true)
+    setIsRugsCollapsed(true)
+    setIsRangeFiltersCollapsed(true)
+    setIsSocialCollapsed(true)
+    setIsScoresCollapsed(true)
     
     // Update main filter state
     setFilters(defaultState)
@@ -121,6 +188,7 @@ export default function HomePage() {
     // Clear localStorage
     if (typeof window !== 'undefined') {
       localStorage.removeItem('kromFilters')
+      localStorage.removeItem('kromFilterSections')
     }
   }
 
@@ -184,10 +252,10 @@ export default function HomePage() {
         <div className="px-5 pt-5 pb-2 flex justify-between items-center">
           <h2 className="text-sm uppercase tracking-[2px] text-[#666] font-semibold">FILTERS</h2>
           <button
-            onClick={clearAllFilters}
+            onClick={resetAllFilters}
             className="text-xs text-[#666] hover:text-[#00ff88] transition-colors uppercase tracking-[1px] font-medium"
           >
-            Clear
+            Reset
           </button>
         </div>
 
