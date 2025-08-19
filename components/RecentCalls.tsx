@@ -409,11 +409,11 @@ export default function RecentCalls({ filters = { tokenType: 'all' } }: RecentCa
                           <span 
                             className="text-[9px] px-1.5 py-0.5 rounded font-semibold"
                             style={{ 
-                              backgroundColor: getTierColor(call.website_tier).bg, 
-                              color: getTierColor(call.website_tier).text 
+                              backgroundColor: call.website_score === -1 ? '#ff666622' : getTierColor(call.website_tier).bg, 
+                              color: call.website_score === -1 ? '#ff6666' : getTierColor(call.website_tier).text 
                             }}
                           >
-                            W: {call.website_tier}
+                            W: {call.website_score === -1 ? 'FAILED' : call.website_tier}
                           </span>
                         )}
                       </div>
