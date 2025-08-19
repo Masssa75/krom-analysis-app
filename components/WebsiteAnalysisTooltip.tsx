@@ -16,13 +16,7 @@ interface WebsiteAnalysisTooltipProps {
 export function WebsiteAnalysisTooltip({ fullAnalysis, children }: WebsiteAnalysisTooltipProps) {
   const [showTooltip, setShowTooltip] = React.useState(false);
 
-  // Debug logging
-  React.useEffect(() => {
-    console.log('Tooltip data received:', fullAnalysis);
-  }, [fullAnalysis]);
-
   if (!fullAnalysis) {
-    console.log('No fullAnalysis data provided to tooltip');
     return <>{children}</>;
   }
 
