@@ -37,6 +37,7 @@ export async function GET(request: NextRequest) {
     // For ATH ROI sorting, we should only show tokens that have ATH ROI data
     const isAthRoiSort = actualSortBy === 'ath_roi_percent'
     const isRoiSort = actualSortBy === 'roi_percent'
+    const isWebsiteScoreSort = actualSortBy === 'website_score'
     
     // First get the total count
     let countQuery = supabase
@@ -123,6 +124,9 @@ export async function GET(request: NextRequest) {
     } else if (isRoiSort) {
       countQuery = countQuery
         .not('roi_percent', 'is', null)
+    } else if (isWebsiteScoreSort) {
+      countQuery = countQuery
+        .not('website_score', 'is', null)
     }
     
     const { count: totalCount, error: countError } = await countQuery
@@ -252,6 +256,12 @@ export async function GET(request: NextRequest) {
       query = query
         .not('roi_percent', 'is', null)
         .order('roi_percent', { ascending: sortOrder === 'asc' })
+        .range(actualOffset, actualOffset + limit - 1)
+    } else if (isWebsiteScoreSort) {
+      // For website_score, exclude NULL values to put them at the end
+      query = query
+        .not('website_score', 'is', null)
+        .order('website_score', { ascending: sortOrder === 'asc' })
         .range(actualOffset, actualOffset + limit - 1)
     } else {
       query = query
