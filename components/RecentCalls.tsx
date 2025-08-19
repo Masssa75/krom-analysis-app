@@ -51,6 +51,9 @@ interface RecentCallsProps {
     marketCapMax?: number
     excludeRugs?: boolean
     socialFilters?: string[]
+    minCallScore?: number
+    minXScore?: number
+    minWebsiteScore?: number
   }
 }
 
@@ -136,6 +139,15 @@ export default function RecentCalls({ filters = { tokenType: 'all' } }: RecentCa
       }
       if (filters?.socialFilters && filters.socialFilters.length > 0) {
         params.set('socialFilters', filters.socialFilters.join(','))
+      }
+      if (filters?.minCallScore !== undefined) {
+        params.set('minCallScore', filters.minCallScore.toString())
+      }
+      if (filters?.minXScore !== undefined) {
+        params.set('minXScore', filters.minXScore.toString())
+      }
+      if (filters?.minWebsiteScore !== undefined) {
+        params.set('minWebsiteScore', filters.minWebsiteScore.toString())
       }
       
       const response = await fetch(`/api/recent-calls?${params}`, {

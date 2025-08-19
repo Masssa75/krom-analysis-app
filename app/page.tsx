@@ -459,6 +459,130 @@ export default function HomePage() {
           </div>
         </div>
 
+
+        {/* Analysis Scores Filter */}
+        <div className={`border-b border-[#1a1c1f] ${isScoresCollapsed ? 'collapsed' : ''}`}>
+          <div 
+            className="px-5 py-5 cursor-pointer flex justify-between items-center bg-[#111214] hover:bg-[#1a1c1f] hover:pl-6 transition-all"
+            onClick={() => setIsScoresCollapsed(!isScoresCollapsed)}
+          >
+            <h3 className={`text-[13px] uppercase tracking-[1px] font-semibold transition-colors ${!isScoresCollapsed ? 'text-[#00ff88]' : 'text-[#888]'}`}>
+              Analysis Scores
+            </h3>
+            <span className={`text-xs transition-all ${!isScoresCollapsed ? 'text-[#00ff88]' : 'text-[#666]'} ${isScoresCollapsed ? 'rotate-[-90deg]' : ''}`}>
+              ▼
+            </span>
+          </div>
+          <div className={`bg-[#0a0b0d] overflow-hidden transition-all ${isScoresCollapsed ? 'max-h-0 opacity-0' : 'max-h-[500px] opacity-100 p-5'}`}>
+            <div className="space-y-5">
+              {/* Call Analysis Score */}
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="text-xs uppercase tracking-wider text-[#666]">Min Call Score</label>
+                  <span className="text-sm font-semibold text-white">{minCallScore.toFixed(1)}</span>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  step="0.5"
+                  value={minCallScore}
+                  onChange={(e) => {
+                    const value = parseFloat(e.target.value)
+                    setMinCallScore(value)
+                    setFilters(prev => ({ ...prev, minCallScore: value }))
+                  }}
+                  className="w-full h-2 bg-[#1a1c1f] rounded-lg appearance-none cursor-pointer slider"
+                  style={{
+                    background: `linear-gradient(to right, #00ff88 0%, #00ff88 ${((minCallScore - 1) / 9) * 100}%, #1a1c1f ${((minCallScore - 1) / 9) * 100}%, #1a1c1f 100%)`
+                  }}
+                />
+                <div className="flex justify-between text-[10px] text-[#666] mt-1">
+                  <span>1</span>
+                  <span>5</span>
+                  <span>10</span>
+                </div>
+              </div>
+
+              {/* X Analysis Score */}
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="text-xs uppercase tracking-wider text-[#666]">Min X Score</label>
+                  <span className="text-sm font-semibold text-white">{minXScore.toFixed(1)}</span>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  step="0.5"
+                  value={minXScore}
+                  onChange={(e) => {
+                    const value = parseFloat(e.target.value)
+                    setMinXScore(value)
+                    setFilters(prev => ({ ...prev, minXScore: value }))
+                  }}
+                  className="w-full h-2 bg-[#1a1c1f] rounded-lg appearance-none cursor-pointer slider"
+                  style={{
+                    background: `linear-gradient(to right, #00ff88 0%, #00ff88 ${((minXScore - 1) / 9) * 100}%, #1a1c1f ${((minXScore - 1) / 9) * 100}%, #1a1c1f 100%)`
+                  }}
+                />
+                <div className="flex justify-between text-[10px] text-[#666] mt-1">
+                  <span>1</span>
+                  <span>5</span>
+                  <span>10</span>
+                </div>
+              </div>
+
+              {/* Website Score (displayed as 1-10 but stored as 1-21) */}
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="text-xs uppercase tracking-wider text-[#666]">Min Website Score</label>
+                  <span className="text-sm font-semibold text-white">{((minWebsiteScore - 1) / 20 * 9 + 1).toFixed(1)}</span>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="21"
+                  step="1"
+                  value={minWebsiteScore}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value)
+                    setMinWebsiteScore(value)
+                    setFilters(prev => ({ ...prev, minWebsiteScore: value }))
+                  }}
+                  className="w-full h-2 bg-[#1a1c1f] rounded-lg appearance-none cursor-pointer slider"
+                  style={{
+                    background: `linear-gradient(to right, #00ff88 0%, #00ff88 ${((minWebsiteScore - 1) / 20) * 100}%, #1a1c1f ${((minWebsiteScore - 1) / 20) * 100}%, #1a1c1f 100%)`
+                  }}
+                />
+                <div className="flex justify-between text-[10px] text-[#666] mt-1">
+                  <span>1</span>
+                  <span>5</span>
+                  <span>10</span>
+                </div>
+              </div>
+
+              {/* Reset Scores Button */}
+              <button
+                onClick={() => {
+                  setMinCallScore(1)
+                  setMinXScore(1)
+                  setMinWebsiteScore(1)
+                  setFilters(prev => ({ 
+                    ...prev, 
+                    minCallScore: 1,
+                    minXScore: 1,
+                    minWebsiteScore: 1
+                  }))
+                }}
+                className="w-full py-2 px-4 bg-[#1a1c1f] hover:bg-[#2a2d31] text-[#888] hover:text-white text-xs uppercase tracking-wider rounded transition-colors"
+              >
+                Reset Score Filters
+              </button>
+            </div>
+          </div>
+        </div>
+
         {/* Range Filters (Liquidity & Market Cap) */}
         <div className={`border-b border-[#1a1c1f] ${isRangeFiltersCollapsed ? 'collapsed' : ''}`}>
           <div 

@@ -22,6 +22,9 @@ export async function GET(request: NextRequest) {
     const excludeRugs = searchParams.get('excludeRugs') === 'true'
     const searchQuery = searchParams.get('search') || ''
     const socialFilters = searchParams.get('socialFilters')?.split(',').filter(Boolean) || []
+    const minCallScore = searchParams.get('minCallScore') ? parseFloat(searchParams.get('minCallScore')!) : undefined
+    const minXScore = searchParams.get('minXScore') ? parseFloat(searchParams.get('minXScore')!) : undefined
+    const minWebsiteScore = searchParams.get('minWebsiteScore') ? parseFloat(searchParams.get('minWebsiteScore')!) : undefined
     
     const supabase = createClient(supabaseUrl, supabaseKey)
     
@@ -116,6 +119,17 @@ export async function GET(request: NextRequest) {
     }
     // If all 3 are selected or none selected, don't filter (show all)
     
+    // Apply score filters
+    if (minCallScore !== undefined && minCallScore > 1) {
+      countQuery = countQuery.gte('analysis_score', minCallScore)
+    }
+    if (minXScore !== undefined && minXScore > 1) {
+      countQuery = countQuery.gte('x_analysis_score', minXScore)
+    }
+    if (minWebsiteScore !== undefined && minWebsiteScore > 1) {
+      countQuery = countQuery.gte('website_score', minWebsiteScore)
+    }
+    
     // Apply same filters for count when sorting by ATH ROI
     if (isAthRoiSort) {
       countQuery = countQuery
@@ -164,6 +178,7 @@ export async function GET(request: NextRequest) {
         website_tier,
         website_token_type,
         website_analysis_reasoning,
+        website_analysis_full,
         market_cap_at_call,
         current_market_cap,
         pool_address,
@@ -244,6 +259,17 @@ export async function GET(request: NextRequest) {
       }
     }
     // If all 3 are selected or none selected, don't filter (show all)
+    
+    // Apply score filters
+    if (minCallScore !== undefined && minCallScore > 1) {
+      query = query.gte('analysis_score', minCallScore)
+    }
+    if (minXScore !== undefined && minXScore > 1) {
+      query = query.gte('x_analysis_score', minXScore)
+    }
+    if (minWebsiteScore !== undefined && minWebsiteScore > 1) {
+      query = query.gte('website_score', minWebsiteScore)
+    }
     
     // When sorting by ATH ROI, only include tokens with ATH ROI > 0
     if (isAthRoiSort) {

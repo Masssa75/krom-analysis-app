@@ -16,7 +16,13 @@ interface WebsiteAnalysisTooltipProps {
 export function WebsiteAnalysisTooltip({ fullAnalysis, children }: WebsiteAnalysisTooltipProps) {
   const [showTooltip, setShowTooltip] = React.useState(false);
 
+  // Debug logging
+  React.useEffect(() => {
+    console.log('Tooltip data received:', fullAnalysis);
+  }, [fullAnalysis]);
+
   if (!fullAnalysis) {
+    console.log('No fullAnalysis data provided to tooltip');
     return <>{children}</>;
   }
 
@@ -36,7 +42,7 @@ export function WebsiteAnalysisTooltip({ fullAnalysis, children }: WebsiteAnalys
       {children}
       
       {showTooltip && (
-        <div className="absolute z-50 bottom-full left-1/2 transform -translate-x-1/2 mb-2 pointer-events-none">
+        <div className="absolute z-[9999] bottom-full left-1/2 transform -translate-x-1/2 mb-2">
           <div className="bg-white rounded-lg shadow-xl border border-gray-200 p-4 min-w-[320px] max-w-[400px]">
             {/* PROS Section */}
             {exceptional_signals.length > 0 && (
