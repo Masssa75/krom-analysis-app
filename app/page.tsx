@@ -479,16 +479,16 @@ export default function HomePage() {
               <div>
                 <div className="flex justify-between items-center mb-2">
                   <label className="text-xs uppercase tracking-wider text-[#666]">Min Call Score</label>
-                  <span className="text-sm font-semibold text-white">{minCallScore.toFixed(1)}</span>
+                  <span className="text-sm font-semibold text-white">{minCallScore}</span>
                 </div>
                 <input
                   type="range"
                   min="1"
                   max="10"
-                  step="0.5"
+                  step="1"
                   value={minCallScore}
                   onChange={(e) => {
-                    const value = parseFloat(e.target.value)
+                    const value = parseInt(e.target.value)
                     setMinCallScore(value)
                     setFilters(prev => ({ ...prev, minCallScore: value }))
                   }}
@@ -508,16 +508,16 @@ export default function HomePage() {
               <div>
                 <div className="flex justify-between items-center mb-2">
                   <label className="text-xs uppercase tracking-wider text-[#666]">Min X Score</label>
-                  <span className="text-sm font-semibold text-white">{minXScore.toFixed(1)}</span>
+                  <span className="text-sm font-semibold text-white">{minXScore}</span>
                 </div>
                 <input
                   type="range"
                   min="1"
                   max="10"
-                  step="0.5"
+                  step="1"
                   value={minXScore}
                   onChange={(e) => {
-                    const value = parseFloat(e.target.value)
+                    const value = parseInt(e.target.value)
                     setMinXScore(value)
                     setFilters(prev => ({ ...prev, minXScore: value }))
                   }}

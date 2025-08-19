@@ -62,12 +62,27 @@ export function WebsiteAnalysisTooltip({ fullAnalysis, children }: WebsiteAnalys
                   <span className="text-[#ff4444] font-bold text-sm">❌ CONS</span>
                 </div>
                 <ul className="space-y-1">
-                  {missing_elements.slice(0, 4).map((element, idx) => (
-                    <li key={idx} className="text-xs text-[#ccc] flex items-start">
-                      <span className="text-[#ff4444] mr-2">•</span>
-                      <span>No {element}</span>
-                    </li>
-                  ))}
+                  {missing_elements.slice(0, 4).map((element, idx) => {
+                    // Clean up the element text - remove redundant "No" and awkward phrasing
+                    let cleanElement = element;
+                    
+                    // Remove "all " prefix for cleaner phrasing
+                    if (cleanElement.startsWith('all ')) {
+                      cleanElement = cleanElement.substring(4);
+                    }
+                    
+                    // Add "No" prefix if it doesn't already start with "No"
+                    if (!cleanElement.toLowerCase().startsWith('no ')) {
+                      cleanElement = `No ${cleanElement}`;
+                    }
+                    
+                    return (
+                      <li key={idx} className="text-xs text-[#ccc] flex items-start">
+                        <span className="text-[#ff4444] mr-2">•</span>
+                        <span>{cleanElement}</span>
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             )}
