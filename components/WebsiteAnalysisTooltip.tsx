@@ -65,7 +65,7 @@ export function WebsiteAnalysisTooltip({ fullAnalysis, children }: WebsiteAnalys
                   {missing_elements.slice(0, 4).map((element, idx) => (
                     <li key={idx} className="text-xs text-[#ccc] flex items-start">
                       <span className="text-[#ff4444] mr-2">•</span>
-                      <span>{element}</span>
+                      <span>No {element}</span>
                     </li>
                   ))}
                 </ul>
