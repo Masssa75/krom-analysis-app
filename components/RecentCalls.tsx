@@ -66,7 +66,9 @@ export default function RecentCalls({ filters = { tokenType: 'all' } }: RecentCa
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>({
     callAnalysis: true,
     xAnalysis: true,
-    websiteAnalysis: false
+    websiteAnalysis: false,
+    showScores: true,
+    showBadges: true
   })
   const itemsPerPage = 20
   
@@ -351,66 +353,70 @@ export default function RecentCalls({ filters = { tokenType: 'all' } }: RecentCa
                       </span>
                     </div>
                     
-                    {/* Analysis Scores - Only show if enabled */}
-                    <div className="flex items-center gap-2">
-                      {columnVisibility.callAnalysis && call.analysis_score && (
-                        <div className="flex flex-col items-center">
-                          <span className="text-[9px] text-[#666]">CALL</span>
-                          <div className="text-lg font-semibold text-white">
-                            {call.analysis_score.toFixed(1)}
+                    {/* Analysis Scores - Only show if enabled and showScores is true */}
+                    {columnVisibility.showScores && (
+                      <div className="flex items-center gap-2">
+                        {columnVisibility.callAnalysis && call.analysis_score && (
+                          <div className="flex flex-col items-center">
+                            <span className="text-[9px] text-[#666]">CALL</span>
+                            <div className="text-lg font-semibold text-white">
+                              {call.analysis_score.toFixed(1)}
+                            </div>
                           </div>
-                        </div>
-                      )}
-                      
-                      {columnVisibility.xAnalysis && call.x_analysis_score && (
-                        <div className="flex flex-col items-center">
-                          <span className="text-[9px] text-[#666]">X</span>
-                          <div className="text-lg font-semibold text-white">
-                            {call.x_analysis_score.toFixed(1)}
+                        )}
+                        
+                        {columnVisibility.xAnalysis && call.x_analysis_score && (
+                          <div className="flex flex-col items-center">
+                            <span className="text-[9px] text-[#666]">X</span>
+                            <div className="text-lg font-semibold text-white">
+                              {call.x_analysis_score.toFixed(1)}
+                            </div>
                           </div>
-                        </div>
-                      )}
-                      
-                      {columnVisibility.websiteAnalysis && call.website_score !== undefined && call.website_score !== null && (
-                        <div className="flex flex-col items-center">
-                          <span className="text-[9px] text-[#666]">WEB</span>
-                          <div className="text-lg font-semibold text-white">
-                            {(call.website_score / 21 * 10).toFixed(1)}
+                        )}
+                        
+                        {columnVisibility.websiteAnalysis && call.website_score !== undefined && call.website_score !== null && (
+                          <div className="flex flex-col items-center">
+                            <span className="text-[9px] text-[#666]">WEB</span>
+                            <div className="text-lg font-semibold text-white">
+                              {(call.website_score / 21 * 10).toFixed(1)}
+                            </div>
                           </div>
-                        </div>
-                      )}
-                    </div>
+                        )}
+                      </div>
+                    )}
                     
-                    {/* Tier Badges - Show based on visibility settings */}
-                    <div className="flex gap-1.5">
-                      {columnVisibility.callAnalysis && call.analysis_tier && (
-                        <span 
-                          className="text-[10px] px-1.5 py-0.5 rounded font-semibold"
-                          style={{ backgroundColor: callTier.bg, color: callTier.text }}
-                        >
-                          C: {call.analysis_tier}
-                        </span>
-                      )}
-                      {columnVisibility.xAnalysis && call.x_analysis_tier && (
-                        <span 
-                          className="text-[9px] px-1.5 py-0.5 rounded font-semibold"
-                          style={{ backgroundColor: xTier.bg, color: xTier.text }}
-                        >
-                          X: {call.x_analysis_tier}
-                        </span>
-                      )}
-                      {columnVisibility.websiteAnalysis && call.website_tier && (
-                        <span 
-                          className="text-[9px] px-1.5 py-0.5 rounded font-semibold"
-                          style={{ 
-                            backgroundColor: getTierColor(call.website_tier).bg, 
-                            color: getTierColor(call.website_tier).text 
-                          }}
-                        >
-                          W: {call.website_tier}
-                        </span>
-                      )}
-                    </div>
+                    {/* Tier Badges - Show based on visibility settings and showBadges */}
+                    {columnVisibility.showBadges && (
+                      <div className="flex gap-1.5">
+                        {columnVisibility.callAnalysis && call.analysis_tier && (
+                          <span 
+                            className="text-[10px] px-1.5 py-0.5 rounded font-semibold"
+                            style={{ backgroundColor: callTier.bg, color: callTier.text }}
+                          >
+                            C: {call.analysis_tier}
+                          </span>
+                        )}
+                        {columnVisibility.xAnalysis && call.x_analysis_tier && (
+                          <span 
+                            className="text-[9px] px-1.5 py-0.5 rounded font-semibold"
+                            style={{ backgroundColor: xTier.bg, color: xTier.text }}
+                          >
+                            X: {call.x_analysis_tier}
+                          </span>
+                        )}
+                        {columnVisibility.websiteAnalysis && call.website_tier && (
+                          <span 
+                            className="text-[9px] px-1.5 py-0.5 rounded font-semibold"
+                            style={{ 
+                              backgroundColor: getTierColor(call.website_tier).bg, 
+                              color: getTierColor(call.website_tier).text 
+                            }}
+                          >
+                            W: {call.website_tier}
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
                   
                   <div className="flex items-center gap-8">
