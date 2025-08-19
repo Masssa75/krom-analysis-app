@@ -37,17 +37,17 @@ export function WebsiteAnalysisTooltip({ fullAnalysis, children }: WebsiteAnalys
       
       {showTooltip && (
         <div className="absolute z-[9999] bottom-full left-1/2 transform -translate-x-1/2 mb-2">
-          <div className="bg-white rounded-lg shadow-xl border border-gray-200 p-4 min-w-[320px] max-w-[400px]">
+          <div className="bg-[#1a1c1f] rounded-lg shadow-xl border border-[#333] p-4 min-w-[320px] max-w-[400px]">
             {/* PROS Section */}
             {exceptional_signals.length > 0 && (
               <div className="mb-3">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-green-600 font-bold text-sm">✅ PROS</span>
+                  <span className="text-[#00ff88] font-bold text-sm">✅ PROS</span>
                 </div>
                 <ul className="space-y-1">
                   {exceptional_signals.slice(0, 4).map((signal, idx) => (
-                    <li key={idx} className="text-xs text-gray-700 flex items-start">
-                      <span className="text-green-500 mr-2">•</span>
+                    <li key={idx} className="text-xs text-[#ccc] flex items-start">
+                      <span className="text-[#00ff88] mr-2">•</span>
                       <span>{signal}</span>
                     </li>
                   ))}
@@ -59,12 +59,12 @@ export function WebsiteAnalysisTooltip({ fullAnalysis, children }: WebsiteAnalys
             {missing_elements.length > 0 && (
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-red-600 font-bold text-sm">❌ CONS</span>
+                  <span className="text-[#ff4444] font-bold text-sm">❌ CONS</span>
                 </div>
                 <ul className="space-y-1">
                   {missing_elements.slice(0, 4).map((element, idx) => (
-                    <li key={idx} className="text-xs text-gray-700 flex items-start">
-                      <span className="text-red-500 mr-2">•</span>
+                    <li key={idx} className="text-xs text-[#ccc] flex items-start">
+                      <span className="text-[#ff4444] mr-2">•</span>
                       <span>{element}</span>
                     </li>
                   ))}
@@ -75,7 +75,7 @@ export function WebsiteAnalysisTooltip({ fullAnalysis, children }: WebsiteAnalys
             {/* Arrow pointing down */}
             <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-0 
               border-l-[8px] border-l-transparent
-              border-t-[8px] border-t-white
+              border-t-[8px] border-t-[#1a1c1f]
               border-r-[8px] border-r-transparent">
             </div>
           </div>
