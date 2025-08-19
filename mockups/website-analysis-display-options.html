@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Analysis Display Options</title>
+    <style>
+        body {
+            background-color: #0a0b0d;
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            padding: 40px;
+        }
+        
+        h2 {
+            color: #00ff88;
+            font-size: 24px;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+        }
+        
+        h3 {
+            color: #888;
+            font-size: 14px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .option-container {
+            background-color: #111214;
+            border: 1px solid #2a2d31;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .display-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            background-color: #0f1011;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        
+        .label {
+            color: #666;
+            font-size: 11px;
+            margin-right: 10px;
+        }
+        
+        /* Current style (for reference) */
+        .current-x-analysis {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .score-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .score-label {
+            font-size: 9px;
+            color: #666;
+        }
+        
+        .score-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .tier-badge {
+            font-size: 9px;
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+        
+        /* Tier colors */
+        .tier-alpha { background-color: #00ff8822; color: #00ff88; }
+        .tier-solid { background-color: #ffcc0022; color: #ffcc00; }
+        .tier-basic { background-color: #88888822; color: #888888; }
+        .tier-trash { background-color: #ff444422; color: #ff4444; }
+        
+        /* Option styles */
+        .option-1 {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .combined-badge {
+            display: inline-flex;
+            align-items: center;
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            gap: 6px;
+        }
+        
+        .combined-badge .score-part {
+            font-size: 13px;
+            font-weight: 700;
+        }
+        
+        .combined-badge .tier-part {
+            opacity: 0.9;
+        }
+        
+        /* Option 2 - Compact with background */
+        .option-2 {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 4px;
+            border-radius: 3px;
+            gap: 6px;
+        }
+        
+        .option-2 .label-part {
+            font-size: 9px;
+            opacity: 0.7;
+        }
+        
+        .option-2 .score-part {
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .option-2 .tier-part {
+            font-size: 10px;
+            font-weight: 500;
+        }
+        
+        /* Option 3 - Minimal inline */
+        .option-3 {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 4px;
+            font-size: 11px;
+        }
+        
+        .option-3 .score {
+            font-weight: 700;
+            font-size: 13px;
+        }
+        
+        .option-3 .separator {
+            color: #444;
+            font-size: 10px;
+        }
+        
+        .option-3 .tier {
+            font-weight: 600;
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+        
+        /* Option 4 - Badge style like original */
+        .option-4 {
+            display: inline-flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .option-4 .score-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2px 6px;
+            border-radius: 3px;
+            background-color: #1a1c1f;
+        }
+        
+        .option-4 .score-box .label {
+            font-size: 8px;
+            color: #666;
+            margin: 0;
+        }
+        
+        .option-4 .score-box .value {
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+            line-height: 1;
+        }
+        
+        .option-4 .tier-badge {
+            font-size: 9px;
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+        
+        .description {
+            color: #666;
+            font-size: 12px;
+            margin-top: 10px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <h2>WEBSITE ANALYSIS DISPLAY OPTIONS</h2>
+    
+    <div class="option-container">
+        <h3>Current X Analysis Display (Reference)</h3>
+        <div class="display-row">
+            <span class="label">X Analysis:</span>
+            <div class="current-x-analysis">
+                <div class="score-column">
+                    <span class="score-label">X</span>
+                    <div class="score-value">7.0</div>
+                </div>
+                <span class="tier-badge tier-solid">X: SOLID</span>
+            </div>
+        </div>
+        <div class="description">Current format: Score column + separate tier badge</div>
+    </div>
+    
+    <div class="option-container">
+        <h3>Option 1: Combined Score & Tier Badge</h3>
+        
+        <div class="display-row">
+            <span class="label">WEB Analysis:</span>
+            <div class="option-1">
+                <div class="combined-badge tier-solid">
+                    <span>WEB:</span>
+                    <span class="score-part">7.0</span>
+                    <span class="tier-part">SOLID</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="display-row">
+            <span class="label">WEB Analysis:</span>
+            <div class="option-1">
+                <div class="combined-badge tier-trash">
+                    <span>WEB:</span>
+                    <span class="score-part">2.3</span>
+                    <span class="tier-part">TRASH</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="display-row">
+            <span class="label">WEB Analysis:</span>
+            <div class="option-1">
+                <div class="combined-badge tier-basic">
+                    <span>WEB:</span>
+                    <span class="score-part">5.5</span>
+                    <span class="tier-part">BASIC</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="description">All-in-one badge with score and tier, colored background based on tier</div>
+    </div>
+    
+    <div class="option-container">
+        <h3>Option 2: Compact Inline</h3>
+        
+        <div class="display-row">
+            <span class="label">WEB Analysis:</span>
+            <div class="option-2 tier-solid">
+                <span class="label-part">WEB</span>
+                <span class="score-part">7.0</span>
+                <span class="tier-part">SOLID</span>
+            </div>
+        </div>
+        
+        <div class="display-row">
+            <span class="label">WEB Analysis:</span>
+            <div class="option-2 tier-trash">
+                <span class="label-part">WEB</span>
+                <span class="score-part">2.3</span>
+                <span class="tier-part">TRASH</span>
+            </div>
+        </div>
+        
+        <div class="display-row">
+            <span class="label">WEB Analysis:</span>
+            <div class="option-2 tier-basic">
+                <span class="label-part">WEB</span>
+                <span class="score-part">5.5</span>
+                <span class="tier-part">BASIC</span>
+            </div>
+        </div>
+        
+        <div class="description">More compact version with subtle background</div>
+    </div>
+    
+    <div class="option-container">
+        <h3>Option 3: Minimal Text (Score:Tier)</h3>
+        
+        <div class="display-row">
+            <span class="label">WEB Analysis:</span>
+            <div class="option-3">
+                <span class="score" style="color: #ffcc00">7.0</span>
+                <span class="separator">:</span>
+                <span class="tier" style="color: #ffcc00">SOLID</span>
+            </div>
+        </div>
+        
+        <div class="display-row">
+            <span class="label">WEB Analysis:</span>
+            <div class="option-3">
+                <span class="score" style="color: #ff4444">2.3</span>
+                <span class="separator">:</span>
+                <span class="tier" style="color: #ff4444">TRASH</span>
+            </div>
+        </div>
+        
+        <div class="display-row">
+            <span class="label">WEB Analysis:</span>
+            <div class="option-3">
+                <span class="score" style="color: #888">5.5</span>
+                <span class="separator">:</span>
+                <span class="tier" style="color: #888">BASIC</span>
+            </div>
+        </div>
+        
+        <div class="description">Minimal approach with color-coded text only, no background</div>
+    </div>
+    
+    <div class="option-container">
+        <h3>Option 4: Match Current X Style Exactly</h3>
+        
+        <div class="display-row">
+            <span class="label">WEB Analysis:</span>
+            <div class="option-4">
+                <div class="score-column">
+                    <span class="score-label">WEB</span>
+                    <div class="score-value">7.0</div>
+                </div>
+                <span class="tier-badge tier-solid">W: SOLID</span>
+            </div>
+        </div>
+        
+        <div class="display-row">
+            <span class="label">WEB Analysis:</span>
+            <div class="option-4">
+                <div class="score-column">
+                    <span class="score-label">WEB</span>
+                    <div class="score-value">2.3</div>
+                </div>
+                <span class="tier-badge tier-trash">W: TRASH</span>
+            </div>
+        </div>
+        
+        <div class="display-row">
+            <span class="label">WEB Analysis:</span>
+            <div class="option-4">
+                <div class="score-column">
+                    <span class="score-label">WEB</span>
+                    <div class="score-value">5.5</div>
+                </div>
+                <span class="tier-badge tier-basic">W: BASIC</span>
+            </div>
+        </div>
+        
+        <div class="description">Exact same format as X analysis for perfect consistency</div>
+    </div>
+    
+    <div class="option-container">
+        <h3>All Three Together (Current Implementation)</h3>
+        
+        <div class="display-row">
+            <span class="label">All analyses:</span>
+            <!-- Call Analysis -->
+            <div class="score-column">
+                <span class="score-label">CALL</span>
+                <div class="score-value">3.0</div>
+            </div>
+            
+            <!-- X Analysis -->
+            <div class="score-column">
+                <span class="score-label">X</span>
+                <div class="score-value">7.0</div>
+            </div>
+            
+            <!-- Website Analysis -->
+            <div class="score-column">
+                <span class="score-label">WEB</span>
+                <div class="score-value">4.5</div>
+            </div>
+            
+            <!-- Tier Badges -->
+            <span class="tier-badge tier-basic">C: BASIC</span>
+            <span class="tier-badge tier-solid">X: SOLID</span>
+            <span class="tier-badge tier-basic">W: BASIC</span>
+        </div>
+        
+        <div class="description">How it would look with all three analyses using the same format</div>
+    </div>
+</body>
+</html>
