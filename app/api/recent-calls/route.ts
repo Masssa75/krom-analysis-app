@@ -79,11 +79,14 @@ export async function GET(request: NextRequest) {
     // Apply token type filter
     if (tokenType !== 'all') {
       if (tokenType === 'utility') {
-        // Show if either analysis says utility
-        countQuery = countQuery.or('analysis_token_type.eq.utility,x_analysis_token_type.eq.utility')
+        // Show tokens that NO analysis identifies as meme
+        // This means: all must be utility or null, none can be meme
+        countQuery = countQuery.not('analysis_token_type', 'eq', 'meme')
+          .not('x_analysis_token_type', 'eq', 'meme')
+          .not('website_token_type', 'eq', 'meme')
       } else if (tokenType === 'meme') {
-        // Show only if both analyses say meme (or one is null)
-        countQuery = countQuery.or('and(analysis_token_type.eq.meme,x_analysis_token_type.is.null),and(analysis_token_type.is.null,x_analysis_token_type.eq.meme),and(analysis_token_type.eq.meme,x_analysis_token_type.eq.meme)')
+        // Show tokens that ANY analysis identifies as meme
+        countQuery = countQuery.or('analysis_token_type.eq.meme,x_analysis_token_type.eq.meme,website_token_type.eq.meme')
       }
     }
     
@@ -226,11 +229,14 @@ export async function GET(request: NextRequest) {
     // Apply token type filter
     if (tokenType !== 'all') {
       if (tokenType === 'utility') {
-        // Show if either analysis says utility
-        query = query.or('analysis_token_type.eq.utility,x_analysis_token_type.eq.utility')
+        // Show tokens that NO analysis identifies as meme
+        // This means: all must be utility or null, none can be meme
+        query = query.not('analysis_token_type', 'eq', 'meme')
+          .not('x_analysis_token_type', 'eq', 'meme')
+          .not('website_token_type', 'eq', 'meme')
       } else if (tokenType === 'meme') {
-        // Show only if both analyses say meme (or one is null)
-        query = query.or('and(analysis_token_type.eq.meme,x_analysis_token_type.is.null),and(analysis_token_type.is.null,x_analysis_token_type.eq.meme),and(analysis_token_type.eq.meme,x_analysis_token_type.eq.meme)')
+        // Show tokens that ANY analysis identifies as meme
+        query = query.or('analysis_token_type.eq.meme,x_analysis_token_type.eq.meme,website_token_type.eq.meme')
       }
     }
     
