@@ -79,14 +79,23 @@ export async function GET(request: NextRequest) {
     // Apply token type filter
     if (tokenType !== 'all') {
       if (tokenType === 'utility') {
-        // Show tokens that NO analysis identifies as meme
-        // This means: all must be utility or null, none can be meme
-        countQuery = countQuery.not('analysis_token_type', 'eq', 'meme')
-          .not('x_analysis_token_type', 'eq', 'meme')
-          .not('website_token_type', 'eq', 'meme')
+        // Priority logic: Website analysis overrides all, otherwise ANY utility classification counts
+        // 1. If website_token_type exists and is utility, show it
+        // 2. If website_token_type exists and is meme, hide it
+        // 3. If no website_token_type, show if ANY other analysis says utility
+        countQuery = countQuery.or(
+          'website_token_type.eq.utility,' +
+          'and(website_token_type.is.null,or(analysis_token_type.eq.utility,x_analysis_token_type.eq.utility))'
+        )
       } else if (tokenType === 'meme') {
-        // Show tokens that ANY analysis identifies as meme
-        countQuery = countQuery.or('analysis_token_type.eq.meme,x_analysis_token_type.eq.meme,website_token_type.eq.meme')
+        // Priority logic: Website analysis overrides all, otherwise ANY meme classification counts
+        // 1. If website_token_type exists and is meme, show it
+        // 2. If website_token_type exists and is utility, hide it
+        // 3. If no website_token_type, show if ANY other analysis says meme
+        countQuery = countQuery.or(
+          'website_token_type.eq.meme,' +
+          'and(website_token_type.is.null,or(analysis_token_type.eq.meme,x_analysis_token_type.eq.meme))'
+        )
       }
     }
     
@@ -229,14 +238,23 @@ export async function GET(request: NextRequest) {
     // Apply token type filter
     if (tokenType !== 'all') {
       if (tokenType === 'utility') {
-        // Show tokens that NO analysis identifies as meme
-        // This means: all must be utility or null, none can be meme
-        query = query.not('analysis_token_type', 'eq', 'meme')
-          .not('x_analysis_token_type', 'eq', 'meme')
-          .not('website_token_type', 'eq', 'meme')
+        // Priority logic: Website analysis overrides all, otherwise ANY utility classification counts
+        // 1. If website_token_type exists and is utility, show it
+        // 2. If website_token_type exists and is meme, hide it
+        // 3. If no website_token_type, show if ANY other analysis says utility
+        query = query.or(
+          'website_token_type.eq.utility,' +
+          'and(website_token_type.is.null,or(analysis_token_type.eq.utility,x_analysis_token_type.eq.utility))'
+        )
       } else if (tokenType === 'meme') {
-        // Show tokens that ANY analysis identifies as meme
-        query = query.or('analysis_token_type.eq.meme,x_analysis_token_type.eq.meme,website_token_type.eq.meme')
+        // Priority logic: Website analysis overrides all, otherwise ANY meme classification counts
+        // 1. If website_token_type exists and is meme, show it
+        // 2. If website_token_type exists and is utility, hide it
+        // 3. If no website_token_type, show if ANY other analysis says meme
+        query = query.or(
+          'website_token_type.eq.meme,' +
+          'and(website_token_type.is.null,or(analysis_token_type.eq.meme,x_analysis_token_type.eq.meme))'
+        )
       }
     }
     
