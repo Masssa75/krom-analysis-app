@@ -344,7 +344,7 @@ export async function GET(request: NextRequest) {
       
       // Check if this is a GeckoTerminal trending token
       if (call.source === 'gecko_trending') {
-        groupName = 'Trending'
+        groupName = 'GT Trending'
       } else if (call.raw_data && typeof call.raw_data === 'object') {
         groupName = call.raw_data.groupName || call.raw_data.group || call.raw_data.group_username || 'Unknown Group'
       }
