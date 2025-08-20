@@ -20,6 +20,7 @@ export async function GET(request: NextRequest) {
     const marketCapMin = searchParams.get('marketCapMin') ? parseFloat(searchParams.get('marketCapMin')!) : undefined
     const marketCapMax = searchParams.get('marketCapMax') ? parseFloat(searchParams.get('marketCapMax')!) : undefined
     const excludeRugs = searchParams.get('excludeRugs') === 'true'
+    const excludeImposters = searchParams.get('excludeImposters') === 'true'
     const searchQuery = searchParams.get('search') || ''
     const socialFilters = searchParams.get('socialFilters')?.split(',').filter(Boolean) || []
     const minCallScore = searchParams.get('minCallScore') ? parseFloat(searchParams.get('minCallScore')!) : undefined
@@ -98,6 +99,11 @@ export async function GET(request: NextRequest) {
         'liquidity_usd.gte.50000,' +
         'current_market_cap.gte.50000'
       )
+    }
+    
+    // Apply imposters filter
+    if (excludeImposters) {
+      countQuery = countQuery.or('is_imposter.eq.false,is_imposter.is.null')
     }
     
     // Apply social media filters
@@ -185,7 +191,8 @@ export async function GET(request: NextRequest) {
         volume_24h,
         liquidity_usd,
         source,
-        raw_data
+        raw_data,
+        is_imposter
       `)
       .or('is_invalidated.is.null,is_invalidated.eq.false')
     
@@ -239,6 +246,11 @@ export async function GET(request: NextRequest) {
         'liquidity_usd.gte.50000,' +
         'current_market_cap.gte.50000'
       )
+    }
+    
+    // Apply imposters filter
+    if (excludeImposters) {
+      query = query.or('is_imposter.eq.false,is_imposter.is.null')
     }
     
     // Apply social media filters

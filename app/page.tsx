@@ -21,6 +21,15 @@ interface FilterState {
 }
 
 export default function HomePage() {
+  // Check for god mode
+  const [isGodMode, setIsGodMode] = useState(false)
+  
+  useEffect(() => {
+    // Check URL params for god mode
+    const params = new URLSearchParams(window.location.search)
+    setIsGodMode(params.get('god') === 'mode')
+  }, [])
+  
   // Load saved filter state from localStorage
   const getInitialFilterState = (): FilterState => {
     if (typeof window !== 'undefined') {
@@ -688,7 +697,7 @@ export default function HomePage() {
         <TopEarlyCalls />
 
         {/* Recent Calls Section */}
-        <RecentCalls filters={debouncedFilters} />
+        <RecentCalls filters={debouncedFilters} isGodMode={isGodMode} />
       </div>
 
       {/* Floating Action Menu */}

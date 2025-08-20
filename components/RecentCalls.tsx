@@ -28,6 +28,7 @@ interface RecentCall {
   x_best_tweet?: string
   analysis_token_type: string
   x_analysis_token_type?: string
+  is_imposter?: boolean
   website_score?: number
   website_tier?: string
   website_token_type?: string
@@ -55,9 +56,10 @@ interface RecentCallsProps {
     minXScore?: number
     minWebsiteScore?: number
   }
+  isGodMode?: boolean
 }
 
-export default function RecentCalls({ filters = { tokenType: 'all' } }: RecentCallsProps) {
+export default function RecentCalls({ filters = { tokenType: 'all' }, isGodMode = false }: RecentCallsProps) {
   const [calls, setCalls] = useState<RecentCall[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedToken, setSelectedToken] = useState<RecentCall | null>(null)
@@ -285,6 +287,33 @@ export default function RecentCalls({ filters = { tokenType: 'all' } }: RecentCa
     setSelectedToken(call)
     setIsModalOpen(true)
   }
+  
+  const handleMarkImposter = async (callId: string, isImposter: boolean) => {
+    try {
+      const response = await fetch('/api/mark-imposter', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ callId, isImposter })
+      })
+      
+      if (response.ok) {
+        // Update the local state
+        setCalls(prevCalls => 
+          prevCalls.map(call => 
+            call.id === callId 
+              ? { ...call, is_imposter: isImposter }
+              : call
+          )
+        )
+      } else {
+        console.error('Failed to mark as imposter')
+      }
+    } catch (error) {
+      console.error('Error marking imposter:', error)
+    }
+  }
 
   const handleSortChange = (newSortBy: string, newSortOrder: 'asc' | 'desc') => {
     setSortBy(newSortBy)
@@ -337,7 +366,11 @@ export default function RecentCalls({ filters = { tokenType: 'all' } }: RecentCa
                     {/* Token Info */}
                     <div className="flex items-center gap-2">
                       <span 
-                        className="font-semibold text-white text-base cursor-pointer hover:text-[#00ff88] transition-colors"
+                        className={`font-semibold text-base cursor-pointer transition-colors ${
+                          call.is_imposter 
+                            ? 'text-red-500 line-through hover:text-red-400' 
+                            : 'text-white hover:text-[#00ff88]'
+                        }`}
                         onClick={() => handleTokenClick(call)}
                       >
                         {call.ticker}
@@ -490,6 +523,23 @@ export default function RecentCalls({ filters = { tokenType: 'all' } }: RecentCa
                       <div>{call.group_name}</div>
                       <div className="text-[#666]">{formatTime(call.buy_timestamp)}</div>
                     </div>
+                    
+                    {/* God Mode Admin Button */}
+                    {isGodMode && (
+                      <div className="ml-4">
+                        <button
+                          onClick={() => handleMarkImposter(call.id, !call.is_imposter)}
+                          className={`px-2 py-1 text-xs rounded ${
+                            call.is_imposter 
+                              ? 'bg-red-600 hover:bg-red-700 text-white' 
+                              : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                          } transition-colors`}
+                          title={call.is_imposter ? 'Unmark as imposter' : 'Mark as imposter'}
+                        >
+                          {call.is_imposter ? '🚫 Imposter' : 'Mark Imposter'}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               )
