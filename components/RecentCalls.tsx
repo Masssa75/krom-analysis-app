@@ -51,6 +51,7 @@ interface RecentCallsProps {
     marketCapMin?: number
     marketCapMax?: number
     excludeRugs?: boolean
+    excludeImposters?: boolean
     socialFilters?: string[]
     minCallScore?: number
     minXScore?: number
@@ -138,6 +139,9 @@ export default function RecentCalls({ filters = { tokenType: 'all' }, isGodMode 
       }
       if (filters?.excludeRugs !== undefined) {
         params.set('excludeRugs', filters.excludeRugs.toString())
+      }
+      if (filters?.excludeImposters !== undefined) {
+        params.set('excludeImposters', filters.excludeImposters.toString())
       }
       if (filters?.socialFilters && filters.socialFilters.length > 0) {
         params.set('socialFilters', filters.socialFilters.join(','))

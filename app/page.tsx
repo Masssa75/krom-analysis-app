@@ -14,6 +14,7 @@ interface FilterState {
   marketCapMin?: number
   marketCapMax?: number
   excludeRugs?: boolean
+  excludeImposters?: boolean
   socialFilters?: string[]
   minCallScore?: number
   minXScore?: number
@@ -47,6 +48,7 @@ export default function HomePage() {
       tokenType: 'all',
       networks: ['ethereum', 'solana', 'bsc', 'base'],
       excludeRugs: true,
+      excludeImposters: true,
       socialFilters: []
     }
   }
@@ -95,6 +97,10 @@ export default function HomePage() {
   const [excludeRugs, setExcludeRugs] = useState(() => {
     const initial = getInitialFilterState()
     return initial.excludeRugs !== undefined ? initial.excludeRugs : true
+  })
+  const [excludeImposters, setExcludeImposters] = useState(() => {
+    const initial = getInitialFilterState()
+    return initial.excludeImposters !== undefined ? initial.excludeImposters : true
   })
   const [isRangeFiltersCollapsed, setIsRangeFiltersCollapsed] = useState(sectionStates.rangeFilters)
   const [liquidityMin, setLiquidityMin] = useState<string>(() => {
@@ -163,6 +169,7 @@ export default function HomePage() {
       tokenType: 'all' as const,
       networks: ['ethereum', 'solana', 'bsc', 'base'],
       excludeRugs: true,
+      excludeImposters: true,
       socialFilters: [],
       minCallScore: 1,
       minXScore: 1,
@@ -174,6 +181,7 @@ export default function HomePage() {
     setIncludeMeme(true)
     setSelectedNetworks(['ethereum', 'solana', 'bsc', 'base'])
     setExcludeRugs(true)
+    setExcludeImposters(true)
     setLiquidityMin('')
     setLiquidityMax('')
     setMarketCapMin('')
@@ -363,6 +371,28 @@ export default function HomePage() {
                   <li>Current ROI &lt; -75% AND</li>
                   <li>Liquidity &amp; Market Cap both &lt; $50K</li>
                 </ul>
+              </div>
+
+              <label 
+                className="flex items-center gap-2.5 cursor-pointer text-sm text-[#ccc] hover:text-white transition-colors mt-4"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div 
+                  className={`w-5 h-5 border-2 rounded-[5px] transition-all flex items-center justify-center ${
+                    !excludeImposters ? 'bg-[#00ff88] border-[#00ff88]' : 'border-[#333]'
+                  }`}
+                  onClick={() => {
+                    const newExcludeState = !excludeImposters
+                    setExcludeImposters(newExcludeState)
+                    setFilters(prev => ({ ...prev, excludeImposters: newExcludeState }))
+                  }}
+                >
+                  {!excludeImposters && <span className="text-black font-bold text-xs">✓</span>}
+                </div>
+                <span>Include Imposters</span>
+              </label>
+              <div className="text-xs text-[#666] mt-1">
+                When unchecked, hides tokens marked as having inauthentic websites
               </div>
             </div>
           </div>
