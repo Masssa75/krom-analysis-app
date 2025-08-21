@@ -288,7 +288,7 @@ export default function RecentCalls({ filters = { tokenType: 'all' }, isGodMode 
     const colors: { [key: string]: { bg: string, text: string } } = {
       ALPHA: { bg: '#00ff8822', text: '#00ff88' },
       SOLID: { bg: '#ffcc0022', text: '#ffcc00' },
-      BASIC: { bg: '#88888822', text: '#888' },
+      BASIC: { bg: '#ff994422', text: '#ff9944' },
       TRASH: { bg: '#ff444422', text: '#ff4444' },
       FAILED: { bg: '#ff666622', text: '#ff6666' }  // Red/orange for failed
     }
