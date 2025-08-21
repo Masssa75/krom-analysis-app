@@ -6,9 +6,17 @@ import { SortDropdown } from './sort-dropdown'
 import SearchInput from './SearchInput'
 import ColumnSettings, { ColumnVisibility } from './ColumnSettings'
 import { WebsiteAnalysisTooltip } from './WebsiteAnalysisTooltip'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { MoreVertical } from 'lucide-react'
 
 interface RecentCall {
   id: string
+  krom_id: string
   ticker: string
   network: string
   contract_address: string
@@ -29,6 +37,7 @@ interface RecentCall {
   analysis_token_type: string
   x_analysis_token_type?: string
   is_imposter?: boolean
+  is_invalidated?: boolean
   website_score?: number
   website_tier?: string
   website_token_type?: string
@@ -319,6 +328,38 @@ export default function RecentCalls({ filters = { tokenType: 'all' }, isGodMode 
     }
   }
 
+  const handleInvalidate = async (call: RecentCall, isInvalidated: boolean) => {
+    try {
+      const response = await fetch('/api/invalidate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          krom_id: call.krom_id,
+          id: call.id, 
+          is_invalidated: isInvalidated,
+          reason: isInvalidated ? 'Marked invalid by admin' : null
+        })
+      })
+      
+      if (response.ok) {
+        // Update the local state
+        setCalls(prevCalls => 
+          prevCalls.map(c => 
+            c.id === call.id 
+              ? { ...c, is_invalidated: isInvalidated }
+              : c
+          )
+        )
+      } else {
+        console.error('Failed to invalidate token')
+      }
+    } catch (error) {
+      console.error('Error invalidating token:', error)
+    }
+  }
+
   const handleSortChange = (newSortBy: string, newSortOrder: 'asc' | 'desc') => {
     setSortBy(newSortBy)
     setSortOrder(newSortOrder)
@@ -373,9 +414,12 @@ export default function RecentCalls({ filters = { tokenType: 'all' }, isGodMode 
                         className={`font-semibold text-base cursor-pointer transition-colors ${
                           call.is_imposter 
                             ? 'text-red-500 line-through hover:text-red-400' 
+                            : call.is_invalidated
+                            ? 'text-gray-500 line-through hover:text-gray-400'
                             : 'text-white hover:text-[#00ff88]'
                         }`}
                         onClick={() => handleTokenClick(call)}
+                        title={call.is_invalidated ? 'Token has been invalidated' : call.is_imposter ? 'Marked as imposter' : ''}
                       >
                         {call.ticker}
                       </span>
@@ -528,20 +572,53 @@ export default function RecentCalls({ filters = { tokenType: 'all' }, isGodMode 
                       <div className="text-[#666]">{formatTime(call.buy_timestamp)}</div>
                     </div>
                     
-                    {/* God Mode Admin Button */}
+                    {/* God Mode Admin Menu */}
                     {isGodMode && (
                       <div className="ml-4">
-                        <button
-                          onClick={() => handleMarkImposter(call.id, !call.is_imposter)}
-                          className={`px-2 py-1 text-xs rounded ${
-                            call.is_imposter 
-                              ? 'bg-red-600 hover:bg-red-700 text-white' 
-                              : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
-                          } transition-colors`}
-                          title={call.is_imposter ? 'Unmark as imposter' : 'Mark as imposter'}
-                        >
-                          {call.is_imposter ? '🚫 Imposter' : 'Mark Imposter'}
-                        </button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button
+                              className="p-1 hover:bg-zinc-800 rounded transition-colors"
+                              title="Admin actions"
+                            >
+                              <MoreVertical className="h-4 w-4 text-gray-400" />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="bg-zinc-900 border-zinc-800">
+                            <DropdownMenuItem
+                              onClick={() => handleMarkImposter(call.id, !call.is_imposter)}
+                              className="text-sm cursor-pointer hover:bg-zinc-800"
+                            >
+                              {call.is_imposter ? (
+                                <>
+                                  <span className="mr-2">✅</span>
+                                  Unmark as Imposter
+                                </>
+                              ) : (
+                                <>
+                                  <span className="mr-2">🚫</span>
+                                  Mark as Imposter
+                                </>
+                              )}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleInvalidate(call, !call.is_invalidated)}
+                              className="text-sm cursor-pointer hover:bg-zinc-800"
+                            >
+                              {call.is_invalidated ? (
+                                <>
+                                  <span className="mr-2">♻️</span>
+                                  Restore Token
+                                </>
+                              ) : (
+                                <>
+                                  <span className="mr-2">❌</span>
+                                  Invalidate Token
+                                </>
+                              )}
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     )}
                   </div>

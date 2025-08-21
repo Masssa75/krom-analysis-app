@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
             .from('crypto_calls')
             .update({
               x_analysis_score: 1,
-              x_analysis_tier: 'TRASH',
+              x_analysis_tier: 'TRASH',  // Keep as TRASH since this is data absence, not a failure
               x_analysis_token_type: 'meme',
               x_legitimacy_factor: 'Low',
               x_analysis_model: model,
@@ -293,11 +293,39 @@ export async function POST(request: NextRequest) {
         console.log(`Analyzed ${call.ticker}: Score ${score}/10 (${tier}) in ${duration}ms`)
         
       } catch (error) {
-        console.error(`Error analyzing ${call.ticker}:`, error)
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+        console.error(`Error analyzing ${call.ticker}:`, errorMessage)
+        
+        // Mark failed X analysis with score 1 and FAILED tier
+        const duration = Date.now() - callStartTime
+        
+        const { error: updateError } = await supabase
+          .from('crypto_calls')
+          .update({
+            x_analysis_score: 1,  // Must use 1 due to constraint
+            x_analysis_tier: 'FAILED',  // Special tier for failures
+            x_analysis_token_type: null,  // No type for failed analysis
+            x_legitimacy_factor: 'Unknown',
+            x_analysis_model: model,
+            x_best_tweet: null,
+            x_analysis_reasoning: `ERROR: ${errorMessage}`,  // Include error details
+            x_analysis_batch_id: batchId,
+            x_analysis_batch_timestamp: batchTimestamp,
+            x_analysis_duration_ms: 0,  // 0 indicates failure
+            x_analysis_prompt_used: X_BATCH_ANALYSIS_PROMPT,
+            x_analyzed_at: new Date().toISOString()
+          })
+          .eq('krom_id', call.krom_id)
+        
+        if (updateError) {
+          console.error(`Failed to save error state for ${call.ticker}:`, updateError)
+        }
+        
         errors.push({
           krom_id: call.krom_id,
           ticker: call.ticker,
-          error: error instanceof Error ? error.message : 'Unknown error'
+          error: errorMessage,
+          markedAsFailed: true
         })
       }
     }
