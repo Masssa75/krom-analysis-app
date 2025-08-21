@@ -151,7 +151,8 @@ export default function ChartModal({ isOpen, onClose, token }: ChartModalProps) 
       ALPHA: { bg: '#00ff8822', text: '#00ff88' },
       SOLID: { bg: '#ffcc0022', text: '#ffcc00' },
       BASIC: { bg: '#88888822', text: '#888' },
-      TRASH: { bg: '#ff444422', text: '#ff4444' }
+      TRASH: { bg: '#ff444422', text: '#ff4444' },
+      FAILED: { bg: '#ff666622', text: '#ff6666' }  // Red/orange for failed
     }
     return colors[tier] || { bg: '#88888822', text: '#888' }
   }
