@@ -490,7 +490,7 @@ export default function RecentCalls({ filters = { tokenType: 'all' }, isGodMode 
                       <div className="flex gap-1.5">
                         {columnVisibility.callAnalysis && call.analysis_tier && (
                           <span 
-                            className="text-[10px] px-1.5 py-0.5 rounded font-semibold"
+                            className="text-[9px] px-1.5 py-0.5 rounded font-semibold"
                             style={{ backgroundColor: callTier.bg, color: callTier.text }}
                           >
                             C: {call.analysis_tier}
