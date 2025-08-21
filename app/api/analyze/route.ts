@@ -264,23 +264,28 @@ Respond with JSON only.`;
         }
         
       } catch (err) {
-        console.error(`Error analyzing call ${call.krom_id} (${call.ticker}):`, err);
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+        console.error(`Error analyzing call ${call.krom_id} (${call.ticker}):`, errorMessage);
         console.error('Call data:', {
           ticker: call.ticker,
           contract: call.raw_data?.token?.ca || 'missing',
           network: call.raw_data?.token?.network || 'missing',
           message: call.raw_data?.text ? 'present' : 'missing'
         });
+        
+        // Use score of 1 with FAILED tier to indicate failed analysis
+        // (Can't use 0 due to database constraint requiring 1-10)
         results.push({
           token: call.ticker || 'Unknown',
           contract: null,
-          score: 1,
+          score: 1,  // Must use 1 due to constraint, but tier will be FAILED
+          token_type: null,  // Don't assign type for failed analysis
           legitimacy_factor: 'Unknown',
-          reasoning: 'Analysis failed',
+          reasoning: `ERROR: ${errorMessage}`,  // Include actual error message
           krom_id: call.krom_id,
           network: 'unknown',
-          // Include empty analysis fields for consistency
-          analysis_reasoning: 'Analysis failed',
+          // Include error details in analysis fields
+          analysis_reasoning: `ERROR: ${errorMessage}`,
           analysis_model: model,
           analysis_duration_ms: 0,
           analysis_batch_id: batchId,
@@ -292,15 +297,29 @@ Respond with JSON only.`;
     
     // Save results to database
     for (const result of results) {
-      if (result.krom_id) {  // Remove the score check - save even failed analyses
+      if (result.krom_id) {  // Save all results including failed analyses
         try {
+          // Determine tier based on score and error status
+          let tier = 'TRASH';
+          const isError = result.analysis_reasoning?.startsWith('ERROR:');
+          
+          if (isError) {
+            tier = 'FAILED';  // Special tier for failed analyses
+          } else if (result.score >= 7) {
+            tier = 'ALPHA';
+          } else if (result.score >= 5) {
+            tier = 'SOLID';
+          } else if (result.score >= 3) {
+            tier = 'BASIC';
+          }
+          
           const updateData = {
             analysis_score: result.score,
-            analysis_tier: result.score >= 7 ? 'ALPHA' : result.score >= 5 ? 'SOLID' : result.score >= 3 ? 'BASIC' : 'TRASH',
-            analysis_token_type: result.token_type || 'meme',
+            analysis_tier: tier,
+            analysis_token_type: result.token_type || (isError ? null : 'meme'),
             analysis_legitimacy_factor: result.legitimacy_factor || 'Unknown',
             analysis_model: model,
-            analysis_reasoning: result.analysis_reasoning || result.reasoning || 'Analysis failed',
+            analysis_reasoning: result.analysis_reasoning || result.reasoning || 'ERROR: Unknown failure',
             analysis_prompt_used: result.analysis_prompt_used || '',
             analysis_batch_id: batchId,
             analysis_batch_timestamp: batchTimestamp,
