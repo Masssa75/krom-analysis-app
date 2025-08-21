@@ -51,8 +51,8 @@ export async function GET(request: NextRequest) {
     
     // Apply search filter
     if (searchQuery) {
-      // Search by ticker (case-insensitive) or contract address
-      countQuery = countQuery.or(`ticker.ilike.%${searchQuery}%,contract_address.ilike.%${searchQuery}%`)
+      // Search by ticker (case-insensitive), contract address, or source
+      countQuery = countQuery.or(`ticker.ilike.%${searchQuery}%,contract_address.ilike.%${searchQuery}%,source.ilike.%${searchQuery}%`)
     }
     
     // Apply networks filter
@@ -105,7 +105,9 @@ export async function GET(request: NextRequest) {
       // - ATH ROI < 20% (or null)
       // - Current ROI < -75% (or null)
       // - Both liquidity AND market cap < $50K (or null)
+      // Exception: Always show gecko_trending tokens regardless of performance
       countQuery = countQuery.or(
+        'source.eq.gecko_trending,' +
         'ath_roi_percent.gte.20,' +
         'roi_percent.gte.-75,' +
         'liquidity_usd.gte.50000,' +
@@ -210,8 +212,8 @@ export async function GET(request: NextRequest) {
     
     // Apply search filter
     if (searchQuery) {
-      // Search by ticker (case-insensitive) or contract address
-      query = query.or(`ticker.ilike.%${searchQuery}%,contract_address.ilike.%${searchQuery}%`)
+      // Search by ticker (case-insensitive), contract address, or source
+      query = query.or(`ticker.ilike.%${searchQuery}%,contract_address.ilike.%${searchQuery}%,source.ilike.%${searchQuery}%`)
     }
     
     // Apply networks filter
@@ -264,7 +266,9 @@ export async function GET(request: NextRequest) {
       // - ATH ROI < 20% (or null)
       // - Current ROI < -75% (or null) 
       // - Both liquidity AND market cap < $50K (or null)
+      // Exception: Always show gecko_trending tokens regardless of performance
       query = query.or(
+        'source.eq.gecko_trending,' +
         'ath_roi_percent.gte.20,' +
         'roi_percent.gte.-75,' +
         'liquidity_usd.gte.50000,' +
