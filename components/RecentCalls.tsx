@@ -584,10 +584,10 @@ export default function RecentCalls({ filters = { tokenType: 'all' }, isGodMode 
                               <MoreVertical className="h-4 w-4 text-gray-400" />
                             </button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="bg-zinc-900 border-zinc-800">
+                          <DropdownMenuContent align="end" className="bg-zinc-900 border border-zinc-700">
                             <DropdownMenuItem
                               onClick={() => handleMarkImposter(call.id, !call.is_imposter)}
-                              className="text-sm cursor-pointer hover:bg-zinc-800"
+                              className="text-sm text-gray-300 cursor-pointer hover:bg-zinc-800 hover:text-white focus:bg-zinc-800 focus:text-white"
                             >
                               {call.is_imposter ? (
                                 <>
@@ -603,7 +603,7 @@ export default function RecentCalls({ filters = { tokenType: 'all' }, isGodMode 
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => handleInvalidate(call, !call.is_invalidated)}
-                              className="text-sm cursor-pointer hover:bg-zinc-800"
+                              className="text-sm text-gray-300 cursor-pointer hover:bg-zinc-800 hover:text-white focus:bg-zinc-800 focus:text-white"
                             >
                               {call.is_invalidated ? (
                                 <>
