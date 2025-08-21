@@ -504,18 +504,30 @@ export default function RecentCalls({ filters = { tokenType: 'all' }, isGodMode 
                             X: {call.x_analysis_tier}
                           </span>
                         )}
-                        {columnVisibility.websiteAnalysis && call.website_tier && (
-                          <WebsiteAnalysisTooltip fullAnalysis={call.website_analysis_full}>
+                        {columnVisibility.websiteAnalysis && (
+                          call.website_tier ? (
+                            <WebsiteAnalysisTooltip fullAnalysis={call.website_analysis_full}>
+                              <span 
+                                className="text-[9px] px-1.5 py-0.5 rounded font-semibold cursor-help"
+                                style={{ 
+                                  backgroundColor: (call.website_score === 0 && call.website_analysis_reasoning?.includes('ERROR')) ? '#ff666622' : getTierColor(call.website_tier).bg, 
+                                  color: (call.website_score === 0 && call.website_analysis_reasoning?.includes('ERROR')) ? '#ff6666' : getTierColor(call.website_tier).text 
+                                }}
+                              >
+                                W: {(call.website_score === 0 && call.website_analysis_reasoning?.includes('ERROR')) ? 'FAILED' : call.website_tier}
+                              </span>
+                            </WebsiteAnalysisTooltip>
+                          ) : (
                             <span 
-                              className="text-[9px] px-1.5 py-0.5 rounded font-semibold cursor-help"
+                              className="text-[9px] px-1.5 py-0.5 rounded font-semibold"
                               style={{ 
-                                backgroundColor: (call.website_score === 0 && call.website_analysis_reasoning?.includes('ERROR')) ? '#ff666622' : getTierColor(call.website_tier).bg, 
-                                color: (call.website_score === 0 && call.website_analysis_reasoning?.includes('ERROR')) ? '#ff6666' : getTierColor(call.website_tier).text 
+                                backgroundColor: '#33333366', 
+                                color: '#888888' 
                               }}
                             >
-                              W: {(call.website_score === 0 && call.website_analysis_reasoning?.includes('ERROR')) ? 'FAILED' : call.website_tier}
+                              W: NO SITE
                             </span>
-                          </WebsiteAnalysisTooltip>
+                          )
                         )}
                       </div>
                     )}
