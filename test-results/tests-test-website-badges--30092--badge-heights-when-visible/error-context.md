@@ -1,0 +1,103 @@
+# Page snapshot
+
+```yaml
+- main:
+  - heading "KROM" [level=1]
+  - button "BUY"
+  - button:
+    - img
+  - paragraph: Advanced AI Powered Token Discovery
+  - text: "Contract Address: 9eCEK7ttNtroHsFLnW8jW7pS9MtSAPrPPrZ6QCUFpump"
+  - heading "FILTERS" [level=2]
+  - button "Reset"
+  - heading "Token Type" [level=3]
+  - text: ▼ ✓ Utility Tokens ✓ Meme Tokens
+  - heading "Rugs" [level=3]
+  - text: "▼ Include Rugs When unchecked, hides tokens with:"
+  - list:
+    - listitem: ATH ROI < 20% AND
+    - listitem: Current ROI < -75% AND
+    - listitem: Liquidity & Market Cap both < $50K
+  - text: Include Imposters When unchecked, hides tokens marked as having inauthentic websites
+  - heading "Networks" [level=3]
+  - text: ▼ ✓ Ethereum ✓ Solana ✓ BSC ✓ Base
+  - heading "Social Media" [level=3]
+  - text: ▼ Has Website Has Twitter/X Has Telegram
+  - heading "Analysis Scores" [level=3]
+  - text: ▼ Min Call Score 1
+  - slider: "1"
+  - text: 1 5 10 Min X Score 1
+  - slider: "1"
+  - text: 1 5 10 Min Website Score 1.0
+  - slider: "1"
+  - text: 1 5 10
+  - button "Reset Score Filters"
+  - heading "Liquidity & Market Cap" [level=3]
+  - text: ▼ Liquidity (USD)
+  - spinbutton
+  - text: "-"
+  - spinbutton
+  - text: Market Cap (USD)
+  - spinbutton
+  - text: "-"
+  - spinbutton
+  - button "Clear Range Filters"
+  - text: TOP EARLY CALLS
+  - button "24H"
+  - button "7D"
+  - button "90D"
+  - button "ALL TIME"
+  - text: "[ANI:233x] [MASK:198x] [ZEUS:171x] [AOL:164x] [TACO:161x] [SUPERGROK:142x] [MANYU:131x] [SPARK:125x] [CHAD:123x]"
+  - heading "RECENT CALLS" [level=2]
+  - button "Column Settings":
+    - img
+  - heading "Column Visibility Settings" [level=3]
+  - heading "Analysis Types" [level=4]
+  - text: Call Analysis
+  - checkbox "Call Analysis" [checked]
+  - text: X Analysis
+  - checkbox "X Analysis" [checked]
+  - text: Website Analysis
+  - checkbox "Website Analysis" [checked]
+  - heading "Display Options" [level=4]
+  - text: Show Scores
+  - checkbox "Show Scores" [checked]
+  - text: Show Tier Badges
+  - checkbox "Show Tier Badges" [checked]
+  - text: "Tip: You can show scores, badges, both, or neither for enabled analysis types."
+  - button "Done"
+  - button "Search":
+    - img
+  - text: "Sort by:"
+  - combobox: Date Called
+  - button "Sort descending":
+    - img
+  - text: "BTCS MEME SOL CALL 3.0 X 2.0 WEB 6.7 C: BASIC X: TRASH W: BASIC LIQUIDITY $19K ENTRY MC $49K ATH MC $51K NOW MC $38K ROI -21% ATH ROI +5% chiggajogambles 59m ago REX MEME BSC CALL 1.0 C: TRASH W: NO SITE LIQUIDITY $302K ENTRY MC $98.1M ATH MC $148.2M NOW MC $100.2M ROI +2% ATH ROI +2% GT Trending 3h ago ETHPRO MEME ETH CALL 2.0 X 4.0 C: TRASH X: BASIC W: NO SITE LIQUIDITY $271K ENTRY MC $254K ATH MC $432K NOW MC $392K ROI +55% ATH ROI +70% TopCallersChannel 3h ago GM MEME SOL CALL 7.0 X 2.0 WEB 6.2 C: ALPHA X: TRASH W: BASIC LIQUIDITY $36K ENTRY MC $141K ATH MC $141K NOW MC $118K ROI -16% ATH ROI +0% Maestrosdegen 4h ago KAM MEME SOL CALL 2.0 X 4.0 C: TRASH X: BASIC W: NO SITE LIQUIDITY $17K ENTRY MC $40K ATH MC $40K NOW MC $17K ROI -57% ATH ROI +0% shitcoinneverland 4h ago LOS UTILITY SOL CALL 2.0 X 2.0 WEB 2.4 C: BASIC X: TRASH W: TRASH LIQUIDITY $194K ENTRY MC $295K ATH MC $707K NOW MC $578K ROI +96% ATH ROI +140% luigiscalls 6h ago AIRI UTILITY SOL CALL 5.0 X 4.0 WEB 1.0 C: SOLID X: BASIC W: TRASH LIQUIDITY $125K ENTRY MC $554K ATH MC $1.2M NOW MC $925K ROI +67% ATH ROI +118% chiggajogambles 6h ago LOS UTILITY SOL CALL 2.0 X 2.0 WEB 2.4 C: TRASH X: TRASH W: TRASH LIQUIDITY $194K ENTRY MC $147K ATH MC $707K NOW MC $578K ROI +294% ATH ROI +381% YodaCallss 6h ago SM MEME SOL CALL 2.0 X 2.0 C: TRASH X: TRASH W: NO SITE LIQUIDITY $39K ENTRY MC $153K ATH MC $153K NOW MC $95K ROI -38% ATH ROI +0% lowtaxsolana 6h ago SM MEME SOL CALL 1.0 X 4.0 C: TRASH X: BASIC W: NO SITE LIQUIDITY $39K ENTRY MC $186K ATH MC $186K NOW MC $95K ROI -49% ATH ROI +0% mewgambles 7h ago OVPP UTILITY ETH CALL 2.0 X 7.0 WEB 4.8 C: TRASH X: SOLID W: BASIC LIQUIDITY $1.7M ENTRY MC $41.1M ATH MC $41.1M NOW MC $40.6M ROI -1% ATH ROI +0% TopCallersChannel 8h ago DEGEN MEME SOL CALL 4.0 X 4.0 WEB 4.8 C: BASIC X: BASIC W: BASIC LIQUIDITY $46K ENTRY MC $130K ATH MC $178K NOW MC $156K ROI +20% ATH ROI +37% Maestrosdegen 8h ago SM MEME SOL CALL 1.0 X 2.0 C: TRASH X: TRASH W: NO SITE LIQUIDITY $39K ENTRY MC $68K ATH MC $95K NOW MC $95K ROI +40% ATH ROI +40% Insider_ECA 9h ago MM MEME SOL CALL 1.0 WEB 1.4 C: TRASH W: TRASH LIQUIDITY $256K ENTRY MC N/A ATH MC N/A NOW MC $2.8M ROI -19% ATH ROI +0% GT Trending 9h ago LFJ MEME SOL CALL 1.0 X 2.0 C: TRASH X: TRASH W: NO SITE LIQUIDITY $4K ENTRY MC $32K ATH MC $40K NOW MC $12K ROI -62% ATH ROI +25% shitcoinneverland 10h ago LAURA MEME SOL CALL 7.0 X 2.0 C: ALPHA X: TRASH W: NO SITE LIQUIDITY $60K ENTRY MC $300K ATH MC $300K NOW MC $69K ROI -77% ATH ROI +0% metagambler 10h ago TT MEME SOL CALL 2.0 X 2.0 C: TRASH X: TRASH W: NO SITE LIQUIDITY $9 ENTRY MC $10K ATH MC $13K NOW MC $9K ROI +6% ATH ROI +23% LuigisGambles 11h ago PULZ UTILITY ETH CALL 2.0 X 7.0 WEB 2.4 C: TRASH X: SOLID W: TRASH LIQUIDITY $16K ENTRY MC $42K ATH MC $42K NOW MC $23K ROI -46% ATH ROI +0% CryptachCalls 12h ago AIRI UTILITY SOL CALL 7.0 X 2.0 WEB ❌ C: ALPHA X: TRASH W: FAILED LIQUIDITY $125K ENTRY MC $753K ATH MC $1.2M NOW MC $925K ROI +23% ATH ROI +60% gubbinscalls 12h ago VVV UTILITY BASE CALL 1.0 WEB 5.7 C: TRASH W: BASIC LIQUIDITY $10.9M ENTRY MC $120.6M ATH MC $120.6M NOW MC $119.4M ROI -1% ATH ROI +0% GT Trending 12h ago Showing 1-20 of 5562 calls"
+  - button "««" [disabled]
+  - button "‹" [disabled]
+  - button "1"
+  - button "2"
+  - button "3"
+  - button "4"
+  - button "5"
+  - button "›"
+  - button "»»"
+  - button "Settings" [disabled]:
+    - text: Settings
+    - img
+  - button "Leaderboard" [disabled]:
+    - text: Leaderboard
+    - img
+  - button "Analytics" [disabled]:
+    - text: Analytics
+    - img
+  - button "Roadmap":
+    - text: Roadmap
+    - img
+  - button "Charts" [disabled]:
+    - text: Charts
+    - img
+  - button:
+    - img
+- alert
+```
