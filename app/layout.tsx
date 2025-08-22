@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { ConditionalLayout } from '@/components/conditional-layout'
-import { TooltipProvider } from '@/components/ui/tooltip'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -41,11 +40,9 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.className} min-h-screen bg-background antialiased`}>
-        <TooltipProvider delayDuration={300} skipDelayDuration={500}>
-          <ConditionalLayout>
-            {children}
-          </ConditionalLayout>
-        </TooltipProvider>
+        <ConditionalLayout>
+          {children}
+        </ConditionalLayout>
       </body>
     </html>
   )

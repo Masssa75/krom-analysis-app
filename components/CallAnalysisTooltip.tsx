@@ -1,14 +1,9 @@
 'use client'
 
-import { ReactNode } from 'react'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
+import React from 'react'
 
 interface CallAnalysisTooltipProps {
-  children: ReactNode
+  children: React.ReactNode
   score?: number
   reasoning?: string
   tokenType?: string
@@ -22,6 +17,8 @@ export function CallAnalysisTooltip({
   tokenType,
   tier
 }: CallAnalysisTooltipProps) {
+  const [showTooltip, setShowTooltip] = React.useState(false)
+
   if (!reasoning) {
     return <>{children}</>
   }
@@ -55,51 +52,60 @@ export function CallAnalysisTooltip({
   }
 
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        {children}
-      </TooltipTrigger>
-      <TooltipContent 
-        side="top" 
-        align="center"
-        className="max-w-md p-3 bg-[#1a1a1a] border border-[#333] shadow-xl"
-      >
-        <div className="space-y-2">
-          {/* Header with score and tier */}
-          <div className="flex items-center justify-between border-b border-[#333] pb-2">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-gray-400">CALL ANALYSIS</span>
-              {score && (
-                <span className="text-xs px-1.5 py-0.5 rounded bg-[#333] text-white">
-                  Score: {score}/10
+    <div 
+      className="relative inline-block"
+      onMouseEnter={() => setShowTooltip(true)}
+      onMouseLeave={() => setShowTooltip(false)}
+    >
+      {children}
+      
+      {showTooltip && (
+        <div className="absolute z-[9999] bottom-full left-1/2 transform -translate-x-1/2 mb-2">
+          <div className="bg-[#1a1c1f] rounded-lg shadow-xl border border-[#333] p-4 min-w-[300px] max-w-[400px]">
+            {/* Header with score and tier */}
+            <div className="flex items-center justify-between border-b border-[#2a2d31] pb-2 mb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-[#888] uppercase tracking-wider">📊 CALL ANALYSIS</span>
+                {score && (
+                  <span className="text-xs px-1.5 py-0.5 rounded bg-[#333] text-white">
+                    Score: {score}/10
+                  </span>
+                )}
+              </div>
+              {tokenType && (
+                <span className="text-xs px-1.5 py-0.5 rounded bg-[#222] text-gray-300">
+                  {tokenType}
                 </span>
               )}
             </div>
-            {tokenType && (
-              <span className="text-xs px-1.5 py-0.5 rounded bg-[#222] text-gray-300">
-                {tokenType}
-              </span>
-            )}
-          </div>
 
-          {/* Tier explanation */}
-          {tier && (
-            <div className="text-xs text-gray-400 italic">
-              {getTierExplanation(tier)}
-            </div>
-          )}
-
-          {/* Key findings */}
-          <div className="space-y-1">
-            <div className="text-xs font-semibold text-gray-300">Key Findings:</div>
-            {keyPoints.map((point, i) => (
-              <div key={i} className="text-xs text-gray-400 pl-2">
-                • {point}
+            {/* Tier explanation */}
+            {tier && (
+              <div className="text-xs text-gray-400 italic mb-3">
+                {getTierExplanation(tier)}
               </div>
-            ))}
+            )}
+
+            {/* Key findings */}
+            <div className="space-y-1">
+              <div className="text-xs font-bold text-[#aaa] mb-2">Key Findings:</div>
+              {keyPoints.map((point, i) => (
+                <div key={i} className="text-[11px] text-[#999] pl-2 flex items-start">
+                  <span className="text-[#666] mr-1.5">•</span>
+                  <span>{point}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Arrow pointing down */}
+            <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-0 
+              border-l-[8px] border-l-transparent
+              border-t-[8px] border-t-[#1a1c1f]
+              border-r-[8px] border-r-transparent">
+            </div>
           </div>
         </div>
-      </TooltipContent>
-    </Tooltip>
+      )}
+    </div>
   )
 }
