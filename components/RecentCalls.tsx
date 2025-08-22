@@ -536,13 +536,13 @@ export default function RecentCalls({ filters = { tokenType: 'all' }, isGodMode 
                             </WebsiteAnalysisTooltip>
                           ) : (
                             <span 
-                              className="text-[9px] leading-[1] px-1.5 py-0.5 rounded font-semibold inline-block whitespace-nowrap"
+                              className="text-[9px] leading-[1] px-1.5 py-0.5 rounded font-semibold whitespace-nowrap"
                               style={{ 
                                 backgroundColor: '#33333366', 
                                 color: '#888888',
-                                display: 'inline-block'
+                                display: 'inline-block !important'
                               }}
-                            >{`W:\u00A0NO\u00A0SITE`}</span>
+                            >W: NO SITE</span>
                           )
                         )}
                       </div>
