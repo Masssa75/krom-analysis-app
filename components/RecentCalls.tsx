@@ -6,6 +6,8 @@ import { SortDropdown } from './sort-dropdown'
 import SearchInput from './SearchInput'
 import ColumnSettings, { ColumnVisibility } from './ColumnSettings'
 import { WebsiteAnalysisTooltip } from './WebsiteAnalysisTooltip'
+import { CallAnalysisTooltip } from './CallAnalysisTooltip'
+import { XAnalysisTooltip } from './XAnalysisTooltip'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,7 +35,9 @@ interface RecentCall {
   x_analysis_score: number
   x_analysis_tier: string
   x_analysis_reasoning?: string
+  x_analysis_summary?: string
   x_best_tweet?: string
+  x_analysis_best_tweet?: string
   analysis_token_type: string
   x_analysis_token_type?: string
   is_imposter?: boolean
@@ -489,20 +493,35 @@ export default function RecentCalls({ filters = { tokenType: 'all' }, isGodMode 
                     {columnVisibility.showBadges && (
                       <div className="flex gap-1.5">
                         {columnVisibility.callAnalysis && call.analysis_tier && (
-                          <span 
-                            className="text-[9px] leading-[1] px-1.5 py-0.5 rounded font-semibold inline-block"
-                            style={{ backgroundColor: callTier.bg, color: callTier.text }}
+                          <CallAnalysisTooltip
+                            score={call.analysis_score}
+                            reasoning={call.analysis_reasoning}
+                            tokenType={call.analysis_token_type}
+                            tier={call.analysis_tier}
                           >
-                            C: {call.analysis_tier}
-                          </span>
+                            <span 
+                              className="text-[9px] leading-[1] px-1.5 py-0.5 rounded font-semibold inline-block cursor-help"
+                              style={{ backgroundColor: callTier.bg, color: callTier.text }}
+                            >
+                              C: {call.analysis_tier}
+                            </span>
+                          </CallAnalysisTooltip>
                         )}
                         {columnVisibility.xAnalysis && call.x_analysis_tier && (
-                          <span 
-                            className="text-[9px] leading-[1] px-1.5 py-0.5 rounded font-semibold inline-block"
-                            style={{ backgroundColor: xTier.bg, color: xTier.text }}
+                          <XAnalysisTooltip
+                            score={call.x_analysis_score}
+                            reasoning={call.x_analysis_reasoning}
+                            summary={call.x_analysis_summary}
+                            bestTweet={call.x_best_tweet || call.x_analysis_best_tweet}
+                            tier={call.x_analysis_tier}
                           >
-                            X: {call.x_analysis_tier}
-                          </span>
+                            <span 
+                              className="text-[9px] leading-[1] px-1.5 py-0.5 rounded font-semibold inline-block cursor-help"
+                              style={{ backgroundColor: xTier.bg, color: xTier.text }}
+                            >
+                              X: {call.x_analysis_tier}
+                            </span>
+                          </XAnalysisTooltip>
                         )}
                         {columnVisibility.websiteAnalysis && (
                           call.website_tier ? (
