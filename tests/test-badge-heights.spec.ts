@@ -14,7 +14,7 @@ test('Check badge heights are consistent', async ({ page }) => {
   const callBadges = await page.locator('span:has-text("C:")').all()
   const xBadges = await page.locator('span:has-text("X:")').all()
   // Get both regular website badges and NO SITE badges
-  const websiteBadges = await page.locator('span').filter({ hasText: /^W:/ }).all()
+  const websiteBadges = await page.locator('span:has-text("W:")').all()
   
   console.log(`Found ${callBadges.length} Call badges`)
   console.log(`Found ${xBadges.length} X badges`)

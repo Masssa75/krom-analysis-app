@@ -500,7 +500,7 @@ export default function RecentCalls({ filters = { tokenType: 'all' }, isGodMode 
                             tier={call.analysis_tier}
                           >
                             <span 
-                              className="text-[9px] leading-[1] px-1.5 py-0.5 rounded font-semibold inline-block cursor-help"
+                              className="text-[9px] leading-[1] px-1.5 py-0.5 rounded font-semibold inline-block whitespace-nowrap cursor-help"
                               style={{ backgroundColor: callTier.bg, color: callTier.text }}
                             >
                               C: {call.analysis_tier}
@@ -516,7 +516,7 @@ export default function RecentCalls({ filters = { tokenType: 'all' }, isGodMode 
                             tier={call.x_analysis_tier}
                           >
                             <span 
-                              className="text-[9px] leading-[1] px-1.5 py-0.5 rounded font-semibold inline-block cursor-help"
+                              className="text-[9px] leading-[1] px-1.5 py-0.5 rounded font-semibold inline-block whitespace-nowrap cursor-help"
                               style={{ backgroundColor: xTier.bg, color: xTier.text }}
                             >
                               X: {call.x_analysis_tier}
@@ -527,7 +527,7 @@ export default function RecentCalls({ filters = { tokenType: 'all' }, isGodMode 
                           call.website_tier ? (
                             <WebsiteAnalysisTooltip fullAnalysis={call.website_analysis_full}>
                               <span 
-                                className="text-[9px] leading-[1] px-1.5 py-0.5 rounded font-semibold inline-block cursor-help"
+                                className="text-[9px] leading-[1] px-1.5 py-0.5 rounded font-semibold inline-block whitespace-nowrap cursor-help"
                                 style={{ 
                                   backgroundColor: (call.website_score === 0 && call.website_analysis_reasoning?.includes('ERROR')) ? '#ff666622' : getTierColor(call.website_tier).bg, 
                                   color: (call.website_score === 0 && call.website_analysis_reasoning?.includes('ERROR')) ? '#ff6666' : getTierColor(call.website_tier).text 
@@ -536,7 +536,7 @@ export default function RecentCalls({ filters = { tokenType: 'all' }, isGodMode 
                             </WebsiteAnalysisTooltip>
                           ) : (
                             <span 
-                              className="text-[9px] leading-[1] px-1.5 py-0.5 rounded font-semibold inline-block"
+                              className="text-[9px] leading-[1] px-1.5 py-0.5 rounded font-semibold inline-block whitespace-nowrap"
                               style={{ 
                                 backgroundColor: '#33333366', 
                                 color: '#888888' 
