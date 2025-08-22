@@ -4,7 +4,6 @@ import { ReactNode } from 'react'
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 
@@ -71,11 +70,10 @@ export function XAnalysisTooltip({
   }
 
   return (
-    <TooltipProvider>
-      <Tooltip delayDuration={300}>
-        <TooltipTrigger asChild>
-          {children}
-        </TooltipTrigger>
+    <Tooltip delayDuration={300}>
+      <TooltipTrigger asChild>
+        {children}
+      </TooltipTrigger>
         <TooltipContent 
           side="top" 
           align="center"
@@ -151,7 +149,6 @@ export function XAnalysisTooltip({
             )}
           </div>
         </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    </Tooltip>
   )
 }
