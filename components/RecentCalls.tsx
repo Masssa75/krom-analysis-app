@@ -539,7 +539,8 @@ export default function RecentCalls({ filters = { tokenType: 'all' }, isGodMode 
                               className="text-[9px] leading-[1] px-1.5 py-0.5 rounded font-semibold inline-block whitespace-nowrap"
                               style={{ 
                                 backgroundColor: '#33333366', 
-                                color: '#888888' 
+                                color: '#888888',
+                                display: 'inline-block'
                               }}
                             >{`W:\u00A0NO\u00A0SITE`}</span>
                           )
