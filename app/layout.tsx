@@ -41,7 +41,7 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.className} min-h-screen bg-background antialiased`}>
-        <TooltipProvider>
+        <TooltipProvider delayDuration={300} skipDelayDuration={500}>
           <ConditionalLayout>
             {children}
           </ConditionalLayout>

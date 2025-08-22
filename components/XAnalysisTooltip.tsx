@@ -70,7 +70,7 @@ export function XAnalysisTooltip({
   }
 
   return (
-    <Tooltip delayDuration={300}>
+    <Tooltip>
       <TooltipTrigger asChild>
         {children}
       </TooltipTrigger>

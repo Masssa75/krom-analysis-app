@@ -55,7 +55,7 @@ export function CallAnalysisTooltip({
   }
 
   return (
-    <Tooltip delayDuration={300}>
+    <Tooltip>
       <TooltipTrigger asChild>
         {children}
       </TooltipTrigger>
