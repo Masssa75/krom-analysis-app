@@ -541,7 +541,7 @@ export default function RecentCalls({ filters = { tokenType: 'all' }, isGodMode 
                                 backgroundColor: '#33333366', 
                                 color: '#888888' 
                               }}
-                            >W: NO SITE</span>
+                            >{`W:\u00A0NO\u00A0SITE`}</span>
                           )
                         )}
                       </div>
