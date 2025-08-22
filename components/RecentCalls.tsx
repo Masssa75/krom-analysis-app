@@ -532,9 +532,7 @@ export default function RecentCalls({ filters = { tokenType: 'all' }, isGodMode 
                                   backgroundColor: (call.website_score === 0 && call.website_analysis_reasoning?.includes('ERROR')) ? '#ff666622' : getTierColor(call.website_tier).bg, 
                                   color: (call.website_score === 0 && call.website_analysis_reasoning?.includes('ERROR')) ? '#ff6666' : getTierColor(call.website_tier).text 
                                 }}
-                              >
-                                W: {(call.website_score === 0 && call.website_analysis_reasoning?.includes('ERROR')) ? 'FAILED' : call.website_tier}
-                              </span>
+                              >W: {(call.website_score === 0 && call.website_analysis_reasoning?.includes('ERROR')) ? 'FAILED' : call.website_tier}</span>
                             </WebsiteAnalysisTooltip>
                           ) : (
                             <span 
@@ -543,9 +541,7 @@ export default function RecentCalls({ filters = { tokenType: 'all' }, isGodMode 
                                 backgroundColor: '#33333366', 
                                 color: '#888888' 
                               }}
-                            >
-                              W: NO SITE
-                            </span>
+                            >W: NO SITE</span>
                           )
                         )}
                       </div>

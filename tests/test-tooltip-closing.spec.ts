@@ -24,7 +24,8 @@ test('Tooltips close when mouse leaves', async ({ page }) => {
   await callBadge.hover();
   await page.waitForTimeout(500);
   
-  let tooltipsVisible = await page.locator('[role="tooltip"]').count();
+  // Look for tooltip divs with specific content
+  let tooltipsVisible = await page.locator('text=CALL ANALYSIS').count();
   console.log(`After hovering Call badge: ${tooltipsVisible} tooltip(s) visible`);
   expect(tooltipsVisible).toBe(1);
   
@@ -32,7 +33,7 @@ test('Tooltips close when mouse leaves', async ({ page }) => {
   await page.mouse.move(100, 100); // Move to a neutral position
   await page.waitForTimeout(500);
   
-  tooltipsVisible = await page.locator('[role="tooltip"]').count();
+  tooltipsVisible = await page.locator('text=CALL ANALYSIS').count();
   console.log(`After moving mouse away: ${tooltipsVisible} tooltip(s) visible`);
   expect(tooltipsVisible).toBe(0);
   
@@ -40,7 +41,7 @@ test('Tooltips close when mouse leaves', async ({ page }) => {
   await callBadge.hover();
   await page.waitForTimeout(500);
   
-  tooltipsVisible = await page.locator('[role="tooltip"]').count();
+  tooltipsVisible = await page.locator('text=CALL ANALYSIS').count();
   console.log(`After hovering again: ${tooltipsVisible} tooltip(s) visible`);
   expect(tooltipsVisible).toBe(1);
   
@@ -49,7 +50,7 @@ test('Tooltips close when mouse leaves', async ({ page }) => {
   await header.hover();
   await page.waitForTimeout(500);
   
-  tooltipsVisible = await page.locator('[role="tooltip"]').count();
+  tooltipsVisible = await page.locator('text=CALL ANALYSIS').count();
   console.log(`After hovering on header: ${tooltipsVisible} tooltip(s) visible`);
   expect(tooltipsVisible).toBe(0);
   
