@@ -8,6 +8,7 @@ import ColumnSettings, { ColumnVisibility } from './ColumnSettings'
 import { WebsiteAnalysisTooltip } from './WebsiteAnalysisTooltip'
 import { CallAnalysisTooltip } from './CallAnalysisTooltip'
 import { XAnalysisTooltip } from './XAnalysisTooltip'
+import { Stage2AnalysisTooltip } from './Stage2AnalysisTooltip'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -47,6 +48,9 @@ interface RecentCall {
   website_token_type?: string
   website_analysis_reasoning?: string
   website_analysis_full?: any
+  stage2_score?: number
+  stage2_analysis?: any
+  stage2_analyzed_at?: string
   pool_address?: string
   volume_24h?: number
   liquidity_usd?: number
@@ -88,6 +92,7 @@ export default function RecentCalls({ filters = { tokenType: 'all' }, isGodMode 
     callAnalysis: true,
     xAnalysis: true,
     websiteAnalysis: false,
+    stage2Analysis: true,
     showScores: true,
     showBadges: true
   })
@@ -299,6 +304,29 @@ export default function RecentCalls({ filters = { tokenType: 'all' }, isGodMode 
     return colors[tier] || { bg: '#88888822', text: '#888' }
   }
 
+  const getStage2Tier = (analysis: any) => {
+    if (!analysis || !analysis.verdict) return null
+    const verdict = analysis.verdict.toLowerCase()
+    if (verdict.includes('honeypot')) return 'HONEYPOT'
+    if (verdict.includes('legitimate')) return 'LEGIT'
+    if (verdict.includes('suspicious')) return 'SUS'
+    if (verdict.includes('risky')) return 'RISKY'
+    return 'UNKNOWN'
+  }
+
+  const getStage2TierColor = (tier: string | null) => {
+    if (!tier) return { bg: '#88888822', text: '#888' }
+    
+    const colors: { [key: string]: { bg: string, text: string } } = {
+      HONEYPOT: { bg: '#ff444422', text: '#ff4444' },
+      LEGIT: { bg: '#00ff8822', text: '#00ff88' },
+      SUS: { bg: '#ffaa0022', text: '#ffaa00' },
+      RISKY: { bg: '#ff880022', text: '#ff8800' },
+      UNKNOWN: { bg: '#88888822', text: '#888' }
+    }
+    return colors[tier] || { bg: '#88888822', text: '#888' }
+  }
+
 
   const handleTokenClick = (call: RecentCall) => {
     setSelectedToken(call)
@@ -486,6 +514,18 @@ export default function RecentCalls({ filters = { tokenType: 'all' }, isGodMode 
                             </div>
                           </WebsiteAnalysisTooltip>
                         )}
+                        
+                        {/* Stage 2 Score - Only show if available and enabled */}
+                        {columnVisibility.stage2Analysis && call.stage2_score !== undefined && call.stage2_score !== null && (
+                          <Stage2AnalysisTooltip score={call.stage2_score} analysis={call.stage2_analysis}>
+                            <div className="flex flex-col items-center cursor-help">
+                              <span className="text-[9px] text-[#666]">S2</span>
+                              <div className="text-lg font-semibold text-white">
+                                {call.stage2_score.toFixed(1)}
+                              </div>
+                            </div>
+                          </Stage2AnalysisTooltip>
+                        )}
                       </div>
                     )}
                     
@@ -546,6 +586,22 @@ export default function RecentCalls({ filters = { tokenType: 'all' }, isGodMode 
                             </div>
                           )
                         )}
+                        
+                        {/* Stage 2 Tier Badge - Show if enabled and Stage 2 analysis exists */}
+                        {columnVisibility.stage2Analysis && call.stage2_analysis && (() => {
+                          const stage2Tier = getStage2Tier(call.stage2_analysis);
+                          const tierColor = getStage2TierColor(stage2Tier);
+                          return stage2Tier ? (
+                            <Stage2AnalysisTooltip score={call.stage2_score} analysis={call.stage2_analysis}>
+                              <span 
+                                className="text-[9px] leading-[1] px-1.5 py-0.5 rounded font-semibold inline-block whitespace-nowrap cursor-help"
+                                style={{ backgroundColor: tierColor.bg, color: tierColor.text }}
+                              >
+                                W2: {stage2Tier}
+                              </span>
+                            </Stage2AnalysisTooltip>
+                          ) : null;
+                        })()}
                       </div>
                     )}
                   </div>

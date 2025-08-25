@@ -8,6 +8,7 @@ export interface ColumnVisibility {
   callAnalysis: boolean
   xAnalysis: boolean
   websiteAnalysis: boolean
+  stage2Analysis: boolean
   
   // Sub-toggles for what to show
   showScores: boolean
@@ -24,6 +25,7 @@ export default function ColumnSettings({ onSettingsChange }: ColumnSettingsProps
     callAnalysis: true,
     xAnalysis: true,
     websiteAnalysis: false, // Default to off until we have data
+    stage2Analysis: true, // Default to on to show Stage 2 when available
     showScores: true,
     showBadges: true
   })
@@ -39,7 +41,8 @@ export default function ColumnSettings({ onSettingsChange }: ColumnSettingsProps
           ...settings,
           ...parsed,
           showScores: parsed.showScores !== undefined ? parsed.showScores : true,
-          showBadges: parsed.showBadges !== undefined ? parsed.showBadges : true
+          showBadges: parsed.showBadges !== undefined ? parsed.showBadges : true,
+          stage2Analysis: parsed.stage2Analysis !== undefined ? parsed.stage2Analysis : true
         }
         setSettings(updatedSettings)
         onSettingsChange(updatedSettings)
@@ -108,6 +111,16 @@ export default function ColumnSettings({ onSettingsChange }: ColumnSettingsProps
                     type="checkbox"
                     checked={settings.websiteAnalysis}
                     onChange={() => handleToggle('websiteAnalysis')}
+                    className="w-4 h-4 rounded border-[#2a2d31] bg-[#1a1c1f] text-[#00ff88] focus:ring-[#00ff88] focus:ring-offset-0"
+                  />
+                </label>
+
+                <label className="flex items-center justify-between cursor-pointer">
+                  <span className="text-[#888]">Stage 2 (Contract) Analysis</span>
+                  <input
+                    type="checkbox"
+                    checked={settings.stage2Analysis}
+                    onChange={() => handleToggle('stage2Analysis')}
                     className="w-4 h-4 rounded border-[#2a2d31] bg-[#1a1c1f] text-[#00ff88] focus:ring-[#00ff88] focus:ring-offset-0"
                   />
                 </label>
