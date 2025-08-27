@@ -19,6 +19,7 @@ interface FilterState {
   minCallScore?: number
   minXScore?: number
   minWebsiteScore?: number
+  showFavoritesOnly?: boolean
 }
 
 export default function HomePage() {
@@ -137,6 +138,10 @@ export default function HomePage() {
     const initial = getInitialFilterState()
     return initial.minWebsiteScore || 1
   })
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState<boolean>(() => {
+    const initial = getInitialFilterState()
+    return initial.showFavoritesOnly || false
+  })
   
   // Debounce all filters with 400ms delay
   const debouncedFilters = useDebounce(filters, 400)
@@ -173,7 +178,8 @@ export default function HomePage() {
       socialFilters: [],
       minCallScore: 1,
       minXScore: 1,
-      minWebsiteScore: 1
+      minWebsiteScore: 1,
+      showFavoritesOnly: false
     }
     
     // Update all individual states
@@ -190,6 +196,7 @@ export default function HomePage() {
     setMinCallScore(1)
     setMinXScore(1)
     setMinWebsiteScore(1)
+    setShowFavoritesOnly(false)
     
     // Reset all sections to collapsed (except token type)
     setIsTokenTypeCollapsed(false)
@@ -274,6 +281,33 @@ export default function HomePage() {
           >
             Reset
           </button>
+        </div>
+
+        {/* Favorites Toggle */}
+        <div className="px-5 pb-3">
+          <label 
+            className="flex items-center gap-2.5 cursor-pointer text-sm text-[#ccc] hover:text-white transition-colors p-3 bg-[#0a0b0d] rounded-lg border border-[#1a1c1f] hover:border-[#00ff88]"
+          >
+            <div 
+              className={`w-5 h-5 border-2 rounded-[5px] transition-all flex items-center justify-center ${
+                showFavoritesOnly ? 'bg-[#00ff88] border-[#00ff88]' : 'border-[#333]'
+              }`}
+              onClick={(e) => {
+                e.stopPropagation()
+                const newState = !showFavoritesOnly
+                setShowFavoritesOnly(newState)
+                setFilters(prev => ({ ...prev, showFavoritesOnly: newState }))
+              }}
+            >
+              {showFavoritesOnly && <span className="text-black font-bold text-xs">✓</span>}
+            </div>
+            <span className="flex items-center gap-2">
+              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+              </svg>
+              Show Favorites Only
+            </span>
+          </label>
         </div>
 
         {/* Token Type Filter */}

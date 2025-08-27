@@ -1,0 +1,77 @@
+# Page snapshot
+
+```yaml
+- main:
+  - heading "KROM" [level=1]
+  - button "BUY"
+  - button:
+    - img
+  - paragraph: Advanced AI Powered Token Discovery
+  - text: "Contract Address: 9eCEK7ttNtroHsFLnW8jW7pS9MtSAPrPPrZ6QCUFpump"
+  - heading "FILTERS" [level=2]
+  - button "Reset"
+  - heading "Token Type" [level=3]
+  - text: ▼ ✓ Utility Tokens ✓ Meme Tokens
+  - heading "Rugs" [level=3]
+  - text: "▼ Include Rugs When unchecked, hides tokens with:"
+  - list:
+    - listitem: ATH ROI < 20% AND
+    - listitem: Current ROI < -75% AND
+    - listitem: Liquidity & Market Cap both < $50K
+  - text: Include Imposters When unchecked, hides tokens marked as having inauthentic websites
+  - heading "Networks" [level=3]
+  - text: ▼ ✓ Ethereum ✓ Solana ✓ BSC ✓ Base
+  - heading "Social Media" [level=3]
+  - text: ▼ Has Website Has Twitter/X Has Telegram
+  - heading "Analysis Scores" [level=3]
+  - text: ▼ Min Call Score1
+  - slider: "1"
+  - text: 1510 Min X Score1
+  - slider: "1"
+  - text: 1510 Min Website Score1.0
+  - slider: "1"
+  - text: "1510"
+  - button "Reset Score Filters"
+  - heading "Liquidity & Market Cap" [level=3]
+  - text: ▼ Liquidity (USD)
+  - spinbutton
+  - text: "-"
+  - spinbutton
+  - text: Market Cap (USD)
+  - spinbutton
+  - text: "-"
+  - spinbutton
+  - button "Clear Range Filters"
+  - text: TOP EARLY CALLS
+  - button "24H"
+  - button "7D"
+  - button "90D"
+  - button "ALL TIME"
+  - text: "[Loading] [Loading] [Loading] [Loading] [Loading] [Loading] [Loading] [Loading] [Loading]"
+  - heading "RECENT CALLS" [level=2]
+  - button "Column Settings":
+    - img
+  - button "Search":
+    - img
+  - text: "Sort by:"
+  - combobox
+  - button "Sort descending":
+    - img
+  - button "Settings" [disabled]:
+    - text: Settings
+    - img
+  - button "Leaderboard" [disabled]:
+    - text: Leaderboard
+    - img
+  - button "Analytics" [disabled]:
+    - text: Analytics
+    - img
+  - button "Roadmap":
+    - text: Roadmap
+    - img
+  - button "Charts" [disabled]:
+    - text: Charts
+    - img
+  - button:
+    - img
+```

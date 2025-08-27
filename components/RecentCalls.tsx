@@ -15,7 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { MoreVertical } from 'lucide-react'
+import { MoreVertical, Star } from 'lucide-react'
 
 interface RecentCall {
   id: string
@@ -73,6 +73,7 @@ interface RecentCallsProps {
     minCallScore?: number
     minXScore?: number
     minWebsiteScore?: number
+    showFavoritesOnly?: boolean
   }
   isGodMode?: boolean
 }
@@ -88,6 +89,7 @@ export default function RecentCalls({ filters = { tokenType: 'all' }, isGodMode 
   const [sortBy, setSortBy] = useState('buy_timestamp')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [searchQuery, setSearchQuery] = useState('')
+  const [favorites, setFavorites] = useState<Set<string>>(new Set())
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>({
     callAnalysis: true,
     xAnalysis: true,
@@ -100,6 +102,41 @@ export default function RecentCalls({ filters = { tokenType: 'all' }, isGodMode 
   
   // AbortController ref to cancel in-flight requests
   const abortControllerRef = useRef<AbortController | null>(null)
+
+  // Load favorites from localStorage on mount
+  useEffect(() => {
+    const storedFavorites = localStorage.getItem('kromFavorites')
+    if (storedFavorites) {
+      try {
+        const favoritesArray = JSON.parse(storedFavorites)
+        setFavorites(new Set(favoritesArray))
+      } catch (e) {
+        console.error('Failed to parse favorites:', e)
+      }
+    }
+  }, [])
+
+  // Save favorites to localStorage whenever they change
+  useEffect(() => {
+    if (favorites.size > 0) {
+      localStorage.setItem('kromFavorites', JSON.stringify(Array.from(favorites)))
+    } else {
+      localStorage.removeItem('kromFavorites')
+    }
+  }, [favorites])
+
+  // Toggle favorite status
+  const toggleFavorite = (tokenId: string) => {
+    setFavorites(prev => {
+      const newFavorites = new Set(prev)
+      if (newFavorites.has(tokenId)) {
+        newFavorites.delete(tokenId)
+      } else {
+        newFavorites.add(tokenId)
+      }
+      return newFavorites
+    })
+  }
 
   useEffect(() => {
     setCurrentPage(1)  // Reset to first page when filters change
@@ -181,9 +218,16 @@ export default function RecentCalls({ filters = { tokenType: 'all' }, isGodMode 
       // Only proceed if the request wasn't aborted
       if (!abortController.signal.aborted) {
         const data = await response.json()
-        setCalls(data.data || [])
-        setTotalPages(data.totalPages || 1)
-        setTotalCount(data.totalCount || 0)
+        let filteredCalls = data.data || []
+        
+        // Apply client-side favorites filter if needed
+        if (filters?.showFavoritesOnly && favorites.size > 0) {
+          filteredCalls = filteredCalls.filter((call: RecentCall) => favorites.has(call.id))
+        }
+        
+        setCalls(filteredCalls)
+        setTotalPages(filters?.showFavoritesOnly ? 1 : data.totalPages || 1)
+        setTotalCount(filters?.showFavoritesOnly ? filteredCalls.length : data.totalCount || 0)
       }
     } catch (error: any) {
       // Ignore abort errors
@@ -442,6 +486,19 @@ export default function RecentCalls({ filters = { tokenType: 'all' }, isGodMode 
                   <div className="flex items-center gap-5">
                     {/* Token Info */}
                     <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => toggleFavorite(call.id)}
+                        className="p-1 hover:bg-[#1a1c1f] rounded transition-colors"
+                        title={favorites.has(call.id) ? 'Remove from favorites' : 'Add to favorites'}
+                      >
+                        <Star 
+                          className={`h-4 w-4 ${
+                            favorites.has(call.id) 
+                              ? 'fill-[#00ff88] text-[#00ff88]' 
+                              : 'text-[#444] hover:text-[#00ff88]'
+                          }`}
+                        />
+                      </button>
                       <span 
                         className={`font-semibold text-base cursor-pointer transition-colors ${
                           call.is_imposter 
