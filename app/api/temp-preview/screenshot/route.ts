@@ -5,8 +5,6 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -17,36 +15,39 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Map URLs to local screenshot files
-    const screenshotMap: Record<string, string> = {
-      'https://www.fedora.club': 'fedora.png',
-      'https://www.ainu.pro': 'ainu.png',
-      'https://www.uiui.wtf': 'uiui.png',
-      'https://bio.xyz': 'bio.png'
-    };
+    // Use the REAL Screenly API
+    const apiKey = process.env.SCREENLY_API_KEY;
     
-    const screenshotFile = screenshotMap[targetUrl];
-    
-    if (screenshotFile) {
-      // Serve the local screenshot file
-      const filePath = path.join(process.cwd(), 'public', 'temp-screenshots', screenshotFile);
-      
-      try {
-        const imageBuffer = fs.readFileSync(filePath);
-        
-        return new NextResponse(imageBuffer, {
-          status: 200,
-          headers: {
-            'Content-Type': 'image/png',
-            'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
-            'Vary': 'url', // Important: vary cache by URL parameter
-            'X-Screenshot-File': screenshotFile, // Debug header
-          },
-        });
-      } catch (fileError) {
-        console.log(`Screenshot file not found: ${filePath}`);
-      }
+    if (!apiKey) {
+      console.error('SCREENLY_API_KEY not found in environment variables');
+      throw new Error('Screenshot service not configured');
     }
+    
+    // Screenly API endpoint with proper parameters
+    const screenshotUrl = `https://api.screenly.com/v1/screenshot?url=${encodeURIComponent(targetUrl)}&key=${apiKey}&width=1280&height=800&delay=3000`;
+    
+    console.log('Fetching screenshot from Screenly for:', targetUrl);
+    
+    // Fetch the screenshot from Screenly
+    const imageResponse = await fetch(screenshotUrl);
+    
+    if (!imageResponse.ok) {
+      console.error(`Screenly API returned ${imageResponse.status}`);
+      throw new Error(`Screenshot service error: ${imageResponse.status}`);
+    }
+    
+    // Get the image as a buffer
+    const imageBuffer = await imageResponse.arrayBuffer();
+    
+    // Return the actual image buffer with caching
+    return new NextResponse(imageBuffer, {
+      status: 200,
+      headers: {
+        'Content-Type': 'image/png',
+        'Cache-Control': 'public, max-age=86400', // Cache for 24 hours
+        'Vary': 'url', // Important: vary cache by URL parameter
+      },
+    });
     
     // Fallback to colored placeholder if no screenshot exists
     const hostname = new URL(targetUrl).hostname.replace('www.', '');
