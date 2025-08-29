@@ -95,6 +95,8 @@ export async function GET(request: NextRequest) {
       headers: {
         'Content-Type': 'image/svg+xml',
         'Cache-Control': 'public, max-age=300', // Cache placeholder for 5 minutes
+        'X-Error-Message': error instanceof Error ? error.message : 'Unknown error',
+        'X-Env-Var-Status': process.env.APIFLASH_ACCESS_KEY ? 'exists' : 'missing',
       },
     });
   }
