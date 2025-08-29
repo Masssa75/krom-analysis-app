@@ -1,0 +1,86 @@
+# Page snapshot
+
+```yaml
+- main:
+  - heading "🚀 KROM Discovery" [level=1]
+  - paragraph: Testing Website Previews
+  - button "Screenshot Mode"
+  - button "iFrame Mode (via Proxy)"
+  - text: "Current Mode: Static Screenshots"
+  - img "Fedora screenshot"
+  - heading "Fedora" [level=3]
+  - paragraph: $FEDORA
+  - text: 13/21
+  - paragraph: Meme coin with strong branding. The gentleman's token.
+  - paragraph: Market Cap
+  - paragraph: $147K
+  - paragraph: Liquidity
+  - paragraph: $14.9K
+  - paragraph: Age
+  - paragraph: 2d
+  - link "Visit Website ↗":
+    - /url: https://www.fedora.club
+  - button "Chart 📊"
+  - img "Ainu AI screenshot"
+  - heading "Ainu AI" [level=3]
+  - paragraph: $AINU
+  - text: 13/21
+  - paragraph: AI-powered utility token with clear tokenomics.
+  - paragraph: Market Cap
+  - paragraph: $154K
+  - paragraph: Liquidity
+  - paragraph: $15.4K
+  - paragraph: Age
+  - paragraph: 3d
+  - link "Visit Website ↗":
+    - /url: https://www.ainu.pro
+  - button "Chart 📊"
+  - img "UIUI screenshot"
+  - heading "UIUI" [level=3]
+  - paragraph: $UIUI
+  - text: 11/21
+  - paragraph: UI/UX focused design toolkit for dApps.
+  - paragraph: Market Cap
+  - paragraph: $250K
+  - paragraph: Liquidity
+  - paragraph: $25K
+  - paragraph: Age
+  - paragraph: 1d
+  - link "Visit Website ↗":
+    - /url: https://www.uiui.wtf
+  - button "Chart 📊"
+  - img "BIO Protocol screenshot"
+  - heading "BIO Protocol" [level=3]
+  - paragraph: $BIO
+  - text: 16/21
+  - paragraph: Decentralized science funding protocol.
+  - paragraph: Market Cap
+  - paragraph: $420K
+  - paragraph: Liquidity
+  - paragraph: $68K
+  - paragraph: Age
+  - paragraph: 14d
+  - link "Visit Website ↗":
+    - /url: https://bio.xyz
+  - button "Chart 📊"
+  - heading "🧪 Preview Testing" [level=3]
+  - paragraph: "This is a temporary page for testing website previews. It demonstrates:"
+  - list:
+    - listitem:
+      - strong: "iFrame Mode:"
+      - text: Uses proxy at /api/temp-preview/proxy to bypass CORS
+    - listitem:
+      - strong: "Screenshot Mode:"
+      - text: Uses screenshot API at /api/temp-preview/screenshot
+    - listitem: Both endpoints are in the /app/api/temp-preview folder
+    - listitem: This entire page is in /app/temp-discovery
+    - listitem: "To remove: Delete /app/api/temp-preview and /app/temp-discovery folders"
+  - paragraph:
+    - strong: "URLs being tested:"
+  - list:
+    - listitem: "Fedora: https://www.fedora.club"
+    - listitem: "Ainu: https://www.ainu.pro"
+    - listitem: "UIUI: https://www.uiui.wtf"
+    - listitem: "BIO: https://bio.xyz"
+- alert
+```

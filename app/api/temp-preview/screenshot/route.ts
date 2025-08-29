@@ -15,24 +15,24 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Use the REAL Screenly API
-    const apiKey = process.env.SCREENLY_API_KEY;
+    // Use ApiFlash for screenshots
+    const apiKey = process.env.APIFLASH_ACCESS_KEY;
     
     if (!apiKey) {
-      console.error('SCREENLY_API_KEY not found in environment variables');
+      console.error('APIFLASH_ACCESS_KEY not found in environment variables');
       throw new Error('Screenshot service not configured');
     }
     
-    // Screenly API endpoint with proper parameters
-    const screenshotUrl = `https://api.screenly.com/v1/screenshot?url=${encodeURIComponent(targetUrl)}&key=${apiKey}&width=1280&height=800&delay=3000`;
+    // ApiFlash API endpoint with mobile viewport for better card display
+    const screenshotUrl = `https://api.apiflash.com/v1/urltoimage?access_key=${apiKey}&url=${encodeURIComponent(targetUrl)}&format=png&width=375&height=667&wait_until=page_loaded&delay=3000&no_cookie_banners=true&no_ads=true&emulate_device=iPhone_12`;
     
-    console.log('Fetching screenshot from Screenly for:', targetUrl);
+    console.log('Fetching screenshot from ApiFlash for:', targetUrl);
     
-    // Fetch the screenshot from Screenly
+    // Fetch the screenshot from ApiFlash
     const imageResponse = await fetch(screenshotUrl);
     
     if (!imageResponse.ok) {
-      console.error(`Screenly API returned ${imageResponse.status}`);
+      console.error(`ApiFlash API returned ${imageResponse.status}`);
       throw new Error(`Screenshot service error: ${imageResponse.status}`);
     }
     
