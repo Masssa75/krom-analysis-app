@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
       url: token.website_url,
       websiteScore: token.website_score || 0,
       websiteAnalysis: token.website_analysis,
-      description: token.analysis_description || null,
+      description: token.analysis_description || token.website_analysis_full?.quick_take || token.website_quick_take || null,
       marketCap: token.current_market_cap || token.market_cap_at_call,
       liquidity: token.liquidity_usd,
       callDate: token.buy_timestamp,
