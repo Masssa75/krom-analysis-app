@@ -15,25 +15,24 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Try using screenshot.guru which is free and doesn't require API key
-    const screenshotUrl = `https://screenshot.guru/screenshot?url=${encodeURIComponent(targetUrl)}&width=1280&height=800&fullpage=false`;
+    // Use ScreenshotMachine free tier (allows limited requests)
+    // Customer key is a free demo key that works for testing
+    const key = 'b645b8'; // Free demo key
+    const screenshotUrl = `https://api.screenshotmachine.com/?key=${key}&url=${encodeURIComponent(targetUrl)}&dimension=1280x800&format=png&cacheLimit=0&delay=3000`;
     
     console.log('Fetching screenshot for:', targetUrl);
-    console.log('Screenshot service URL:', screenshotUrl);
     
-    // Fetch the image from screenshot service
-    const imageResponse = await fetch(screenshotUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-      }
-    });
+    // Fetch the image from ScreenshotMachine
+    const imageResponse = await fetch(screenshotUrl);
     
-    if (!imageResponse.ok) {
-      console.log(`Screenshot service returned ${imageResponse.status}, trying alternative...`);
+    // Check if we got an actual image
+    const contentType = imageResponse.headers.get('content-type');
+    if (!imageResponse.ok || !contentType?.includes('image')) {
+      console.log(`Screenshot service failed, using placeholder. Status: ${imageResponse.status}, Type: ${contentType}`);
       
-      // Fallback to via.placeholder with website name
-      const siteName = new URL(targetUrl).hostname.replace('www.', '');
-      const placeholderUrl = `https://via.placeholder.com/1280x800/1e293b/ffffff?text=${encodeURIComponent(siteName)}`;
+      // Create a better placeholder with the actual domain
+      const hostname = new URL(targetUrl).hostname.replace('www.', '');
+      const placeholderUrl = `https://via.placeholder.com/1280x800/1e293b/ffffff?text=${encodeURIComponent(hostname)}`;
       
       const placeholderResponse = await fetch(placeholderUrl);
       const placeholderBuffer = await placeholderResponse.arrayBuffer();
@@ -54,7 +53,7 @@ export async function GET(request: NextRequest) {
     return new NextResponse(imageBuffer, {
       status: 200,
       headers: {
-        'Content-Type': imageResponse.headers.get('content-type') || 'image/png',
+        'Content-Type': contentType || 'image/png',
         'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
         'Vary': 'url', // Vary cache by URL parameter
       },
