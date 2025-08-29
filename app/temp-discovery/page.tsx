@@ -136,7 +136,7 @@ export default function TempDiscoveryPage() {
               ) : (
                 <div className="w-full h-full overflow-y-auto">
                   <img
-                    src={`/api/temp-preview/screenshot?url=${encodeURIComponent(token.url)}&v=${token.ticker}&t=${Date.now()}`}
+                    src={`/api/temp-preview/screenshot?url=${encodeURIComponent(token.url)}`}
                     alt={`${token.name} screenshot`}
                     className="w-full h-auto object-top"
                     onError={(e) => {
