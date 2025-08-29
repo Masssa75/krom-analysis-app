@@ -7,6 +7,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { WebsiteAnalysisTooltip } from '@/components/WebsiteAnalysisTooltip';
 
 interface Token {
   id: string;
@@ -15,6 +16,7 @@ interface Token {
   url: string;
   websiteScore: number;
   websiteAnalysis: any;
+  websiteAnalysisFull: any;
   description: string;
   marketCap: number;
   liquidity: number;
@@ -23,6 +25,7 @@ interface Token {
   contractAddress: string;
   analysisScore: number;
   analysisTier: string;
+  analysisReasoning: string;
   roi: number;
   currentPrice: number;
   priceAtCall: number;
@@ -142,21 +145,6 @@ export default function TempDiscoveryPage() {
     }
   };
 
-  const getTierTooltip = (tier: string | null | undefined) => {
-    if (!tier) return 'No tier assigned';
-    switch (tier.toUpperCase()) {
-      case 'ALPHA':
-        return 'High-quality token with strong fundamentals (8-10 score)';
-      case 'SOLID':
-        return 'Good token with solid potential (6-7 score)';
-      case 'BASIC':
-        return 'Average token with some promise (4-5 score)';
-      case 'TRASH':
-        return 'Low-quality token with red flags (1-3 score)';
-      default:
-        return 'Unknown tier';
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-600 to-purple-900 p-6">
@@ -266,11 +254,11 @@ export default function TempDiscoveryPage() {
                   />
                 </>
               ) : (
-                <div className="w-full h-full overflow-y-auto">
+                <div className="w-full h-full overflow-hidden">
                   <img
                     src={`/api/temp-preview/screenshot?url=${encodeURIComponent(token.url)}&cache=${btoa(token.url).substring(0, 8)}`}
                     alt={`${token.name} screenshot`}
-                    className="w-full h-auto object-top"
+                    className="w-full h-full object-cover object-top"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.src = `https://via.placeholder.com/400x300/667eea/ffffff?text=${encodeURIComponent(token.name)}`;
@@ -297,18 +285,16 @@ export default function TempDiscoveryPage() {
                 </div>
                 <div className="text-right">
                   {token.analysisTier && (
-                    <div className="relative inline-block group">
-                      <span className={`${getTierColor(token.analysisTier)} text-white px-3 py-1 rounded-full text-sm font-semibold uppercase inline-block`}>
+                    <WebsiteAnalysisTooltip 
+                      fullAnalysis={{
+                        ...token.websiteAnalysisFull,
+                        type_reasoning: token.analysisReasoning
+                      }}
+                    >
+                      <span className={`${getTierColor(token.analysisTier)} text-white px-2 py-0.5 rounded-full text-xs font-semibold uppercase inline-block`}>
                         {token.analysisTier}
                       </span>
-                      {/* Tooltip */}
-                      <div className="absolute right-0 bottom-full mb-2 hidden group-hover:block w-64 z-10">
-                        <div className="bg-gray-900 text-white text-xs rounded-lg p-2 shadow-lg">
-                          <p>{getTierTooltip(token.analysisTier)}</p>
-                          <div className="absolute bottom-0 right-4 transform translate-y-1/2 rotate-45 w-2 h-2 bg-gray-900"></div>
-                        </div>
-                      </div>
-                    </div>
+                    </WebsiteAnalysisTooltip>
                   )}
                   <p className="text-xs text-gray-500 mt-1">{formatDate(token.callDate)}</p>
                 </div>
