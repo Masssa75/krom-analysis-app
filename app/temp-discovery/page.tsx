@@ -34,7 +34,7 @@ const tokens = [
   {
     name: 'UIUI',
     ticker: '$UIUI',
-    url: 'https://uiui.wtf',  // FIXED URL
+    url: 'https://www.uiui.wtf',  // FIXED URL - needs www
     score: '11/21',
     description: 'UI/UX focused design toolkit for dApps.',
     marketCap: '$250K',

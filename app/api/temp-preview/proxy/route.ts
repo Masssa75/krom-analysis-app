@@ -16,11 +16,13 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Fetch the target website
+    // Fetch the target website (follow redirects automatically)
     const response = await fetch(targetUrl, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; KROM Preview Bot/1.0)',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
       },
+      redirect: 'follow',
     });
 
     if (!response.ok) {
