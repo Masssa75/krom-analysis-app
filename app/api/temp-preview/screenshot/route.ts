@@ -16,12 +16,20 @@ export async function GET(request: NextRequest) {
 
   try {
     // Use thum.io - completely free, no API key needed
-    const thumUrl = `https://image.thum.io/get/width/1280/crop/800/noanimate/${targetUrl}`;
+    // Add cache busting parameter to ensure unique screenshots
+    const cacheBuster = Date.now();
+    const thumUrl = `https://image.thum.io/get/width/1280/crop/800/noanimate/${targetUrl}?cb=${cacheBuster}`;
     
-    console.log('Fetching screenshot from thum.io:', thumUrl);
+    console.log('Fetching screenshot from thum.io for:', targetUrl);
+    console.log('Full thum.io URL:', thumUrl);
     
-    // Fetch the image from thum.io server-side
-    const imageResponse = await fetch(thumUrl);
+    // Fetch the image from thum.io server-side with no-cache headers
+    const imageResponse = await fetch(thumUrl, {
+      headers: {
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache'
+      }
+    });
     
     if (!imageResponse.ok) {
       throw new Error(`Thum.io returned ${imageResponse.status}`);
@@ -30,12 +38,13 @@ export async function GET(request: NextRequest) {
     // Get the image as a buffer
     const imageBuffer = await imageResponse.arrayBuffer();
     
-    // Return the actual image buffer with caching
+    // Return the actual image buffer with varied cache key based on URL
     return new NextResponse(imageBuffer, {
       status: 200,
       headers: {
         'Content-Type': 'image/png',
         'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
+        'Vary': 'url', // Vary cache by URL parameter
       },
     });
     
