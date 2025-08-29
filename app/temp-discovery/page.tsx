@@ -242,7 +242,7 @@ export default function TempDiscoveryPage() {
               ) : (
                 <div className="w-full h-full overflow-y-auto">
                   <img
-                    src={`/api/temp-preview/screenshot?url=${encodeURIComponent(token.url)}`}
+                    src={`/api/temp-preview/screenshot?url=${encodeURIComponent(token.url)}&cache=${btoa(token.url).substring(0, 8)}`}
                     alt={`${token.name} screenshot`}
                     className="w-full h-auto object-top"
                     onError={(e) => {

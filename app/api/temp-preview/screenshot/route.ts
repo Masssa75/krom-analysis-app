@@ -53,8 +53,10 @@ export async function GET(request: NextRequest) {
       status: 200,
       headers: {
         'Content-Type': 'image/png',
-        'Cache-Control': 'public, max-age=86400, s-maxage=86400', // Cache for 24 hours
+        'Cache-Control': 'private, max-age=3600', // Browser cache only for 1 hour
         'ETag': `"${Buffer.from(targetUrl).toString('base64')}"`, // Unique ETag per URL
+        'Vary': 'url', // Tell CDN to vary cache by URL parameter
+        'X-Screenshot-URL': targetUrl, // Debug header to verify correct URL
       },
     });
     
