@@ -15,34 +15,46 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Use thum.io - completely free, no API key needed
-    // Add cache busting parameter to ensure unique screenshots
-    const cacheBuster = Date.now();
-    const thumUrl = `https://image.thum.io/get/width/1280/crop/800/noanimate/${targetUrl}?cb=${cacheBuster}`;
+    // Try using screenshot.guru which is free and doesn't require API key
+    const screenshotUrl = `https://screenshot.guru/screenshot?url=${encodeURIComponent(targetUrl)}&width=1280&height=800&fullpage=false`;
     
-    console.log('Fetching screenshot from thum.io for:', targetUrl);
-    console.log('Full thum.io URL:', thumUrl);
+    console.log('Fetching screenshot for:', targetUrl);
+    console.log('Screenshot service URL:', screenshotUrl);
     
-    // Fetch the image from thum.io server-side with no-cache headers
-    const imageResponse = await fetch(thumUrl, {
+    // Fetch the image from screenshot service
+    const imageResponse = await fetch(screenshotUrl, {
       headers: {
-        'Cache-Control': 'no-cache',
-        'Pragma': 'no-cache'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
       }
     });
     
     if (!imageResponse.ok) {
-      throw new Error(`Thum.io returned ${imageResponse.status}`);
+      console.log(`Screenshot service returned ${imageResponse.status}, trying alternative...`);
+      
+      // Fallback to via.placeholder with website name
+      const siteName = new URL(targetUrl).hostname.replace('www.', '');
+      const placeholderUrl = `https://via.placeholder.com/1280x800/1e293b/ffffff?text=${encodeURIComponent(siteName)}`;
+      
+      const placeholderResponse = await fetch(placeholderUrl);
+      const placeholderBuffer = await placeholderResponse.arrayBuffer();
+      
+      return new NextResponse(placeholderBuffer, {
+        status: 200,
+        headers: {
+          'Content-Type': 'image/png',
+          'Cache-Control': 'public, max-age=300', // Cache placeholder for 5 minutes
+        },
+      });
     }
     
     // Get the image as a buffer
     const imageBuffer = await imageResponse.arrayBuffer();
     
-    // Return the actual image buffer with varied cache key based on URL
+    // Return the actual image buffer with caching
     return new NextResponse(imageBuffer, {
       status: 200,
       headers: {
-        'Content-Type': 'image/png',
+        'Content-Type': imageResponse.headers.get('content-type') || 'image/png',
         'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
         'Vary': 'url', // Vary cache by URL parameter
       },
