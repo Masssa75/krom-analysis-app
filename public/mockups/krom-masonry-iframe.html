@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KROM - Crypto Projects Masonry Grid</title>
+    <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .masonry-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .project-card {
+            width: 350px;
+            background: white;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .website-preview {
+            width: 100%;
+            height: 300px;
+            border: none;
+            background: #f8f9fa;
+            position: relative;
+        }
+
+        .website-preview::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.05) 100%);
+            pointer-events: none;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .token-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .token-info h3 {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        .token-info .ticker {
+            font-size: 0.9em;
+            color: #666;
+            font-family: 'Monaco', monospace;
+        }
+
+        .score-badge {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9em;
+            box-shadow: 0 2px 8px rgba(238, 90, 36, 0.3);
+        }
+
+        .description {
+            color: #555;
+            font-size: 0.95em;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .metric {
+            text-align: center;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .metric-label {
+            font-size: 0.7em;
+            color: #888;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .metric-value {
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .contract-address {
+            font-family: 'Monaco', monospace;
+            font-size: 0.8em;
+            color: #888;
+            background: #f1f3f4;
+            padding: 8px 12px;
+            border-radius: 6px;
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .project-card {
+                width: calc(100vw - 40px);
+                margin-left: auto;
+                margin-right: auto;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .header p {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚀 KROM</h1>
+        <p>Discover the next generation of crypto projects</p>
+    </div>
+
+    <div class="masonry-container" id="masonry-container">
+        <!-- FEDORA Card -->
+        <div class="project-card" onclick="openProjectDetail('FEDORA', '$FEDORA')">
+            <div style="position: relative;">
+                <iframe 
+                    src="https://www.fedora.club" 
+                    class="website-preview"
+                    loading="lazy"
+                    sandbox="allow-same-origin allow-scripts"
+                ></iframe>
+                <div class="loading-overlay" id="loading-fedora">Loading website...</div>
+            </div>
+            <div class="card-content">
+                <div class="token-header">
+                    <div class="token-info">
+                        <h3>Fedora</h3>
+                        <div class="ticker">$FEDORA</div>
+                    </div>
+                    <div class="score-badge">13</div>
+                </div>
+                <div class="description">
+                    Meme coin with strong branding but lacks transparency
+                </div>
+                <div class="metrics-grid">
+                    <div class="metric">
+                        <div class="metric-label">Market Cap</div>
+                        <div class="metric-value">$147K</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Liquidity</div>
+                        <div class="metric-value">$14.9K</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Age</div>
+                        <div class="metric-value">2d</div>
+                    </div>
+                </div>
+                <div class="contract-address">
+                    0x1234...5678
+                </div>
+            </div>
+        </div>
+
+        <!-- AINU Card -->
+        <div class="project-card" onclick="openProjectDetail('AINU', '$AINU')">
+            <div style="position: relative;">
+                <iframe 
+                    src="https://www.ainuaitoken.com" 
+                    class="website-preview"
+                    loading="lazy"
+                    sandbox="allow-same-origin allow-scripts"
+                ></iframe>
+                <div class="loading-overlay" id="loading-ainu">Loading website...</div>
+            </div>
+            <div class="card-content">
+                <div class="token-header">
+                    <div class="token-info">
+                        <h3>Ainu AI</h3>
+                        <div class="ticker">$AINU</div>
+                    </div>
+                    <div class="score-badge">13</div>
+                </div>
+                <div class="description">
+                    AI-powered utility token with clear tokenomics
+                </div>
+                <div class="metrics-grid">
+                    <div class="metric">
+                        <div class="metric-label">Market Cap</div>
+                        <div class="metric-value">$154K</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Liquidity</div>
+                        <div class="metric-value">$15.4K</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Age</div>
+                        <div class="metric-value">3d</div>
+                    </div>
+                </div>
+                <div class="contract-address">
+                    0xabcd...ef01
+                </div>
+            </div>
+        </div>
+
+        <!-- UIUI Card -->
+        <div class="project-card" onclick="openProjectDetail('UIUI', '$UIUI')">
+            <div style="position: relative;">
+                <iframe 
+                    src="https://www.uiui.cool" 
+                    class="website-preview"
+                    loading="lazy"
+                    sandbox="allow-same-origin allow-scripts"
+                ></iframe>
+                <div class="loading-overlay" id="loading-uiui">Loading website...</div>
+            </div>
+            <div class="card-content">
+                <div class="token-header">
+                    <div class="token-info">
+                        <h3>UIUI</h3>
+                        <div class="ticker">$UIUI</div>
+                    </div>
+                    <div class="score-badge">11</div>
+                </div>
+                <div class="description">
+                    UI/UX focused design toolkit token
+                </div>
+                <div class="metrics-grid">
+                    <div class="metric">
+                        <div class="metric-label">Market Cap</div>
+                        <div class="metric-value">$250K</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Liquidity</div>
+                        <div class="metric-value">$25.0K</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Age</div>
+                        <div class="metric-value">1d</div>
+                    </div>
+                </div>
+                <div class="contract-address">
+                    0x9876...5432
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Masonry layout
+        const container = document.getElementById('masonry-container');
+        const masonry = new Masonry(container, {
+            itemSelector: '.project-card',
+            columnWidth: 350,
+            gutter: 20,
+            fitWidth: true,
+            transitionDuration: '0.3s'
+        });
+
+        // Handle iframe loading
+        document.addEventListener('DOMContentLoaded', function() {
+            const iframes = document.querySelectorAll('.website-preview');
+            
+            iframes.forEach((iframe, index) => {
+                const loadingId = ['loading-fedora', 'loading-ainu', 'loading-uiui'][index];
+                const loadingOverlay = document.getElementById(loadingId);
+                
+                iframe.addEventListener('load', function() {
+                    setTimeout(() => {
+                        if (loadingOverlay) {
+                            loadingOverlay.style.opacity = '0';
+                            setTimeout(() => {
+                                loadingOverlay.style.display = 'none';
+                            }, 300);
+                        }
+                        masonry.layout();
+                    }, 1000);
+                });
+
+                iframe.addEventListener('error', function() {
+                    if (loadingOverlay) {
+                        loadingOverlay.innerHTML = 'Website unavailable';
+                        loadingOverlay.style.background = '#f1f3f4';
+                    }
+                });
+            });
+        });
+
+        // Project detail click handler
+        function openProjectDetail(name, ticker) {
+            console.log(`Opening detail view for ${name} (${ticker})`);
+            // Future: Open modal or navigate to detail page
+            alert(`${name} (${ticker}) - Detail view coming soon!`);
+        }
+
+        // Relayout masonry on window resize
+        window.addEventListener('resize', function() {
+            masonry.layout();
+        });
+    </script>
+</body>
+</html>

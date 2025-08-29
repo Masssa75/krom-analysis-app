@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KROM Discovery - Hybrid Loading</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .filter-pills {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-pill {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            font-size: 0.9rem;
+        }
+
+        .filter-pill:hover,
+        .filter-pill.active {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .mode-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .toggle-switch::before {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-switch.live::before {
+            transform: translateX(28px);
+            background: #4CAF50;
+        }
+
+        .performance-metrics {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            text-align: center;
+        }
+
+        .metric {
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .masonry-container {
+            column-count: 3;
+            column-gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 1024px) {
+            .masonry-container {
+                column-count: 2;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .masonry-container {
+                column-count: 1;
+            }
+        }
+
+        .token-card {
+            break-inside: avoid;
+            margin-bottom: 20px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .token-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-content {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .token-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .token-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .token-symbol {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .static-preview {
+            height: 200px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .preview-logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .preview-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .preview-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .hover-indicator {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .token-card:hover .hover-indicator {
+            opacity: 1;
+        }
+
+        .token-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .loading-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .iframe-container {
+            height: 300px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .category-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .category-ai {
+            background: linear-gradient(135deg, #FF6B6B, #FF8E88);
+        }
+
+        .category-meme {
+            background: linear-gradient(135deg, #4ECDC4, #44A08D);
+        }
+
+        .category-defi {
+            background: linear-gradient(135deg, #FFE66D, #FFB74D);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>KROM Discovery</h1>
+        <p>Utility Tokens Ranked by Quality</p>
+    </div>
+
+    <div class="controls">
+        <div class="filter-pills">
+            <div class="filter-pill active" data-category="all">All</div>
+            <div class="filter-pill" data-category="ai">AI</div>
+            <div class="filter-pill" data-category="meme">Meme</div>
+            <div class="filter-pill" data-category="defi">DeFi</div>
+        </div>
+        
+        <div class="mode-toggle">
+            <span>Fast Mode</span>
+            <div class="toggle-switch" onclick="toggleMode()"></div>
+            <span>Live Mode</span>
+        </div>
+    </div>
+
+    <div class="performance-metrics">
+        <div class="metrics-grid">
+            <div class="metric">
+                <div class="metric-value" id="loadTime">1.2s</div>
+                <div class="metric-label">Load Time</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value" id="tokensShown">3</div>
+                <div class="metric-label">Tokens Shown</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value" id="mode">Static</div>
+                <div class="metric-label">Current Mode</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value" id="bandwidth">~50KB</div>
+                <div class="metric-label">Data Used</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="masonry-container">
+        <!-- FEDORA Token Card -->
+        <div class="token-card" data-category="ai" onmouseenter="handleHover(this)" onclick="handleClick(this)">
+            <div class="card-content">
+                <div class="category-badge category-ai">AI</div>
+                <div class="token-header">
+                    <div class="token-name">FEDORA</div>
+                    <div class="token-symbol">FEDORA</div>
+                </div>
+                
+                <div class="static-preview">
+                    <div class="preview-logo">F</div>
+                    <div class="preview-title">FEDORA AI Platform</div>
+                    <div class="preview-subtitle">Advanced AI Infrastructure</div>
+                    <div class="hover-indicator">Click to load live preview</div>
+                </div>
+                
+                <div class="loading-spinner"></div>
+                
+                <div class="iframe-container">
+                    <iframe src="about:blank" data-src="https://fedora-ai.com"></iframe>
+                </div>
+                
+                <div class="token-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">$2.4M</div>
+                        <div class="stat-label">Market Cap</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">9.2/10</div>
+                        <div class="stat-label">KROM Score</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">$890K</div>
+                        <div class="stat-label">Liquidity</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">+234%</div>
+                        <div class="stat-label">24h ROI</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AINU Token Card -->
+        <div class="token-card" data-category="ai" onmouseenter="handleHover(this)" onclick="handleClick(this)">
+            <div class="card-content">
+                <div class="category-badge category-ai">AI</div>
+                <div class="token-header">
+                    <div class="token-name">AINU</div>
+                    <div class="token-symbol">AINU</div>
+                </div>
+                
+                <div class="static-preview">
+                    <div class="preview-logo">A</div>
+                    <div class="preview-title">AINU Protocol</div>
+                    <div class="preview-subtitle">Next-Gen AI Ecosystem</div>
+                    <div class="hover-indicator">Click to load live preview</div>
+                </div>
+                
+                <div class="loading-spinner"></div>
+                
+                <div class="iframe-container">
+                    <iframe src="about:blank" data-src="https://ainuprotocol.com"></iframe>
+                </div>
+                
+                <div class="token-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">$1.8M</div>
+                        <div class="stat-label">Market Cap</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">8.7/10</div>
+                        <div class="stat-label">KROM Score</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">$445K</div>
+                        <div class="stat-label">Liquidity</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">+156%</div>
+                        <div class="stat-label">24h ROI</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- UIUI Token Card -->
+        <div class="token-card" data-category="defi" onmouseenter="handleHover(this)" onclick="handleClick(this)">
+            <div class="card-content">
+                <div class="category-badge category-defi">DeFi</div>
+                <div class="token-header">
+                    <div class="token-name">UIUI</div>
+                    <div class="token-symbol">UIUI</div>
+                </div>
+                
+                <div class="static-preview">
+                    <div class="preview-logo">U</div>
+                    <div class="preview-title">UIUI Exchange</div>
+                    <div class="preview-subtitle">Decentralized Trading Platform</div>
+                    <div class="hover-indicator">Click to load live preview</div>
+                </div>
+                
+                <div class="loading-spinner"></div>
+                
+                <div class="iframe-container">
+                    <iframe src="about:blank" data-src="https://uiui.exchange"></iframe>
+                </div>
+                
+                <div class="token-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">$3.1M</div>
+                        <div class="stat-label">Market Cap</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">8.9/10</div>
+                        <div class="stat-label">KROM Score</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">$1.2M</div>
+                        <div class="stat-label">Liquidity</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">+189%</div>
+                        <div class="stat-label">24h ROI</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isLiveMode = false;
+        let loadStartTime = Date.now();
+        let iframeLoadCount = 0;
+
+        // Update load time metric
+        window.addEventListener('load', () => {
+            const loadTime = (Date.now() - loadStartTime) / 1000;
+            document.getElementById('loadTime').textContent = loadTime.toFixed(1) + 's';
+        });
+
+        function toggleMode() {
+            isLiveMode = !isLiveMode;
+            const toggle = document.querySelector('.toggle-switch');
+            const mode = document.getElementById('mode');
+            const bandwidth = document.getElementById('bandwidth');
+            
+            toggle.classList.toggle('live', isLiveMode);
+            
+            if (isLiveMode) {
+                mode.textContent = 'Live';
+                bandwidth.textContent = '~2.3MB';
+                // Auto-load all iframes in live mode
+                document.querySelectorAll('.token-card').forEach(card => {
+                    loadIframe(card);
+                });
+            } else {
+                mode.textContent = 'Static';
+                bandwidth.textContent = '~50KB';
+                // Hide all iframes and show static previews
+                document.querySelectorAll('.token-card').forEach(card => {
+                    const staticPreview = card.querySelector('.static-preview');
+                    const iframeContainer = card.querySelector('.iframe-container');
+                    const spinner = card.querySelector('.loading-spinner');
+                    
+                    staticPreview.style.display = 'flex';
+                    iframeContainer.style.display = 'none';
+                    spinner.style.display = 'none';
+                });
+                iframeLoadCount = 0;
+            }
+        }
+
+        function handleHover(card) {
+            if (!isLiveMode) return;
+            loadIframe(card);
+        }
+
+        function handleClick(card) {
+            if (!isLiveMode) {
+                loadIframe(card);
+            }
+        }
+
+        function loadIframe(card) {
+            const staticPreview = card.querySelector('.static-preview');
+            const iframeContainer = card.querySelector('.iframe-container');
+            const iframe = card.querySelector('iframe');
+            const spinner = card.querySelector('.loading-spinner');
+            
+            if (iframeContainer.style.display === 'block') return; // Already loaded
+            
+            // Show loading spinner
+            spinner.style.display = 'block';
+            staticPreview.style.opacity = '0.5';
+            
+            // Simulate loading time
+            setTimeout(() => {
+                staticPreview.style.display = 'none';
+                spinner.style.display = 'none';
+                iframeContainer.style.display = 'block';
+                
+                // Load the actual iframe (in real implementation)
+                const src = iframe.dataset.src;
+                iframe.src = src;
+                
+                iframeLoadCount++;
+                
+                // Update bandwidth metric
+                const bandwidth = document.getElementById('bandwidth');
+                const estimatedSize = isLiveMode ? 2.3 : (0.05 + (iframeLoadCount * 0.8));
+                bandwidth.textContent = '~' + estimatedSize.toFixed(1) + 'MB';
+                
+            }, Math.random() * 1000 + 500); // Random load time 0.5-1.5s
+        }
+
+        // Filter functionality
+        document.querySelectorAll('.filter-pill').forEach(pill => {
+            pill.addEventListener('click', () => {
+                // Update active state
+                document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+                
+                const category = pill.dataset.category;
+                
+                // Filter cards
+                document.querySelectorAll('.token-card').forEach(card => {
+                    if (category === 'all' || card.dataset.category === category) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+                
+                // Update tokens shown metric
+                const visibleCards = document.querySelectorAll('.token-card[style*="block"], .token-card:not([style])').length;
+                document.getElementById('tokensShown').textContent = category === 'all' ? '3' : visibleCards;
+            });
+        });
+
+        // Intersection Observer for automatic loading when cards enter viewport
+        if ('IntersectionObserver' in window) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && isLiveMode) {
+                        loadIframe(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.3
+            });
+
+            document.querySelectorAll('.token-card').forEach(card => {
+                observer.observe(card);
+            });
+        }
+    </script>
+</body>
+</html>

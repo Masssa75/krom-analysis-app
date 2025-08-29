@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KROM Masonry - Static Preview Version</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .masonry-grid {
+            display: columns;
+            columns: 350px;
+            column-gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .website-card {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            break-inside: avoid;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+        }
+
+        .website-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+        }
+
+        .preview-container {
+            position: relative;
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .preview-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .external-link-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .token-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .token-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .score-badge {
+            background: linear-gradient(45deg, #10b981, #059669);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .score-badge.medium {
+            background: linear-gradient(45deg, #f59e0b, #d97706);
+        }
+
+        .description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .metric {
+            text-align: center;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 4px;
+        }
+
+        .metric-value {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+        .metric-value.positive {
+            color: #10b981;
+        }
+
+        .metric-value.negative {
+            color: #ef4444;
+        }
+
+        /* Custom preview styles for each token */
+        .fedora-preview {
+            background: linear-gradient(135deg, #8b5cf6, #a855f7, #c084fc);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+        }
+
+        .ainu-preview {
+            background: linear-gradient(135deg, #1e40af, #3b82f6, #60a5fa);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .ainu-tech-grid {
+            position: absolute;
+            inset: 0;
+            opacity: 0.3;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .ainu-text {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            z-index: 1;
+        }
+
+        .uiui-preview {
+            background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1e293b;
+        }
+
+        .uiui-circles {
+            position: absolute;
+            inset: 0;
+        }
+
+        .uiui-circle {
+            position: absolute;
+            border: 2px solid #cbd5e1;
+            border-radius: 50%;
+        }
+
+        .uiui-circle:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            top: 20px;
+            left: 30px;
+            opacity: 0.4;
+        }
+
+        .uiui-circle:nth-child(2) {
+            width: 60px;
+            height: 60px;
+            top: 60px;
+            right: 40px;
+            opacity: 0.6;
+        }
+
+        .uiui-circle:nth-child(3) {
+            width: 40px;
+            height: 40px;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0.5;
+        }
+
+        .uiui-text {
+            font-size: 1.8rem;
+            font-weight: 300;
+            letter-spacing: 4px;
+            z-index: 1;
+        }
+
+        .load-time {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .masonry-grid {
+                columns: 1;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="load-time" id="loadTime">Load time: <span id="timeValue">0ms</span></div>
+    
+    <div class="header">
+        <h1>🎯 KROM Website Discovery</h1>
+        <p>Static Preview Version - Instant Loading</p>
+    </div>
+
+    <div class="masonry-grid">
+        <!-- FEDORA Card -->
+        <div class="website-card" onclick="window.open('https://fedoratoken.com', '_blank')">
+            <div class="preview-container">
+                <div class="preview-image fedora-preview">
+                    🎩
+                </div>
+                <div class="external-link-icon">↗</div>
+            </div>
+            <div class="card-content">
+                <div class="token-header">
+                    <div class="token-name">FEDORA</div>
+                    <div class="score-badge">8.5/10</div>
+                </div>
+                <div class="description">
+                    A meme token inspired by the classic fedora hat and doge culture. Features a professional website with clear branding, community links, and detailed tokenomics. Strong visual identity with purple theme and hat imagery throughout the site.
+                </div>
+                <div class="metrics">
+                    <div class="metric">
+                        <div class="metric-label">Market Cap</div>
+                        <div class="metric-value">$2.4M</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">24h ROI</div>
+                        <div class="metric-value positive">+156%</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Liquidity</div>
+                        <div class="metric-value">$89K</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Holders</div>
+                        <div class="metric-value">1,247</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AINU Card -->
+        <div class="website-card" onclick="window.open('https://ainu.ai', '_blank')">
+            <div class="preview-container">
+                <div class="preview-image ainu-preview">
+                    <div class="ainu-tech-grid"></div>
+                    <div class="ainu-text">AINU</div>
+                </div>
+                <div class="external-link-icon">↗</div>
+            </div>
+            <div class="card-content">
+                <div class="token-header">
+                    <div class="token-name">AINU</div>
+                    <div class="score-badge">7.2/10</div>
+                </div>
+                <div class="description">
+                    AI-powered utility token with a sleek, tech-focused website. Features blue gradient design, clear value proposition for AI services, and comprehensive documentation. Professional presentation with technical depth and roadmap visibility.
+                </div>
+                <div class="metrics">
+                    <div class="metric">
+                        <div class="metric-label">Market Cap</div>
+                        <div class="metric-value">$1.8M</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">24h ROI</div>
+                        <div class="metric-value positive">+89%</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Liquidity</div>
+                        <div class="metric-value">$145K</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Volume</div>
+                        <div class="metric-value">$267K</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- UIUI Card -->
+        <div class="website-card" onclick="window.open('https://uiui.design', '_blank')">
+            <div class="preview-container">
+                <div class="preview-image uiui-preview">
+                    <div class="uiui-circles">
+                        <div class="uiui-circle"></div>
+                        <div class="uiui-circle"></div>
+                        <div class="uiui-circle"></div>
+                    </div>
+                    <div class="uiui-text">UI/UI</div>
+                </div>
+                <div class="external-link-icon">↗</div>
+            </div>
+            <div class="card-content">
+                <div class="token-header">
+                    <div class="token-name">UIUI</div>
+                    <div class="score-badge medium">6.8/10</div>
+                </div>
+                <div class="description">
+                    Design-focused token with minimalist website aesthetic. Clean typography, subtle animations, and modern UI patterns. Emphasizes user interface and user experience in the crypto space with portfolio showcases and design resources.
+                </div>
+                <div class="metrics">
+                    <div class="metric">
+                        <div class="metric-label">Market Cap</div>
+                        <div class="metric-value">$892K</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">24h ROI</div>
+                        <div class="metric-value negative">-12%</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Liquidity</div>
+                        <div class="metric-value">$34K</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Website Score</div>
+                        <div class="metric-value">6.8/10</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Track load time to demonstrate speed
+        const startTime = performance.now();
+        
+        window.addEventListener('load', () => {
+            const loadTime = Math.round(performance.now() - startTime);
+            document.getElementById('timeValue').textContent = `${loadTime}ms`;
+        });
+
+        // Add subtle parallax effect to previews
+        document.addEventListener('mousemove', (e) => {
+            const cards = document.querySelectorAll('.website-card');
+            const mouseX = e.clientX / window.innerWidth;
+            const mouseY = e.clientY / window.innerHeight;
+            
+            cards.forEach((card, index) => {
+                const rect = card.getBoundingClientRect();
+                const cardCenterX = rect.left + rect.width / 2;
+                const cardCenterY = rect.top + rect.height / 2;
+                
+                const deltaX = (e.clientX - cardCenterX) / 50;
+                const deltaY = (e.clientY - cardCenterY) / 50;
+                
+                const preview = card.querySelector('.preview-container');
+                if (preview) {
+                    preview.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

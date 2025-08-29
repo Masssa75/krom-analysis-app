@@ -1,0 +1,149 @@
+# Page snapshot
+
+```yaml
+- main:
+  - heading "KROM" [level=1]
+  - button "BUY"
+  - button:
+    - img
+  - paragraph: Advanced AI Powered Token Discovery
+  - text: "Contract Address: 9eCEK7ttNtroHsFLnW8jW7pS9MtSAPrPPrZ6QCUFpump"
+  - heading "FILTERS" [level=2]
+  - button "Reset"
+  - img
+  - text: Show Favorites Only
+  - heading "Token Type" [level=3]
+  - text: ▼ ✓ Utility Tokens ✓ Meme Tokens
+  - heading "Rugs" [level=3]
+  - text: "▼ Include Rugs When unchecked, hides tokens with:"
+  - list:
+    - listitem: ATH ROI < 20% AND
+    - listitem: Current ROI < -75% AND
+    - listitem: Liquidity & Market Cap both < $50K
+  - text: Include Imposters When unchecked, hides tokens marked as having inauthentic websites
+  - heading "Networks" [level=3]
+  - text: ▼ ✓ Ethereum ✓ Solana ✓ BSC ✓ Base
+  - heading "Social Media" [level=3]
+  - text: ▼ Has Website Has Twitter/X Has Telegram
+  - heading "Analysis Scores" [level=3]
+  - text: ▼ Min Call Score 1
+  - slider: "1"
+  - text: 1 5 10 Min X Score 1
+  - slider: "1"
+  - text: 1 5 10 Min Website Score 1.0
+  - slider: "1"
+  - text: 1 5 10
+  - button "Reset Score Filters"
+  - heading "Liquidity & Market Cap" [level=3]
+  - text: ▼ Liquidity (USD)
+  - spinbutton
+  - text: "-"
+  - spinbutton
+  - text: Market Cap (USD)
+  - spinbutton
+  - text: "-"
+  - spinbutton
+  - button "Clear Range Filters"
+  - text: TOP EARLY CALLS
+  - button "24H"
+  - button "7D"
+  - button "90D"
+  - button "ALL TIME"
+  - text: "[ANI:233x] [POKE6900:216x] [MASK:198x] [AOL:177x] [SUPERGROK:142x] [MANYU:131x] [SPARK:125x] [CHAD:123x] [CHLOE:121x]"
+  - heading "RECENT CALLS" [level=2]
+  - button "Column Settings":
+    - img
+  - button "Search":
+    - img
+  - text: "Sort by:"
+  - combobox: Date Called
+  - button "Sort descending":
+    - img
+  - button "Remove from favorites":
+    - img
+  - text: "JAWN UTILITY SOL CALL 8.0 C: ALPHA LIQUIDITY $163K ENTRY MC N/A ATH MC N/A NOW MC N/A ROI - ATH ROI - Discovery Pools 5m ago"
+  - button "Add to favorites":
+    - img
+  - text: "ETHY UTILITY BASE CALL 2.0 C: TRASH LIQUIDITY $430K ENTRY MC $4.8M ATH MC $4.8M NOW MC $4.3M ROI +0% ATH ROI +0% DegenSeals 7m ago"
+  - button "Add to favorites":
+    - img
+  - text: "NEURAART MEME SOL CALL 2.0 C: TRASH LIQUIDITY $43K ENTRY MC $50K ATH MC $50K NOW MC $35K ROI -30% ATH ROI +0% shitcoinneverland 13m ago"
+  - button "Add to favorites":
+    - img
+  - text: "JAKE MEME SOL CALL 2.0 C: TRASH LIQUIDITY $51K ENTRY MC $125K ATH MC $203K NOW MC $161K ROI +29% ATH ROI +62% kweensjournal 36m ago"
+  - button "Add to favorites":
+    - img
+  - text: "JAKE MEME SOL CALL 2.0 C: TRASH LIQUIDITY $51K ENTRY MC $125K ATH MC $203K NOW MC $161K ROI +29% ATH ROI +62% kulture_kall 36m ago"
+  - button "Add to favorites":
+    - img
+  - text: "NEURAART MEME SOL CALL 2.0 C: TRASH LIQUIDITY $20K ENTRY MC $65K ATH MC $65K NOW MC $17K ROI -73% ATH ROI +0% shitcoinneverland 48m ago"
+  - button "Add to favorites":
+    - img
+  - text: "BondETH MEME BASE CALL 1.0 C: TRASH LIQUIDITY $965K ENTRY MC $1.0M ATH MC $799K NOW MC $1.0M ROI 0% ATH ROI +0% GT Trending 49m ago"
+  - button "Add to favorites":
+    - img
+  - text: "LEGOFY MEME ETH CALL 4.0 C: BASIC LIQUIDITY $75K ENTRY MC N/A ATH MC N/A NOW MC N/A ROI - ATH ROI - Discovery Pools 1h ago"
+  - button "Add to favorites":
+    - img
+  - text: "FYM MEME SOL CALL 1.0 C: TRASH LIQUIDITY $42K ENTRY MC $158K ATH MC $178K NOW MC $112K ROI -29% ATH ROI +13% kweensjournal 1h ago"
+  - button "Add to favorites":
+    - img
+  - text: "SSC UTILITY SOL CALL 2.0 C: TRASH LIQUIDITY $131K ENTRY MC $1.0M ATH MC $1.2M NOW MC $849K ROI -18% ATH ROI +12% lowtaxsolana 1h ago"
+  - button "Add to favorites":
+    - img
+  - text: "THERANOS MEME SOL CALL 1.0 C: TRASH LIQUIDITY $28K ENTRY MC $43K ATH MC $54K NOW MC $17K ROI -61% ATH ROI +24% shitcoinneverland 1h ago"
+  - button "Add to favorites":
+    - img
+  - text: "MONONOKE MEME ETH CALL 4.0 C: BASIC LIQUIDITY $48K ENTRY MC $204K ATH MC $305K NOW MC $248K ROI +21% ATH ROI +49% chiggajogambles 1h ago"
+  - button "Add to favorites":
+    - img
+  - text: "MONONOKE MEME ETH CALL 2.0 C: TRASH LIQUIDITY $48K ENTRY MC $204K ATH MC $305K NOW MC $248K ROI +21% ATH ROI +49% kulture_kall 1h ago"
+  - button "Add to favorites":
+    - img
+  - text: "SSC UTILITY SOL CALL 3.0 C: BASIC LIQUIDITY $127K ENTRY MC $1.2M ATH MC $1.2M NOW MC $796K ROI -32% ATH ROI +3% DegenSeals 1h ago"
+  - button "Add to favorites":
+    - img
+  - text: "MARGIN UTILITY ETH CALL 4.0 C: BASIC LIQUIDITY $149K ENTRY MC N/A ATH MC N/A NOW MC N/A ROI - ATH ROI - Discovery Pools 2h ago"
+  - button "Add to favorites":
+    - img
+  - text: "MONONOKE MEME ETH CALL 2.0 C: TRASH LIQUIDITY $49K ENTRY MC $102K ATH MC $308K NOW MC $261K ROI +156% ATH ROI +203% TopCallersChannel 3h ago"
+  - button "Add to favorites":
+    - img
+  - text: "B UTILITY BSC CALL 8.0 C: ALPHA LIQUIDITY $23K ENTRY MC $63K ATH MC $67K NOW MC $38K ROI -39% ATH ROI +7% NejatGemsCalls 3h ago"
+  - button "Add to favorites":
+    - img
+  - text: "MOMO MEME ETH CALL 4.0 C: BASIC LIQUIDITY $133K ENTRY MC N/A ATH MC N/A NOW MC N/A ROI - ATH ROI - Discovery Pools 3h ago"
+  - button "Add to favorites":
+    - img
+  - text: "HOKK MEME ETH CALL 8.0 C: ALPHA LIQUIDITY $164K ENTRY MC N/A ATH MC N/A NOW MC N/A ROI - ATH ROI - Discovery Pools 3h ago"
+  - button "Add to favorites":
+    - img
+  - text: "HIKI MEME SOL CALL 1.0 C: TRASH LIQUIDITY $129K ENTRY MC $578K ATH MC $638K NOW MC $626K ROI +8% ATH ROI +10% kulture_kall 3h ago Showing 1-20 of 5786 calls"
+  - button "««" [disabled]
+  - button "‹" [disabled]
+  - button "1"
+  - button "2"
+  - button "3"
+  - button "4"
+  - button "5"
+  - button "›"
+  - button "»»"
+  - button "Settings" [disabled]:
+    - text: Settings
+    - img
+  - button "Leaderboard" [disabled]:
+    - text: Leaderboard
+    - img
+  - button "Analytics" [disabled]:
+    - text: Analytics
+    - img
+  - button "Roadmap":
+    - text: Roadmap
+    - img
+  - button "Charts" [disabled]:
+    - text: Charts
+    - img
+  - button:
+    - img
+- alert
+```

@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KROM Discovery - Utility Apps</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        .filters {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .filter-pill {
+            padding: 8px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-pill:hover, .filter-pill.active {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .apps-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        @media (max-width: 768px) {
+            .apps-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 20px;
+            }
+        }
+
+        .app-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .app-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .app-preview {
+            position: relative;
+            height: 220px;
+            background: #f5f7fa;
+            overflow: hidden;
+        }
+
+        .preview-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .preview-logo {
+            font-size: 64px;
+            margin-bottom: 10px;
+        }
+
+        .preview-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .preview-tagline {
+            font-size: 14px;
+            color: #666;
+            opacity: 0.8;
+        }
+
+        .preview-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Custom themes for each token */
+        .fedora-preview {
+            background: linear-gradient(135deg, #8b5cf6, #d946ef);
+            color: white;
+        }
+
+        .ainu-preview {
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+            color: white;
+        }
+
+        .uiui-preview {
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+            color: #333;
+        }
+
+        .app-info {
+            padding: 20px;
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .app-title-section {
+            flex: 1;
+        }
+
+        .app-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .app-ticker {
+            font-size: 14px;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .score-badge {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .score-badge::before {
+            content: "⭐";
+            font-size: 12px;
+        }
+
+        .app-description {
+            color: #555;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            height: 42px;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .app-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .metric {
+            text-align: center;
+            padding: 10px 5px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .metric-label {
+            font-size: 10px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .metric-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .app-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #333;
+            border: 1px solid #e9ecef;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+
+        .loading-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
+        .loading .loading-spinner {
+            display: block;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .external-icon {
+            font-size: 12px;
+        }
+
+        /* Category badges */
+        .category-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .category-ai {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+
+        .category-meme {
+            background: rgba(139, 92, 246, 0.1);
+            color: #8b5cf6;
+        }
+
+        .category-defi {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+
+        .contract-address {
+            font-size: 11px;
+            color: #999;
+            font-family: monospace;
+            text-align: center;
+            margin-top: 10px;
+            padding: 5px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚀 KROM Discovery</h1>
+        <p>Utility tokens ranked by product quality, not market cap</p>
+    </div>
+
+    <div class="filters">
+        <div class="filter-pill active" data-filter="all">All</div>
+        <div class="filter-pill" data-filter="ai">AI</div>
+        <div class="filter-pill" data-filter="meme">Meme</div>
+        <div class="filter-pill" data-filter="defi">DeFi</div>
+        <div class="filter-pill" data-filter="gaming">Gaming</div>
+    </div>
+
+    <div class="apps-grid" id="appsGrid">
+        <!-- FEDORA Card -->
+        <div class="app-card" data-category="meme" data-url="https://www.fedora.club">
+            <div class="app-preview fedora-preview">
+                <div class="preview-content">
+                    <div class="preview-logo">🎩</div>
+                    <div class="preview-title">$FEDORA</div>
+                    <div class="preview-tagline">The Gentleman's Token</div>
+                </div>
+                <div class="loading-spinner"></div>
+            </div>
+            <div class="app-info">
+                <div class="app-header">
+                    <div class="app-title-section">
+                        <div class="app-name">
+                            Fedora
+                            <span class="category-badge category-meme">Meme</span>
+                        </div>
+                        <div class="app-ticker">$FEDORA</div>
+                    </div>
+                    <div class="score-badge">13/21</div>
+                </div>
+                <div class="app-description">
+                    Meme coin with strong branding but lacks transparency. Just get in. There's no time to explain.
+                </div>
+                <div class="app-metrics">
+                    <div class="metric">
+                        <div class="metric-label">Market Cap</div>
+                        <div class="metric-value">$147K</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Liquidity</div>
+                        <div class="metric-value">$14.9K</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Age</div>
+                        <div class="metric-value">2d</div>
+                    </div>
+                </div>
+                <div class="app-actions">
+                    <button class="action-btn btn-primary" onclick="openWebsite('https://www.fedora.club')">
+                        Visit Website <span class="external-icon">↗</span>
+                    </button>
+                    <button class="action-btn btn-secondary" onclick="openChart('fedora')">
+                        Chart 📊
+                    </button>
+                </div>
+                <div class="contract-address">0x1234...5678</div>
+            </div>
+        </div>
+
+        <!-- AINU Card -->
+        <div class="app-card" data-category="ai" data-url="https://www.ainuaitoken.com">
+            <div class="app-preview ainu-preview">
+                <div class="preview-content">
+                    <div class="preview-logo">🤖</div>
+                    <div class="preview-title">$AINU</div>
+                    <div class="preview-tagline">AI-Powered Innovation</div>
+                </div>
+                <div class="loading-spinner"></div>
+            </div>
+            <div class="app-info">
+                <div class="app-header">
+                    <div class="app-title-section">
+                        <div class="app-name">
+                            Ainu AI
+                            <span class="category-badge category-ai">AI</span>
+                        </div>
+                        <div class="app-ticker">$AINU</div>
+                    </div>
+                    <div class="score-badge">13/21</div>
+                </div>
+                <div class="app-description">
+                    AI-powered utility token with clear tokenomics and innovative machine learning use cases.
+                </div>
+                <div class="app-metrics">
+                    <div class="metric">
+                        <div class="metric-label">Market Cap</div>
+                        <div class="metric-value">$154K</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Liquidity</div>
+                        <div class="metric-value">$15.4K</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Age</div>
+                        <div class="metric-value">3d</div>
+                    </div>
+                </div>
+                <div class="app-actions">
+                    <button class="action-btn btn-primary" onclick="openWebsite('https://www.ainuaitoken.com')">
+                        Visit Website <span class="external-icon">↗</span>
+                    </button>
+                    <button class="action-btn btn-secondary" onclick="openChart('ainu')">
+                        Chart 📊
+                    </button>
+                </div>
+                <div class="contract-address">0xabcd...ef01</div>
+            </div>
+        </div>
+
+        <!-- UIUI Card -->
+        <div class="app-card" data-category="defi" data-url="https://www.uiui.cool">
+            <div class="app-preview uiui-preview">
+                <div class="preview-content">
+                    <div class="preview-logo">🎨</div>
+                    <div class="preview-title">$UIUI</div>
+                    <div class="preview-tagline">Design Toolkit Token</div>
+                </div>
+                <div class="loading-spinner"></div>
+            </div>
+            <div class="app-info">
+                <div class="app-header">
+                    <div class="app-title-section">
+                        <div class="app-name">
+                            UIUI
+                            <span class="category-badge category-defi">DeFi</span>
+                        </div>
+                        <div class="app-ticker">$UIUI</div>
+                    </div>
+                    <div class="score-badge">11/21</div>
+                </div>
+                <div class="app-description">
+                    UI/UX focused design toolkit token for building beautiful decentralized applications.
+                </div>
+                <div class="app-metrics">
+                    <div class="metric">
+                        <div class="metric-label">Market Cap</div>
+                        <div class="metric-value">$250K</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Liquidity</div>
+                        <div class="metric-value">$25.0K</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Age</div>
+                        <div class="metric-value">1d</div>
+                    </div>
+                </div>
+                <div class="app-actions">
+                    <button class="action-btn btn-primary" onclick="openWebsite('https://www.uiui.cool')">
+                        Visit Website <span class="external-icon">↗</span>
+                    </button>
+                    <button class="action-btn btn-secondary" onclick="openChart('uiui')">
+                        Chart 📊
+                    </button>
+                </div>
+                <div class="contract-address">0x9876...5432</div>
+            </div>
+        </div>
+
+        <!-- BIO Protocol Card -->
+        <div class="app-card" data-category="defi" data-url="https://bio.xyz">
+            <div class="app-preview" style="background: linear-gradient(135deg, #00d084, #00a676); color: white;">
+                <div class="preview-content">
+                    <div class="preview-logo">🧬</div>
+                    <div class="preview-title">$BIO</div>
+                    <div class="preview-tagline">Decentralized Science</div>
+                </div>
+            </div>
+            <div class="app-info">
+                <div class="app-header">
+                    <div class="app-title-section">
+                        <div class="app-name">
+                            BIO Protocol
+                            <span class="category-badge category-defi">DeFi</span>
+                        </div>
+                        <div class="app-ticker">$BIO</div>
+                    </div>
+                    <div class="score-badge">16/21</div>
+                </div>
+                <div class="app-description">
+                    Funding and accelerating decentralized science through blockchain technology.
+                </div>
+                <div class="app-metrics">
+                    <div class="metric">
+                        <div class="metric-label">Market Cap</div>
+                        <div class="metric-value">$420K</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Liquidity</div>
+                        <div class="metric-value">$68K</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Age</div>
+                        <div class="metric-value">14d</div>
+                    </div>
+                </div>
+                <div class="app-actions">
+                    <button class="action-btn btn-primary" onclick="openWebsite('https://bio.xyz')">
+                        Visit Website <span class="external-icon">↗</span>
+                    </button>
+                    <button class="action-btn btn-secondary" onclick="openChart('bio')">
+                        Chart 📊
+                    </button>
+                </div>
+                <div class="contract-address">0x5555...6666</div>
+            </div>
+        </div>
+
+        <!-- Virtual Protocol Card -->
+        <div class="app-card" data-category="ai" data-url="https://virtual.io">
+            <div class="app-preview" style="background: linear-gradient(135deg, #f093fb, #f5576c); color: white;">
+                <div class="preview-content">
+                    <div class="preview-logo">🔮</div>
+                    <div class="preview-title">$VIRTUAL</div>
+                    <div class="preview-tagline">AI Agent Economy</div>
+                </div>
+            </div>
+            <div class="app-info">
+                <div class="app-header">
+                    <div class="app-title-section">
+                        <div class="app-name">
+                            Virtual Protocol
+                            <span class="category-badge category-ai">AI</span>
+                        </div>
+                        <div class="app-ticker">$VIRTUAL</div>
+                    </div>
+                    <div class="score-badge">17/21</div>
+                </div>
+                <div class="app-description">
+                    Building the infrastructure for AI agents to own assets and transact autonomously.
+                </div>
+                <div class="app-metrics">
+                    <div class="metric">
+                        <div class="metric-label">Market Cap</div>
+                        <div class="metric-value">$180K</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Liquidity</div>
+                        <div class="metric-value">$32K</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Age</div>
+                        <div class="metric-value">5d</div>
+                    </div>
+                </div>
+                <div class="app-actions">
+                    <button class="action-btn btn-primary" onclick="openWebsite('https://virtual.io')">
+                        Visit Website <span class="external-icon">↗</span>
+                    </button>
+                    <button class="action-btn btn-secondary" onclick="openChart('virtual')">
+                        Chart 📊
+                    </button>
+                </div>
+                <div class="contract-address">0x7777...8888</div>
+            </div>
+        </div>
+
+        <!-- PEPE AI Card -->
+        <div class="app-card" data-category="meme" data-url="#">
+            <div class="app-preview" style="background: linear-gradient(135deg, #43e97b, #38f9d7); color: white;">
+                <div class="preview-content">
+                    <div class="preview-logo">🐸</div>
+                    <div class="preview-title">$PEPEAI</div>
+                    <div class="preview-tagline">Memes Meet AI</div>
+                </div>
+            </div>
+            <div class="app-info">
+                <div class="app-header">
+                    <div class="app-title-section">
+                        <div class="app-name">
+                            PEPE AI
+                            <span class="category-badge category-meme">Meme</span>
+                        </div>
+                        <div class="app-ticker">$PEPEAI</div>
+                    </div>
+                    <div class="score-badge">12/21</div>
+                </div>
+                <div class="app-description">
+                    AI-generated meme content platform powered by community governance.
+                </div>
+                <div class="app-metrics">
+                    <div class="metric">
+                        <div class="metric-label">Market Cap</div>
+                        <div class="metric-value">$92K</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Liquidity</div>
+                        <div class="metric-value">$8.2K</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Age</div>
+                        <div class="metric-value">1d</div>
+                    </div>
+                </div>
+                <div class="app-actions">
+                    <button class="action-btn btn-primary" onclick="openWebsite('#')">
+                        Visit Website <span class="external-icon">↗</span>
+                    </button>
+                    <button class="action-btn btn-secondary" onclick="openChart('pepeai')">
+                        Chart 📊
+                    </button>
+                </div>
+                <div class="contract-address">0x9999...0000</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Filter functionality
+        const filterPills = document.querySelectorAll('.filter-pill');
+        const appCards = document.querySelectorAll('.app-card');
+
+        filterPills.forEach(pill => {
+            pill.addEventListener('click', () => {
+                filterPills.forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+
+                const filter = pill.dataset.filter;
+                appCards.forEach(card => {
+                    if (filter === 'all' || card.dataset.category === filter) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Open website in new tab
+        function openWebsite(url) {
+            if (url && url !== '#') {
+                window.open(url, '_blank');
+            } else {
+                console.log('No website available');
+            }
+        }
+
+        // Open chart (placeholder)
+        function openChart(token) {
+            console.log('Opening chart for:', token);
+            // In production, this would open DexScreener or similar
+            // window.open(`https://dexscreener.com/search?q=${token}`, '_blank');
+        }
+
+        // Card click to open detail view
+        appCards.forEach(card => {
+            card.addEventListener('click', function(e) {
+                // Don't trigger if clicking on buttons
+                if (e.target.closest('.action-btn')) return;
+                
+                const appName = this.querySelector('.app-name').textContent.trim();
+                console.log('Opening detail view for:', appName);
+                // In production, this would open a modal or navigate to detail page
+                // Similar to RocketApps with iframe on right, info on left
+            });
+        });
+
+        // Simulate loading effect on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.querySelectorAll('.loading-spinner').forEach(spinner => {
+                    spinner.style.display = 'none';
+                });
+            }, 500);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KROM Discovery - App Store Style</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .header p {
+            font-size: 20px;
+            opacity: 0.9;
+        }
+
+        .filters {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .filter-pill {
+            padding: 8px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-pill:hover, .filter-pill.active {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .masonry-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            column-count: 4;
+            column-gap: 20px;
+        }
+
+        @media (max-width: 1200px) {
+            .masonry-container { column-count: 3; }
+        }
+
+        @media (max-width: 900px) {
+            .masonry-container { column-count: 2; }
+        }
+
+        @media (max-width: 600px) {
+            .masonry-container { column-count: 1; }
+        }
+
+        .app-card {
+            break-inside: avoid;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .app-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .phone-frame {
+            position: relative;
+            padding: 10px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            aspect-ratio: 9/16;
+            max-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .phone-screen {
+            width: calc(100% - 20px);
+            height: calc(100% - 20px);
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .website-preview {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+        }
+
+        .preview-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .preview-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+        }
+
+        .preview-loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .app-info {
+            padding: 20px;
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .app-title {
+            flex: 1;
+        }
+
+        .app-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .app-ticker {
+            font-size: 14px;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .score-badge {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .app-description {
+            color: #555;
+            font-size: 14px;
+            line-height: 1.4;
+            margin-bottom: 15px;
+        }
+
+        .app-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .metric {
+            text-align: center;
+            padding: 8px;
+            background: #f5f7fa;
+            border-radius: 10px;
+        }
+
+        .metric-label {
+            font-size: 11px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-top: 2px;
+        }
+
+        .app-contract {
+            font-size: 12px;
+            color: #999;
+            font-family: monospace;
+            text-align: center;
+            padding: 8px;
+            background: #f5f7fa;
+            border-radius: 8px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .website-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+        }
+
+        /* Specific app themes */
+        .app-fedora .website-preview {
+            background: linear-gradient(135deg, #8b5cf6, #d946ef);
+            color: white;
+        }
+
+        .app-fedora .preview-icon::after {
+            content: "🎩";
+        }
+
+        .app-ainu .website-preview {
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+            color: white;
+        }
+
+        .app-ainu .preview-icon::after {
+            content: "🤖";
+        }
+
+        .app-uiui .website-preview {
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+            color: #666;
+        }
+
+        .app-uiui .preview-icon::after {
+            content: "🎨";
+        }
+
+        .view-toggle {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .toggle-btn {
+            padding: 5px 15px;
+            border: none;
+            background: #f5f7fa;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .toggle-btn.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚀 KROM Discovery</h1>
+        <p>Utility tokens ranked by product quality, not just market cap</p>
+    </div>
+
+    <div class="filters">
+        <div class="filter-pill active" data-filter="all">All</div>
+        <div class="filter-pill" data-filter="ai">AI</div>
+        <div class="filter-pill" data-filter="meme">Meme</div>
+        <div class="filter-pill" data-filter="defi">DeFi</div>
+        <div class="filter-pill" data-filter="gaming">Gaming</div>
+    </div>
+
+    <div class="masonry-container" id="appGrid">
+        <!-- FEDORA Card -->
+        <div class="app-card app-fedora" data-category="meme" data-url="https://www.fedora.club">
+            <div class="phone-frame">
+                <div class="phone-screen">
+                    <div class="website-preview">
+                        <div class="preview-icon"></div>
+                        <div>$FEDORA</div>
+                        <small>Click to load website</small>
+                    </div>
+                    <div class="preview-loading">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="app-info">
+                <div class="app-header">
+                    <div class="app-title">
+                        <div class="app-name">Fedora</div>
+                        <div class="app-ticker">$FEDORA</div>
+                    </div>
+                    <div class="score-badge">13/21</div>
+                </div>
+                <div class="app-description">
+                    Meme coin with strong branding but lacks transparency. The gentleman's token.
+                </div>
+                <div class="app-metrics">
+                    <div class="metric">
+                        <div class="metric-label">Market Cap</div>
+                        <div class="metric-value">$147K</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Liquidity</div>
+                        <div class="metric-value">$14.9K</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Age</div>
+                        <div class="metric-value">2d</div>
+                    </div>
+                </div>
+                <div class="app-contract">0x1234...5678</div>
+            </div>
+        </div>
+
+        <!-- AINU Card -->
+        <div class="app-card app-ainu" data-category="ai" data-url="https://www.ainuaitoken.com">
+            <div class="phone-frame">
+                <div class="phone-screen">
+                    <div class="website-preview">
+                        <div class="preview-icon"></div>
+                        <div>$AINU</div>
+                        <small>Click to load website</small>
+                    </div>
+                    <div class="preview-loading">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="app-info">
+                <div class="app-header">
+                    <div class="app-title">
+                        <div class="app-name">Ainu AI</div>
+                        <div class="app-ticker">$AINU</div>
+                    </div>
+                    <div class="score-badge">13/21</div>
+                </div>
+                <div class="app-description">
+                    AI-powered utility token with clear tokenomics and innovative use cases.
+                </div>
+                <div class="app-metrics">
+                    <div class="metric">
+                        <div class="metric-label">Market Cap</div>
+                        <div class="metric-value">$154K</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Liquidity</div>
+                        <div class="metric-value">$15.4K</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Age</div>
+                        <div class="metric-value">3d</div>
+                    </div>
+                </div>
+                <div class="app-contract">0xabcd...ef01</div>
+            </div>
+        </div>
+
+        <!-- UIUI Card -->
+        <div class="app-card app-uiui" data-category="defi" data-url="https://www.uiui.cool">
+            <div class="phone-frame">
+                <div class="phone-screen">
+                    <div class="website-preview">
+                        <div class="preview-icon"></div>
+                        <div>$UIUI</div>
+                        <small>Click to load website</small>
+                    </div>
+                    <div class="preview-loading">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="app-info">
+                <div class="app-header">
+                    <div class="app-title">
+                        <div class="app-name">UIUI</div>
+                        <div class="app-ticker">$UIUI</div>
+                    </div>
+                    <div class="score-badge">11/21</div>
+                </div>
+                <div class="app-description">
+                    UI/UX focused design toolkit token for decentralized applications.
+                </div>
+                <div class="app-metrics">
+                    <div class="metric">
+                        <div class="metric-label">Market Cap</div>
+                        <div class="metric-value">$250K</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Liquidity</div>
+                        <div class="metric-value">$25.0K</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Age</div>
+                        <div class="metric-value">1d</div>
+                    </div>
+                </div>
+                <div class="app-contract">0x9876...5432</div>
+            </div>
+        </div>
+
+        <!-- Additional sample cards to show masonry effect -->
+        <div class="app-card" data-category="gaming">
+            <div class="phone-frame">
+                <div class="phone-screen">
+                    <div class="website-preview" style="background: linear-gradient(135deg, #f093fb, #f5576c);">
+                        <div class="preview-icon">🎮</div>
+                        <div>$GAME</div>
+                        <small>Gaming Protocol</small>
+                    </div>
+                </div>
+            </div>
+            <div class="app-info">
+                <div class="app-header">
+                    <div class="app-title">
+                        <div class="app-name">GameFi Protocol</div>
+                        <div class="app-ticker">$GAME</div>
+                    </div>
+                    <div class="score-badge">15/21</div>
+                </div>
+                <div class="app-description">
+                    Next-gen gaming ecosystem with play-to-earn mechanics.
+                </div>
+                <div class="app-metrics">
+                    <div class="metric">
+                        <div class="metric-label">Market Cap</div>
+                        <div class="metric-value">$320K</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Liquidity</div>
+                        <div class="metric-value">$45K</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Age</div>
+                        <div class="metric-value">5d</div>
+                    </div>
+                </div>
+                <div class="app-contract">0x1111...2222</div>
+            </div>
+        </div>
+
+        <div class="app-card" data-category="defi">
+            <div class="phone-frame">
+                <div class="phone-screen">
+                    <div class="website-preview" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">
+                        <div class="preview-icon">💎</div>
+                        <div>$YIELD</div>
+                        <small>DeFi Yield Optimizer</small>
+                    </div>
+                </div>
+            </div>
+            <div class="app-info">
+                <div class="app-header">
+                    <div class="app-title">
+                        <div class="app-name">Yield Max</div>
+                        <div class="app-ticker">$YIELD</div>
+                    </div>
+                    <div class="score-badge">18/21</div>
+                </div>
+                <div class="app-description">
+                    Automated yield farming with AI-optimized strategies.
+                </div>
+                <div class="app-metrics">
+                    <div class="metric">
+                        <div class="metric-label">Market Cap</div>
+                        <div class="metric-value">$89K</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Liquidity</div>
+                        <div class="metric-value">$12K</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Age</div>
+                        <div class="metric-value">7d</div>
+                    </div>
+                </div>
+                <div class="app-contract">0x3333...4444</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="view-toggle">
+        <span>Preview Mode:</span>
+        <button class="toggle-btn active" id="staticBtn">Fast</button>
+        <button class="toggle-btn" id="liveBtn">Live</button>
+    </div>
+
+    <script>
+        // Filter functionality
+        const filterPills = document.querySelectorAll('.filter-pill');
+        const appCards = document.querySelectorAll('.app-card');
+
+        filterPills.forEach(pill => {
+            pill.addEventListener('click', () => {
+                // Update active state
+                filterPills.forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+
+                // Filter cards
+                const filter = pill.dataset.filter;
+                appCards.forEach(card => {
+                    if (filter === 'all' || card.dataset.category === filter) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Preview mode toggle
+        const staticBtn = document.getElementById('staticBtn');
+        const liveBtn = document.getElementById('liveBtn');
+        let liveMode = false;
+
+        staticBtn.addEventListener('click', () => {
+            liveMode = false;
+            staticBtn.classList.add('active');
+            liveBtn.classList.remove('active');
+            // Clear all iframes
+            document.querySelectorAll('.website-iframe').forEach(iframe => {
+                iframe.remove();
+            });
+            document.querySelectorAll('.website-preview').forEach(preview => {
+                preview.style.display = 'flex';
+            });
+        });
+
+        liveBtn.addEventListener('click', () => {
+            liveMode = true;
+            liveBtn.classList.add('active');
+            staticBtn.classList.remove('active');
+            // Load iframes for visible cards
+            loadVisibleIframes();
+        });
+
+        // Click to load individual iframe
+        appCards.forEach(card => {
+            card.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const url = this.dataset.url;
+                
+                if (url && !liveMode) {
+                    // Load iframe for this card only
+                    const screen = this.querySelector('.phone-screen');
+                    const preview = screen.querySelector('.website-preview');
+                    const loading = screen.querySelector('.preview-loading');
+                    
+                    if (!screen.querySelector('.website-iframe')) {
+                        preview.style.display = 'none';
+                        loading.classList.add('active');
+                        
+                        const iframe = document.createElement('iframe');
+                        iframe.className = 'website-iframe';
+                        iframe.src = url;
+                        iframe.sandbox = 'allow-scripts allow-same-origin';
+                        
+                        iframe.onload = () => {
+                            loading.classList.remove('active');
+                        };
+                        
+                        iframe.onerror = () => {
+                            loading.classList.remove('active');
+                            preview.style.display = 'flex';
+                            preview.innerHTML = '<div class="preview-icon">⚠️</div><div>Unable to load website</div>';
+                        };
+                        
+                        screen.appendChild(iframe);
+                        
+                        // Simulate loading time
+                        setTimeout(() => {
+                            loading.classList.remove('active');
+                        }, 2000);
+                    }
+                } else if (!url) {
+                    // Open detail view (similar to RocketApps)
+                    console.log('Opening detail view for:', this.querySelector('.app-name').textContent);
+                    // In production, this would navigate to detail page or open modal
+                }
+            });
+        });
+
+        function loadVisibleIframes() {
+            const visibleCards = Array.from(appCards).filter(card => {
+                return card.style.display !== 'none' && card.dataset.url;
+            });
+
+            visibleCards.forEach(card => {
+                const screen = card.querySelector('.phone-screen');
+                const preview = screen.querySelector('.website-preview');
+                const loading = screen.querySelector('.preview-loading');
+                
+                if (!screen.querySelector('.website-iframe')) {
+                    preview.style.display = 'none';
+                    loading.classList.add('active');
+                    
+                    const iframe = document.createElement('iframe');
+                    iframe.className = 'website-iframe';
+                    iframe.src = card.dataset.url;
+                    iframe.sandbox = 'allow-scripts allow-same-origin';
+                    
+                    iframe.onload = () => {
+                        loading.classList.remove('active');
+                    };
+                    
+                    screen.appendChild(iframe);
+                    
+                    // Fallback timeout
+                    setTimeout(() => {
+                        loading.classList.remove('active');
+                    }, 3000);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
