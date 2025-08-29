@@ -39,6 +39,8 @@ export async function GET(request: NextRequest) {
           headers: {
             'Content-Type': 'image/png',
             'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
+            'Vary': 'url', // Important: vary cache by URL parameter
+            'X-Screenshot-File': screenshotFile, // Debug header
           },
         });
       } catch (fileError) {
