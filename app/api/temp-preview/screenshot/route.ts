@@ -28,7 +28,8 @@ export async function GET(request: NextRequest) {
     }
     
     // ApiFlash API endpoint with mobile viewport for better card display
-    const screenshotUrl = `https://api.apiflash.com/v1/urltoimage?access_key=${apiKey}&url=${encodeURIComponent(targetUrl)}&format=png&width=375&height=667&wait_until=page_loaded&delay=3000&no_cookie_banners=true&no_ads=true&emulate_device=iPhone_12`;
+    // Note: delay is in seconds (not milliseconds), max 10
+    const screenshotUrl = `https://api.apiflash.com/v1/urltoimage?access_key=${apiKey}&url=${encodeURIComponent(targetUrl)}&format=png&width=375&height=667&wait_until=page_loaded&delay=3&no_cookie_banners=true&no_ads=true&emulate_device=iPhone_12`;
     
     console.log('Fetching screenshot from ApiFlash for:', targetUrl);
     
