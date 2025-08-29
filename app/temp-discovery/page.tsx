@@ -143,30 +143,30 @@ export default function TempDiscoveryPage() {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 to-purple-900 p-6">
+    <div className="min-h-screen bg-[#0a0b0d] p-6">
       {/* Header */}
-      <div className="text-center text-white mb-8">
-        <h1 className="text-4xl font-bold mb-2">🚀 KROM Discovery</h1>
-        <p className="text-lg opacity-90">Utility Tokens with Websites</p>
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-bold mb-2 text-white">🚀 KROM Discovery</h1>
+        <p className="text-lg text-[#888]">Utility Tokens with Websites</p>
         
         {/* Preview Mode Toggle */}
         <div className="mt-6 flex justify-center gap-4">
           <button
             onClick={() => setPreviewMode('screenshot')}
-            className={`px-6 py-2 rounded-full transition-all ${
+            className={`px-6 py-2 rounded-lg transition-all ${
               previewMode === 'screenshot'
-                ? 'bg-green-500 text-white'
-                : 'bg-white/20 text-white hover:bg-white/30'
+                ? 'bg-[#00ff88] text-black font-semibold'
+                : 'bg-[#1a1c1f] text-[#888] hover:bg-[#252729] hover:text-white border border-[#2a2d31]'
             }`}
           >
             Screenshot Mode
           </button>
           <button
             onClick={() => setPreviewMode('iframe')}
-            className={`px-6 py-2 rounded-full transition-all ${
+            className={`px-6 py-2 rounded-lg transition-all ${
               previewMode === 'iframe'
-                ? 'bg-green-500 text-white'
-                : 'bg-white/20 text-white hover:bg-white/30'
+                ? 'bg-[#00ff88] text-black font-semibold'
+                : 'bg-[#1a1c1f] text-[#888] hover:bg-[#252729] hover:text-white border border-[#2a2d31]'
             }`}
           >
             iFrame Mode (via Proxy)
@@ -175,22 +175,22 @@ export default function TempDiscoveryPage() {
       </div>
 
       {/* Filters and Sorting */}
-      <div className="max-w-7xl mx-auto mb-6 bg-white/10 backdrop-blur rounded-xl p-4">
+      <div className="max-w-7xl mx-auto mb-6 bg-[#111214] border border-[#2a2d31] rounded-xl p-4">
         <div className="flex flex-wrap gap-4 items-center justify-center">
           {/* Sort By */}
           <div className="flex items-center gap-2">
-            <label className="text-white text-sm">Sort by:</label>
+            <label className="text-[#888] text-sm">Sort by:</label>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as 'buy_timestamp' | 'website_score')}
-              className="bg-white/20 text-white border border-white/30 rounded-lg px-3 py-1 text-sm"
+              className="bg-[#1a1c1f] text-white border border-[#2a2d31] rounded-lg px-3 py-1 text-sm hover:border-[#333] focus:outline-none focus:border-[#00ff88]"
             >
               <option value="buy_timestamp">Date Called</option>
               <option value="website_score">Website Score</option>
             </select>
             <button
               onClick={() => setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc')}
-              className="bg-white/20 text-white border border-white/30 rounded-lg px-3 py-1 text-sm hover:bg-white/30"
+              className="bg-[#1a1c1f] text-white border border-[#2a2d31] rounded-lg px-3 py-1 text-sm hover:bg-[#252729] hover:border-[#333]"
             >
               {sortOrder === 'desc' ? '↓' : '↑'}
             </button>
@@ -198,11 +198,11 @@ export default function TempDiscoveryPage() {
 
           {/* Website Score Filter */}
           <div className="flex items-center gap-2">
-            <label className="text-white text-sm">Min Website Score:</label>
+            <label className="text-[#888] text-sm">Min Website Score:</label>
             <select
               value={minWebsiteScore}
               onChange={(e) => setMinWebsiteScore(parseInt(e.target.value))}
-              className="bg-white/20 text-white border border-white/30 rounded-lg px-3 py-1 text-sm"
+              className="bg-[#1a1c1f] text-white border border-[#2a2d31] rounded-lg px-3 py-1 text-sm hover:border-[#333] focus:outline-none focus:border-[#00ff88]"
             >
               <option value="0">All</option>
               <option value="5">5+</option>
@@ -213,7 +213,7 @@ export default function TempDiscoveryPage() {
           </div>
 
           {/* Token Count */}
-          <div className="text-white text-sm opacity-75">
+          <div className="text-[#666] text-sm">
             Showing {tokens.length} tokens
           </div>
         </div>
@@ -225,17 +225,17 @@ export default function TempDiscoveryPage() {
           <div
             key={token.id}
             ref={index === tokens.length - 1 ? lastTokenRef : null}
-            className="bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1 relative"
+            className="bg-[#111214] rounded-2xl border border-[#2a2d31] hover:border-[#00ff88] transition-all hover:-translate-y-1 relative overflow-hidden"
           >
-            {/* Preview Area - Fixed height with scrollable content */}
-            <div className="relative h-64 bg-gray-100 overflow-hidden rounded-t-2xl">
+            {/* Preview Area - Taller for phone-like dimensions */}
+            <div className="relative h-[420px] bg-[#0a0b0d] overflow-hidden">
               {previewMode === 'iframe' ? (
                 <>
                   {loadingStates[token.ticker] && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-gray-100 z-10">
+                    <div className="absolute inset-0 flex items-center justify-center bg-[#0a0b0d] z-10">
                       <div className="text-center">
-                        <div className="w-12 h-12 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-                        <p className="text-sm text-gray-600">Loading preview...</p>
+                        <div className="w-12 h-12 border-4 border-[#00ff88] border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                        <p className="text-sm text-[#666]">Loading preview...</p>
                       </div>
                     </div>
                   )}
@@ -257,7 +257,7 @@ export default function TempDiscoveryPage() {
                     className="w-full h-auto object-top"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
-                      target.src = `https://via.placeholder.com/400x300/667eea/ffffff?text=${encodeURIComponent(token.name)}`;
+                      target.src = `https://via.placeholder.com/400x600/1a1c1f/666666?text=${encodeURIComponent(token.name)}`;
                     }}
                   />
                 </div>
@@ -265,8 +265,8 @@ export default function TempDiscoveryPage() {
               
               {/* Live Indicator */}
               {previewMode === 'iframe' && !loadingStates[token.ticker] && (
-                <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                  <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+                <div className="absolute top-2 right-2 bg-[#00ff88] text-black text-xs px-2 py-1 rounded-full flex items-center gap-1 font-semibold">
+                  <span className="w-2 h-2 bg-black rounded-full animate-pulse"></span>
                   LIVE
                 </div>
               )}
@@ -276,8 +276,8 @@ export default function TempDiscoveryPage() {
             <div className="p-5">
               <div className="flex justify-between items-start mb-3">
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900">{token.name}</h3>
-                  <p className="text-sm text-gray-500">{token.ticker}</p>
+                  <h3 className="text-xl font-bold text-white">{token.name}</h3>
+                  <p className="text-sm text-[#666]">{token.ticker}</p>
                 </div>
                 <div className="text-right relative z-10">
                   {token.analysisTier && (
@@ -298,27 +298,27 @@ export default function TempDiscoveryPage() {
                       </span>
                     </WebsiteAnalysisTooltip>
                   )}
-                  <p className="text-xs text-gray-500 mt-1">{formatDate(token.callDate)}</p>
+                  <p className="text-xs text-[#666] mt-1">{formatDate(token.callDate)}</p>
                 </div>
               </div>
               
-              <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                {token.description || <span className="text-gray-400 italic">No description available</span>}
+              <p className="text-[#888] text-sm mb-4 line-clamp-2">
+                {token.description || <span className="text-[#666] italic">No description available</span>}
               </p>
               
               {/* Metrics */}
               <div className="grid grid-cols-3 gap-2 mb-4">
-                <div className="text-center p-2 bg-gray-50 rounded-lg">
-                  <p className="text-xs text-gray-500">Market Cap</p>
-                  <p className="text-sm font-semibold">{formatMarketCap(token.marketCap)}</p>
+                <div className="text-center p-2 bg-[#1a1c1f] rounded-lg border border-[#2a2d31]">
+                  <p className="text-xs text-[#666]">Market Cap</p>
+                  <p className="text-sm font-semibold text-white">{formatMarketCap(token.marketCap)}</p>
                 </div>
-                <div className="text-center p-2 bg-gray-50 rounded-lg">
-                  <p className="text-xs text-gray-500">Liquidity</p>
-                  <p className="text-sm font-semibold">{formatMarketCap(token.liquidity)}</p>
+                <div className="text-center p-2 bg-[#1a1c1f] rounded-lg border border-[#2a2d31]">
+                  <p className="text-xs text-[#666]">Liquidity</p>
+                  <p className="text-sm font-semibold text-white">{formatMarketCap(token.liquidity)}</p>
                 </div>
-                <div className="text-center p-2 bg-gray-50 rounded-lg">
-                  <p className="text-xs text-gray-500">ROI</p>
-                  <p className={`text-sm font-semibold ${token.roi && token.roi > 0 ? 'text-green-600' : token.roi && token.roi < 0 ? 'text-red-600' : 'text-gray-600'}`}>
+                <div className="text-center p-2 bg-[#1a1c1f] rounded-lg border border-[#2a2d31]">
+                  <p className="text-xs text-[#666]">ROI</p>
+                  <p className={`text-sm font-semibold ${token.roi && token.roi > 0 ? 'text-[#00ff88]' : token.roi && token.roi < 0 ? 'text-[#ff4444]' : 'text-[#888]'}`}>
                     {token.roi ? `${token.roi > 0 ? '+' : ''}${token.roi.toFixed(0)}%` : 'N/A'}
                   </p>
                 </div>
@@ -330,7 +330,7 @@ export default function TempDiscoveryPage() {
                   href={token.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 bg-gradient-to-r from-purple-600 to-purple-800 text-white text-center py-2 rounded-lg hover:opacity-90 transition-opacity text-sm"
+                  className="flex-1 bg-[#00ff88] text-black text-center py-2 rounded-lg hover:bg-[#00cc66] transition-colors text-sm font-semibold"
                 >
                   Visit Website ↗
                 </a>
@@ -339,7 +339,7 @@ export default function TempDiscoveryPage() {
                     href={`https://dexscreener.com/${token.network}/${token.contractAddress}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 bg-gray-100 text-gray-700 py-2 rounded-lg hover:bg-gray-200 transition-colors text-center text-sm"
+                    className="flex-1 bg-[#1a1c1f] text-[#888] py-2 rounded-lg hover:bg-[#252729] hover:text-white transition-colors text-center text-sm border border-[#2a2d31]"
                   >
                     Chart 📊
                   </a>
@@ -353,22 +353,22 @@ export default function TempDiscoveryPage() {
       {/* Loading Indicator */}
       {loading && (
         <div className="flex justify-center mt-8">
-          <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-12 h-12 border-4 border-[#00ff88] border-t-transparent rounded-full animate-spin"></div>
         </div>
       )}
 
       {/* No More Results */}
       {!hasMore && tokens.length > 0 && (
-        <div className="text-center mt-8 text-white opacity-75">
+        <div className="text-center mt-8 text-[#666]">
           <p>No more tokens to load</p>
         </div>
       )}
 
       {/* No Results */}
       {!loading && tokens.length === 0 && (
-        <div className="text-center mt-8 text-white">
-          <p className="text-xl mb-2">No tokens found</p>
-          <p className="opacity-75">Try adjusting your filters</p>
+        <div className="text-center mt-8">
+          <p className="text-xl mb-2 text-white">No tokens found</p>
+          <p className="text-[#666]">Try adjusting your filters</p>
         </div>
       )}
     </div>
