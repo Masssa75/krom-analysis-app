@@ -53,9 +53,7 @@ export async function GET(request: NextRequest) {
       status: 200,
       headers: {
         'Content-Type': 'image/png',
-        'Cache-Control': 'no-cache, no-store, must-revalidate', // Temporary: disable cache to test
-        'Pragma': 'no-cache',
-        'Expires': '0',
+        'Cache-Control': 'public, max-age=86400, s-maxage=86400', // Cache for 24 hours
         'Vary': 'url', // Important: vary cache by URL parameter
       },
     });
