@@ -49,40 +49,6 @@ export async function GET(request: NextRequest) {
       },
     });
     
-    // Fallback to colored placeholder if no screenshot exists
-    const hostname = new URL(targetUrl).hostname.replace('www.', '');
-    const colors: Record<string, string> = {
-      'fedora.club': '667eea',
-      'ainu.pro': '10b981',
-      'uiui.wtf': 'f59e0b',
-      'bio.xyz': 'ef4444'
-    };
-    
-    const bgColor = colors[hostname] || '1e293b';
-    const placeholderUrl = `https://via.placeholder.com/1280x800/${bgColor}/ffffff?text=${encodeURIComponent(hostname.toUpperCase())}`;
-    
-    console.log('Using placeholder for:', targetUrl);
-    
-    // Fetch the placeholder image
-    const imageResponse = await fetch(placeholderUrl);
-    
-    if (!imageResponse.ok) {
-      throw new Error(`Placeholder service returned ${imageResponse.status}`);
-    }
-    
-    // Get the image as a buffer
-    const imageBuffer = await imageResponse.arrayBuffer();
-    
-    // Return the actual image buffer with caching
-    return new NextResponse(imageBuffer, {
-      status: 200,
-      headers: {
-        'Content-Type': 'image/png',
-        'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
-        'Vary': 'url', // Vary cache by URL parameter
-      },
-    });
-    
   } catch (error) {
     console.error('Screenshot service error:', error);
     

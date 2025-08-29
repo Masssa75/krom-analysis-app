@@ -56,7 +56,7 @@ const tokens = [
 ];
 
 export default function TempDiscoveryPage() {
-  const [previewMode, setPreviewMode] = useState<'iframe' | 'screenshot'>('iframe');
+  const [previewMode, setPreviewMode] = useState<'iframe' | 'screenshot'>('screenshot');
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
 
   // Initialize loading states
@@ -78,16 +78,6 @@ export default function TempDiscoveryPage() {
         {/* Preview Mode Toggle */}
         <div className="mt-6 flex justify-center gap-4">
           <button
-            onClick={() => setPreviewMode('iframe')}
-            className={`px-6 py-2 rounded-full transition-all ${
-              previewMode === 'iframe'
-                ? 'bg-green-500 text-white'
-                : 'bg-white/20 text-white hover:bg-white/30'
-            }`}
-          >
-            iFrame Mode (via Proxy)
-          </button>
-          <button
             onClick={() => setPreviewMode('screenshot')}
             className={`px-6 py-2 rounded-full transition-all ${
               previewMode === 'screenshot'
@@ -96,6 +86,16 @@ export default function TempDiscoveryPage() {
             }`}
           >
             Screenshot Mode
+          </button>
+          <button
+            onClick={() => setPreviewMode('iframe')}
+            className={`px-6 py-2 rounded-full transition-all ${
+              previewMode === 'iframe'
+                ? 'bg-green-500 text-white'
+                : 'bg-white/20 text-white hover:bg-white/30'
+            }`}
+          >
+            iFrame Mode (via Proxy)
           </button>
         </div>
         
