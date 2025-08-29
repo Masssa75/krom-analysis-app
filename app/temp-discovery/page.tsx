@@ -130,19 +130,15 @@ export default function TempDiscoveryPage() {
   };
 
   const getTierColor = (tier: string | null | undefined) => {
-    if (!tier) return 'bg-gray-500';
-    switch (tier.toUpperCase()) {
-      case 'ALPHA':
-        return 'bg-green-500';
-      case 'SOLID':
-        return 'bg-blue-500';
-      case 'BASIC':
-        return 'bg-yellow-500';
-      case 'TRASH':
-        return 'bg-red-500';
-      default:
-        return 'bg-gray-500';
-    }
+    if (!tier) return { bg: '#88888822', text: '#888' };
+    
+    const colors: { [key: string]: { bg: string, text: string } } = {
+      ALPHA: { bg: '#00ff8822', text: '#00ff88' },
+      SOLID: { bg: '#ffcc0022', text: '#ffcc00' },
+      BASIC: { bg: '#ff994422', text: '#ff9944' },
+      TRASH: { bg: '#ff444422', text: '#ff4444' }
+    };
+    return colors[tier.toUpperCase()] || { bg: '#88888822', text: '#888' };
   };
 
 
@@ -229,10 +225,10 @@ export default function TempDiscoveryPage() {
           <div
             key={token.id}
             ref={index === tokens.length - 1 ? lastTokenRef : null}
-            className="bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1"
+            className="bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1 relative"
           >
             {/* Preview Area - Fixed height with scrollable content */}
-            <div className="relative h-64 bg-gray-100 overflow-hidden">
+            <div className="relative h-64 bg-gray-100 overflow-hidden rounded-t-2xl">
               {previewMode === 'iframe' ? (
                 <>
                   {loadingStates[token.ticker] && (
@@ -254,11 +250,11 @@ export default function TempDiscoveryPage() {
                   />
                 </>
               ) : (
-                <div className="w-full h-full overflow-hidden">
+                <div className="w-full h-full overflow-y-auto scrollbar-hide">
                   <img
                     src={`/api/temp-preview/screenshot?url=${encodeURIComponent(token.url)}&cache=${btoa(token.url).substring(0, 8)}`}
                     alt={`${token.name} screenshot`}
-                    className="w-full h-full object-cover object-top"
+                    className="w-full h-auto object-top"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.src = `https://via.placeholder.com/400x300/667eea/ffffff?text=${encodeURIComponent(token.name)}`;
@@ -283,7 +279,7 @@ export default function TempDiscoveryPage() {
                   <h3 className="text-xl font-bold text-gray-900">{token.name}</h3>
                   <p className="text-sm text-gray-500">{token.ticker}</p>
                 </div>
-                <div className="text-right">
+                <div className="text-right relative z-10">
                   {token.analysisTier && (
                     <WebsiteAnalysisTooltip 
                       fullAnalysis={{
@@ -291,7 +287,13 @@ export default function TempDiscoveryPage() {
                         type_reasoning: token.analysisReasoning
                       }}
                     >
-                      <span className={`${getTierColor(token.analysisTier)} text-white px-2 py-0.5 rounded-full text-xs font-semibold uppercase inline-block`}>
+                      <span 
+                        className="px-2 py-0.5 rounded text-xs font-semibold uppercase inline-block"
+                        style={{ 
+                          backgroundColor: getTierColor(token.analysisTier).bg,
+                          color: getTierColor(token.analysisTier).text
+                        }}
+                      >
                         {token.analysisTier}
                       </span>
                     </WebsiteAnalysisTooltip>
