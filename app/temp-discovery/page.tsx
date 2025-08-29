@@ -6,74 +6,138 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
-const tokens = [
-  {
-    name: 'Fedora',
-    ticker: '$FEDORA',
-    url: 'https://www.fedora.club',
-    score: '13/21',
-    description: 'Meme coin with strong branding. The gentleman\'s token.',
-    marketCap: '$147K',
-    liquidity: '$14.9K',
-    age: '2d',
-    category: 'meme'
-  },
-  {
-    name: 'Ainu AI',
-    ticker: '$AINU',
-    url: 'https://www.ainu.pro',  // FIXED URL
-    score: '13/21',
-    description: 'AI-powered utility token with clear tokenomics.',
-    marketCap: '$154K',
-    liquidity: '$15.4K',
-    age: '3d',
-    category: 'ai'
-  },
-  {
-    name: 'UIUI',
-    ticker: '$UIUI',
-    url: 'https://www.uiui.wtf',  // FIXED URL - needs www
-    score: '11/21',
-    description: 'UI/UX focused design toolkit for dApps.',
-    marketCap: '$250K',
-    liquidity: '$25K',
-    age: '1d',
-    category: 'defi'
-  },
-  {
-    name: 'BIO Protocol',
-    ticker: '$BIO',
-    url: 'https://bio.xyz',
-    score: '16/21',
-    description: 'Decentralized science funding protocol.',
-    marketCap: '$420K',
-    liquidity: '$68K',
-    age: '14d',
-    category: 'defi'
-  }
-];
+interface Token {
+  id: string;
+  name: string;
+  ticker: string;
+  url: string;
+  websiteScore: number;
+  websiteAnalysis: any;
+  description: string;
+  marketCap: number;
+  liquidity: number;
+  callDate: string;
+  network: string;
+  contractAddress: string;
+  analysisScore: number;
+  roi: number;
+  currentPrice: number;
+  priceAtCall: number;
+}
 
 export default function TempDiscoveryPage() {
   const [previewMode, setPreviewMode] = useState<'iframe' | 'screenshot'>('screenshot');
+  const [tokens, setTokens] = useState<Token[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [sortBy, setSortBy] = useState<'buy_timestamp' | 'website_score'>('buy_timestamp');
+  const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
+  const [minWebsiteScore, setMinWebsiteScore] = useState(0);
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
-
-  // Initialize loading states
-  useEffect(() => {
-    const initialStates: Record<string, boolean> = {};
-    tokens.forEach(token => {
-      initialStates[token.ticker] = true;
+  
+  const observer = useRef<IntersectionObserver>();
+  const lastTokenRef = useCallback((node: HTMLDivElement | null) => {
+    if (loading) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMore) {
+        setPage(prevPage => prevPage + 1);
+      }
     });
-    setLoadingStates(initialStates);
-  }, []);
+    if (node) observer.current.observe(node);
+  }, [loading, hasMore]);
+
+  // Fetch tokens
+  const fetchTokens = useCallback(async (pageNum: number, reset: boolean = false) => {
+    if (loading) return;
+    setLoading(true);
+
+    try {
+      const params = new URLSearchParams({
+        page: pageNum.toString(),
+        limit: '8',
+        sortBy,
+        sortOrder,
+        minWebsiteScore: minWebsiteScore.toString()
+      });
+
+      const response = await fetch(`/api/discovery-tokens?${params}`);
+      const data = await response.json();
+
+      if (data.tokens) {
+        if (reset) {
+          setTokens(data.tokens);
+        } else {
+          setTokens(prev => [...prev, ...data.tokens]);
+        }
+        setHasMore(pageNum < data.pagination.totalPages);
+        
+        // Initialize loading states for new tokens
+        const newLoadingStates: Record<string, boolean> = {};
+        data.tokens.forEach((token: Token) => {
+          newLoadingStates[token.ticker] = true;
+        });
+        setLoadingStates(prev => ({ ...prev, ...newLoadingStates }));
+      }
+    } catch (error) {
+      console.error('Error fetching tokens:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [sortBy, sortOrder, minWebsiteScore, loading]);
+
+  // Reset and fetch when filters change
+  useEffect(() => {
+    setTokens([]);
+    setPage(1);
+    setHasMore(true);
+    fetchTokens(1, true);
+  }, [sortBy, sortOrder, minWebsiteScore]);
+
+  // Fetch more when page changes
+  useEffect(() => {
+    if (page > 1) {
+      fetchTokens(page);
+    }
+  }, [page]);
+
+  // Format functions
+  const formatMarketCap = (value: number | null) => {
+    if (!value) return 'N/A';
+    if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
+    if (value >= 1000) return `$${(value / 1000).toFixed(0)}K`;
+    return `$${value.toFixed(0)}`;
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays}d ago`;
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
+    return `${Math.floor(diffDays / 30)}mo ago`;
+  };
+
+  const getScoreColor = (score: number) => {
+    if (score >= 15) return 'from-green-500 to-green-700';
+    if (score >= 10) return 'from-blue-500 to-blue-700';
+    if (score >= 5) return 'from-yellow-500 to-yellow-700';
+    return 'from-red-500 to-red-700';
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-600 to-purple-900 p-6">
       {/* Header */}
       <div className="text-center text-white mb-8">
         <h1 className="text-4xl font-bold mb-2">🚀 KROM Discovery</h1>
-        <p className="text-lg opacity-90">Testing Website Previews</p>
+        <p className="text-lg opacity-90">Utility Tokens with Websites</p>
         
         {/* Preview Mode Toggle */}
         <div className="mt-6 flex justify-center gap-4">
@@ -98,17 +162,59 @@ export default function TempDiscoveryPage() {
             iFrame Mode (via Proxy)
           </button>
         </div>
-        
-        <div className="mt-4 text-sm opacity-75">
-          Current Mode: {previewMode === 'iframe' ? 'Live iFrame via Proxy' : 'Static Screenshots'}
+      </div>
+
+      {/* Filters and Sorting */}
+      <div className="max-w-7xl mx-auto mb-6 bg-white/10 backdrop-blur rounded-xl p-4">
+        <div className="flex flex-wrap gap-4 items-center justify-center">
+          {/* Sort By */}
+          <div className="flex items-center gap-2">
+            <label className="text-white text-sm">Sort by:</label>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as 'buy_timestamp' | 'website_score')}
+              className="bg-white/20 text-white border border-white/30 rounded-lg px-3 py-1 text-sm"
+            >
+              <option value="buy_timestamp">Date Called</option>
+              <option value="website_score">Website Score</option>
+            </select>
+            <button
+              onClick={() => setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc')}
+              className="bg-white/20 text-white border border-white/30 rounded-lg px-3 py-1 text-sm hover:bg-white/30"
+            >
+              {sortOrder === 'desc' ? '↓' : '↑'}
+            </button>
+          </div>
+
+          {/* Website Score Filter */}
+          <div className="flex items-center gap-2">
+            <label className="text-white text-sm">Min Website Score:</label>
+            <select
+              value={minWebsiteScore}
+              onChange={(e) => setMinWebsiteScore(parseInt(e.target.value))}
+              className="bg-white/20 text-white border border-white/30 rounded-lg px-3 py-1 text-sm"
+            >
+              <option value="0">All</option>
+              <option value="5">5+</option>
+              <option value="10">10+</option>
+              <option value="15">15+</option>
+              <option value="18">18+</option>
+            </select>
+          </div>
+
+          {/* Token Count */}
+          <div className="text-white text-sm opacity-75">
+            Showing {tokens.length} tokens
+          </div>
         </div>
       </div>
 
       {/* Token Grid */}
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {tokens.map((token) => (
+        {tokens.map((token, index) => (
           <div
-            key={token.ticker}
+            key={token.id}
+            ref={index === tokens.length - 1 ? lastTokenRef : null}
             className="bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1"
           >
             {/* Preview Area - Fixed height with scrollable content */}
@@ -154,6 +260,13 @@ export default function TempDiscoveryPage() {
                   LIVE
                 </div>
               )}
+
+              {/* Website Score Badge */}
+              {token.websiteScore > 0 && (
+                <div className={`absolute top-2 left-2 bg-gradient-to-r ${getScoreColor(token.websiteScore)} text-white text-xs px-2 py-1 rounded-full font-semibold`}>
+                  W{token.websiteScore}/21
+                </div>
+              )}
             </div>
 
             {/* Token Info */}
@@ -163,26 +276,33 @@ export default function TempDiscoveryPage() {
                   <h3 className="text-xl font-bold text-gray-900">{token.name}</h3>
                   <p className="text-sm text-gray-500">{token.ticker}</p>
                 </div>
-                <span className="bg-gradient-to-r from-purple-600 to-purple-800 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                  {token.score}
-                </span>
+                <div className="text-right">
+                  {token.analysisScore && (
+                    <span className="bg-gradient-to-r from-purple-600 to-purple-800 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                      {token.analysisScore}/10
+                    </span>
+                  )}
+                  <p className="text-xs text-gray-500 mt-1">{formatDate(token.callDate)}</p>
+                </div>
               </div>
               
-              <p className="text-gray-600 text-sm mb-4">{token.description}</p>
+              <p className="text-gray-600 text-sm mb-4 line-clamp-2">{token.description}</p>
               
               {/* Metrics */}
               <div className="grid grid-cols-3 gap-2 mb-4">
                 <div className="text-center p-2 bg-gray-50 rounded-lg">
                   <p className="text-xs text-gray-500">Market Cap</p>
-                  <p className="text-sm font-semibold">{token.marketCap}</p>
+                  <p className="text-sm font-semibold">{formatMarketCap(token.marketCap)}</p>
                 </div>
                 <div className="text-center p-2 bg-gray-50 rounded-lg">
                   <p className="text-xs text-gray-500">Liquidity</p>
-                  <p className="text-sm font-semibold">{token.liquidity}</p>
+                  <p className="text-sm font-semibold">{formatMarketCap(token.liquidity)}</p>
                 </div>
                 <div className="text-center p-2 bg-gray-50 rounded-lg">
-                  <p className="text-xs text-gray-500">Age</p>
-                  <p className="text-sm font-semibold">{token.age}</p>
+                  <p className="text-xs text-gray-500">ROI</p>
+                  <p className={`text-sm font-semibold ${token.roi && token.roi > 0 ? 'text-green-600' : token.roi && token.roi < 0 ? 'text-red-600' : 'text-gray-600'}`}>
+                    {token.roi ? `${token.roi > 0 ? '+' : ''}${token.roi.toFixed(0)}%` : 'N/A'}
+                  </p>
                 </div>
               </div>
               
@@ -192,40 +312,47 @@ export default function TempDiscoveryPage() {
                   href={token.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 bg-gradient-to-r from-purple-600 to-purple-800 text-white text-center py-2 rounded-lg hover:opacity-90 transition-opacity"
+                  className="flex-1 bg-gradient-to-r from-purple-600 to-purple-800 text-white text-center py-2 rounded-lg hover:opacity-90 transition-opacity text-sm"
                 >
                   Visit Website ↗
                 </a>
-                <button className="flex-1 bg-gray-100 text-gray-700 py-2 rounded-lg hover:bg-gray-200 transition-colors">
-                  Chart 📊
-                </button>
+                {token.contractAddress && (
+                  <a
+                    href={`https://dexscreener.com/${token.network}/${token.contractAddress}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 bg-gray-100 text-gray-700 py-2 rounded-lg hover:bg-gray-200 transition-colors text-center text-sm"
+                  >
+                    Chart 📊
+                  </a>
+                )}
               </div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Info Box */}
-      <div className="max-w-4xl mx-auto mt-12 p-6 bg-white/10 backdrop-blur rounded-xl text-white">
-        <h3 className="text-xl font-bold mb-3">🧪 Preview Testing</h3>
-        <p className="mb-2">This is a temporary page for testing website previews. It demonstrates:</p>
-        <ul className="list-disc list-inside space-y-1 text-sm opacity-90">
-          <li><strong>iFrame Mode:</strong> Uses proxy at /api/temp-preview/proxy to bypass CORS</li>
-          <li><strong>Screenshot Mode:</strong> Uses screenshot API at /api/temp-preview/screenshot</li>
-          <li>Both endpoints are in the /app/api/temp-preview folder</li>
-          <li>This entire page is in /app/temp-discovery</li>
-          <li className="text-yellow-300">To remove: Delete /app/api/temp-preview and /app/temp-discovery folders</li>
-        </ul>
-        <div className="mt-4 p-3 bg-white/10 rounded">
-          <p className="text-sm"><strong>URLs being tested:</strong></p>
-          <ul className="text-xs mt-2 space-y-1">
-            <li>Fedora: {tokens[0].url}</li>
-            <li>Ainu: {tokens[1].url}</li>
-            <li>UIUI: {tokens[2].url}</li>
-            <li>BIO: {tokens[3].url}</li>
-          </ul>
+      {/* Loading Indicator */}
+      {loading && (
+        <div className="flex justify-center mt-8">
+          <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
         </div>
-      </div>
+      )}
+
+      {/* No More Results */}
+      {!hasMore && tokens.length > 0 && (
+        <div className="text-center mt-8 text-white opacity-75">
+          <p>No more tokens to load</p>
+        </div>
+      )}
+
+      {/* No Results */}
+      {!loading && tokens.length === 0 && (
+        <div className="text-center mt-8 text-white">
+          <p className="text-xl mb-2">No tokens found</p>
+          <p className="opacity-75">Try adjusting your filters</p>
+        </div>
+      )}
     </div>
   );
 }
