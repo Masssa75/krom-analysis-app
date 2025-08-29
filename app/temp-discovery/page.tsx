@@ -23,7 +23,7 @@ const tokens = [
   {
     name: 'Ainu AI',
     ticker: '$AINU',
-    url: 'https://www.ainuaitoken.com',
+    url: 'https://www.ainu.pro',  // FIXED URL
     score: '13/21',
     description: 'AI-powered utility token with clear tokenomics.',
     marketCap: '$154K',
@@ -34,7 +34,7 @@ const tokens = [
   {
     name: 'UIUI',
     ticker: '$UIUI',
-    url: 'https://www.uiui.cool',
+    url: 'https://uiui.wtf',  // FIXED URL
     score: '11/21',
     description: 'UI/UX focused design toolkit for dApps.',
     marketCap: '$250K',
@@ -58,6 +58,15 @@ const tokens = [
 export default function TempDiscoveryPage() {
   const [previewMode, setPreviewMode] = useState<'iframe' | 'screenshot'>('iframe');
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
+
+  // Initialize loading states
+  useEffect(() => {
+    const initialStates: Record<string, boolean> = {};
+    tokens.forEach(token => {
+      initialStates[token.ticker] = true;
+    });
+    setLoadingStates(initialStates);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-600 to-purple-900 p-6">
@@ -102,8 +111,8 @@ export default function TempDiscoveryPage() {
             key={token.ticker}
             className="bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1"
           >
-            {/* Preview Area */}
-            <div className="relative h-64 bg-gray-100">
+            {/* Preview Area - Fixed height with responsive iframe */}
+            <div className="relative h-64 bg-gray-100 overflow-hidden">
               {previewMode === 'iframe' ? (
                 <>
                   {loadingStates[token.ticker] && (
@@ -116,8 +125,9 @@ export default function TempDiscoveryPage() {
                   )}
                   <iframe
                     src={`/api/temp-preview/proxy?url=${encodeURIComponent(token.url)}`}
-                    className="w-full h-full border-0"
-                    sandbox="allow-scripts allow-same-origin"
+                    className="w-full h-full border-0 transform scale-75 origin-top-left"
+                    style={{ width: '133.33%', height: '133.33%' }}
+                    sandbox="allow-scripts allow-same-origin allow-forms"
                     onLoad={() => setLoadingStates(prev => ({ ...prev, [token.ticker]: false }))}
                     onError={() => setLoadingStates(prev => ({ ...prev, [token.ticker]: false }))}
                     title={`${token.name} preview`}
@@ -136,7 +146,7 @@ export default function TempDiscoveryPage() {
               )}
               
               {/* Live Indicator */}
-              {previewMode === 'iframe' && (
+              {previewMode === 'iframe' && !loadingStates[token.ticker] && (
                 <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
                   <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
                   LIVE
@@ -204,6 +214,15 @@ export default function TempDiscoveryPage() {
           <li>This entire page is in /app/temp-discovery</li>
           <li className="text-yellow-300">To remove: Delete /app/api/temp-preview and /app/temp-discovery folders</li>
         </ul>
+        <div className="mt-4 p-3 bg-white/10 rounded">
+          <p className="text-sm"><strong>URLs being tested:</strong></p>
+          <ul className="text-xs mt-2 space-y-1">
+            <li>Fedora: {tokens[0].url}</li>
+            <li>Ainu: {tokens[1].url}</li>
+            <li>UIUI: {tokens[2].url}</li>
+            <li>BIO: {tokens[3].url}</li>
+          </ul>
+        </div>
       </div>
     </div>
   );
