@@ -135,7 +135,7 @@ export default function TempDiscoveryPage() {
                 </>
               ) : (
                 <img
-                  src={`/api/temp-preview/screenshot?url=${encodeURIComponent(token.url)}&t=${Date.now()}`}
+                  src={`/api/temp-preview/screenshot?url=${encodeURIComponent(token.url)}`}
                   alt={`${token.name} screenshot`}
                   className="w-full h-full object-cover"
                   onError={(e) => {
