@@ -18,50 +18,64 @@ export async function GET(request: NextRequest) {
     // Use thum.io - completely free, no API key needed
     const thumUrl = `https://image.thum.io/get/width/1280/crop/800/noanimate/${targetUrl}`;
     
-    console.log('Using thum.io for screenshot:', thumUrl);
+    console.log('Fetching screenshot from thum.io:', thumUrl);
     
-    // Simply redirect to the thum.io URL
-    // The browser will fetch and display the image directly
-    return NextResponse.redirect(thumUrl, { status: 302 });
+    // Fetch the image from thum.io server-side
+    const imageResponse = await fetch(thumUrl);
+    
+    if (!imageResponse.ok) {
+      throw new Error(`Thum.io returned ${imageResponse.status}`);
+    }
+    
+    // Get the image as a buffer
+    const imageBuffer = await imageResponse.arrayBuffer();
+    
+    // Return the actual image buffer with caching
+    return new NextResponse(imageBuffer, {
+      status: 200,
+      headers: {
+        'Content-Type': 'image/png',
+        'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
+      },
+    });
     
   } catch (error) {
-    console.error('Screenshot error:', error);
+    console.error('Screenshot service error:', error);
     
-    // If thum.io fails, try another free service
+    // Try to extract hostname for placeholder
+    let hostname = 'Website';
     try {
-      // Pikwy is another free service
-      const pikwyUrl = `https://pikwy.com/api/v1/screenshot?url=${encodeURIComponent(targetUrl)}&width=1280&height=800`;
-      return NextResponse.redirect(pikwyUrl, { status: 302 });
-    } catch {
-      // Final fallback: placeholder
-      const errorSvg = `
-        <svg width="1280" height="800" xmlns="http://www.w3.org/2000/svg">
-          <rect width="1280" height="800" fill="url(#grad)"/>
-          <defs>
-            <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
-              <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
-            </linearGradient>
-          </defs>
-          <text x="640" y="380" font-family="Arial" font-size="48" fill="white" text-anchor="middle">
-            📸 Loading Screenshot...
-          </text>
-          <text x="640" y="440" font-family="Arial" font-size="24" fill="white" opacity="0.8" text-anchor="middle">
-            ${new URL(targetUrl).hostname}
-          </text>
-          <text x="640" y="480" font-family="Arial" font-size="16" fill="white" opacity="0.6" text-anchor="middle">
-            This may take a few seconds on first load
-          </text>
-        </svg>
-      `;
-      
-      return new NextResponse(errorSvg, {
-        status: 200,
-        headers: {
-          'Content-Type': 'image/svg+xml',
-          'Cache-Control': 'no-cache',
-        },
-      });
-    }
+      hostname = new URL(targetUrl).hostname;
+    } catch {}
+    
+    // Return a nice placeholder SVG
+    const placeholderSvg = `
+      <svg width="1280" height="800" xmlns="http://www.w3.org/2000/svg">
+        <rect width="1280" height="800" fill="url(#gradient)"/>
+        <defs>
+          <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#1e293b;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#334155;stop-opacity:1" />
+          </linearGradient>
+        </defs>
+        <text x="640" y="380" font-family="system-ui, -apple-system, sans-serif" font-size="48" fill="white" text-anchor="middle">
+          📸 Preview Unavailable
+        </text>
+        <text x="640" y="440" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="white" opacity="0.8" text-anchor="middle">
+          ${hostname}
+        </text>
+        <text x="640" y="480" font-family="system-ui, -apple-system, sans-serif" font-size="16" fill="white" opacity="0.6" text-anchor="middle">
+          Screenshot service temporarily unavailable
+        </text>
+      </svg>
+    `;
+    
+    return new NextResponse(placeholderSvg, {
+      status: 200,
+      headers: {
+        'Content-Type': 'image/svg+xml',
+        'Cache-Control': 'public, max-age=300', // Cache placeholder for 5 minutes
+      },
+    });
   }
 }
