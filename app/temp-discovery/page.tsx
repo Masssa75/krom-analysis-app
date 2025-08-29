@@ -22,6 +22,7 @@ interface Token {
   network: string;
   contractAddress: string;
   analysisScore: number;
+  analysisTier: string;
   roi: number;
   currentPrice: number;
   priceAtCall: number;
@@ -125,11 +126,36 @@ export default function TempDiscoveryPage() {
     return `${Math.floor(diffDays / 30)}mo ago`;
   };
 
-  const getScoreColor = (score: number) => {
-    if (score >= 15) return 'from-green-500 to-green-700';
-    if (score >= 10) return 'from-blue-500 to-blue-700';
-    if (score >= 5) return 'from-yellow-500 to-yellow-700';
-    return 'from-red-500 to-red-700';
+  const getTierColor = (tier: string | null | undefined) => {
+    if (!tier) return 'bg-gray-500';
+    switch (tier.toUpperCase()) {
+      case 'ALPHA':
+        return 'bg-green-500';
+      case 'SOLID':
+        return 'bg-blue-500';
+      case 'BASIC':
+        return 'bg-yellow-500';
+      case 'TRASH':
+        return 'bg-red-500';
+      default:
+        return 'bg-gray-500';
+    }
+  };
+
+  const getTierTooltip = (tier: string | null | undefined) => {
+    if (!tier) return 'No tier assigned';
+    switch (tier.toUpperCase()) {
+      case 'ALPHA':
+        return 'High-quality token with strong fundamentals (8-10 score)';
+      case 'SOLID':
+        return 'Good token with solid potential (6-7 score)';
+      case 'BASIC':
+        return 'Average token with some promise (4-5 score)';
+      case 'TRASH':
+        return 'Low-quality token with red flags (1-3 score)';
+      default:
+        return 'Unknown tier';
+    }
   };
 
   return (
@@ -260,13 +286,6 @@ export default function TempDiscoveryPage() {
                   LIVE
                 </div>
               )}
-
-              {/* Website Score Badge */}
-              {token.websiteScore > 0 && (
-                <div className={`absolute top-2 left-2 bg-gradient-to-r ${getScoreColor(token.websiteScore)} text-white text-xs px-2 py-1 rounded-full font-semibold`}>
-                  W{token.websiteScore}/21
-                </div>
-              )}
             </div>
 
             {/* Token Info */}
@@ -277,10 +296,19 @@ export default function TempDiscoveryPage() {
                   <p className="text-sm text-gray-500">{token.ticker}</p>
                 </div>
                 <div className="text-right">
-                  {token.analysisScore && (
-                    <span className="bg-gradient-to-r from-purple-600 to-purple-800 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                      {token.analysisScore}/10
-                    </span>
+                  {token.analysisTier && (
+                    <div className="relative inline-block group">
+                      <span className={`${getTierColor(token.analysisTier)} text-white px-3 py-1 rounded-full text-sm font-semibold uppercase inline-block`}>
+                        {token.analysisTier}
+                      </span>
+                      {/* Tooltip */}
+                      <div className="absolute right-0 bottom-full mb-2 hidden group-hover:block w-64 z-10">
+                        <div className="bg-gray-900 text-white text-xs rounded-lg p-2 shadow-lg">
+                          <p>{getTierTooltip(token.analysisTier)}</p>
+                          <div className="absolute bottom-0 right-4 transform translate-y-1/2 rotate-45 w-2 h-2 bg-gray-900"></div>
+                        </div>
+                      </div>
+                    </div>
                   )}
                   <p className="text-xs text-gray-500 mt-1">{formatDate(token.callDate)}</p>
                 </div>

@@ -65,6 +65,7 @@ export async function GET(request: NextRequest) {
       network: token.network,
       contractAddress: token.contract_address,
       analysisScore: token.analysis_score,
+      analysisTier: token.analysis_tier || token.website_tier,
       roi: token.roi_percent,
       currentPrice: token.current_price,
       priceAtCall: token.price_at_call,
