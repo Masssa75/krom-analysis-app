@@ -62,25 +62,14 @@ test.describe('Screenshot Mode Testing', () => {
   test('Compare iframe vs screenshot modes', async ({ page }) => {
     await page.goto(`${baseUrl}/temp-discovery`);
     
-    // Start in iframe mode
-    const iframeButton = page.locator('button:has-text("iFrame Mode")');
-    await expect(iframeButton).toHaveClass(/bg-green-500/);
+    // Start in screenshot mode (default)
+    const screenshotButton = page.locator('button:has-text("Screenshot Mode")');
+    await expect(screenshotButton).toHaveClass(/bg-green-500/);
     
-    // Check iframes exist
-    const iframes = page.locator('iframe');
-    await expect(iframes).toHaveCount(4);
-    console.log('✅ iFrame mode: 4 iframes loaded');
-    
-    // Switch to screenshot mode
-    await page.locator('button:has-text("Screenshot Mode")').click();
-    await page.waitForTimeout(1000);
-    
-    // Check images exist
+    // Check images exist and capture their sources
     const images = page.locator('img[alt*="screenshot"]');
     await expect(images).toHaveCount(4);
-    console.log('✅ Screenshot mode: 4 images present');
     
-    // Check each image src
     const imageSources = await images.evaluateAll((imgs) => 
       imgs.map(img => ({
         src: img.getAttribute('src'),
@@ -89,6 +78,24 @@ test.describe('Screenshot Mode Testing', () => {
       }))
     );
     
+    console.log('✅ Screenshot mode: 4 images loaded');
     console.log('Image sources:', imageSources);
+    
+    // Switch to iframe mode
+    await page.locator('button:has-text("iFrame Mode")').click();
+    await page.waitForTimeout(1000);
+    
+    // Check iframes exist
+    const iframes = page.locator('iframe');
+    await expect(iframes).toHaveCount(4);
+    console.log('✅ iFrame mode: 4 iframes present');
+    
+    // Switch back to screenshot mode to verify toggle works both ways
+    await page.locator('button:has-text("Screenshot Mode")').click();
+    await page.waitForTimeout(1000);
+    
+    // Verify images are back
+    await expect(images).toHaveCount(4);
+    console.log('✅ Successfully toggled between modes');
   });
 });
