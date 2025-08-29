@@ -111,7 +111,7 @@ export default function TempDiscoveryPage() {
             key={token.ticker}
             className="bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1"
           >
-            {/* Preview Area - Fixed height with responsive iframe */}
+            {/* Preview Area - Fixed height with scrollable content */}
             <div className="relative h-64 bg-gray-100 overflow-hidden">
               {previewMode === 'iframe' ? (
                 <>
@@ -134,15 +134,17 @@ export default function TempDiscoveryPage() {
                   />
                 </>
               ) : (
-                <img
-                  src={`/api/temp-preview/screenshot?url=${encodeURIComponent(token.url)}&v=${token.ticker}&t=${Date.now()}`}
-                  alt={`${token.name} screenshot`}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = `https://via.placeholder.com/400x300/667eea/ffffff?text=${encodeURIComponent(token.name)}`;
-                  }}
-                />
+                <div className="w-full h-full overflow-y-auto">
+                  <img
+                    src={`/api/temp-preview/screenshot?url=${encodeURIComponent(token.url)}&v=${token.ticker}&t=${Date.now()}`}
+                    alt={`${token.name} screenshot`}
+                    className="w-full h-auto object-top"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = `https://via.placeholder.com/400x300/667eea/ffffff?text=${encodeURIComponent(token.name)}`;
+                    }}
+                  />
+                </div>
               )}
               
               {/* Live Indicator */}
