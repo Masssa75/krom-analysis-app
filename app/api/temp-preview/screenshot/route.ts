@@ -18,9 +18,13 @@ export async function GET(request: NextRequest) {
     // Use ApiFlash for screenshots
     const apiKey = process.env.APIFLASH_ACCESS_KEY;
     
+    console.log('Environment check - APIFLASH_ACCESS_KEY exists:', !!apiKey);
+    console.log('API Key first 10 chars:', apiKey ? apiKey.substring(0, 10) + '...' : 'NOT FOUND');
+    
     if (!apiKey) {
       console.error('APIFLASH_ACCESS_KEY not found in environment variables');
-      throw new Error('Screenshot service not configured');
+      console.error('Available env vars:', Object.keys(process.env).filter(k => k.includes('API') || k.includes('KEY')));
+      throw new Error('Screenshot service not configured - API key missing');
     }
     
     // ApiFlash API endpoint with mobile viewport for better card display
@@ -31,9 +35,13 @@ export async function GET(request: NextRequest) {
     // Fetch the screenshot from ApiFlash
     const imageResponse = await fetch(screenshotUrl);
     
+    console.log('ApiFlash response status:', imageResponse.status);
+    console.log('ApiFlash response content-type:', imageResponse.headers.get('content-type'));
+    
     if (!imageResponse.ok) {
-      console.error(`ApiFlash API returned ${imageResponse.status}`);
-      throw new Error(`Screenshot service error: ${imageResponse.status}`);
+      const errorText = await imageResponse.text();
+      console.error(`ApiFlash API returned ${imageResponse.status}:`, errorText);
+      throw new Error(`Screenshot service error: ${imageResponse.status} - ${errorText}`);
     }
     
     // Get the image as a buffer
