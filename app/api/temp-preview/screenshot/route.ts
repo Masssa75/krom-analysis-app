@@ -6,9 +6,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
-// Get Screenly API key from environment
-const SCREENLY_API_KEY = process.env.SCREEENLY_API_KEY || '';
-
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const targetUrl = searchParams.get('url');
@@ -18,116 +15,75 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // First try Screenly v3 if we have an API key
-    if (SCREENLY_API_KEY) {
-      console.log('Using Screenly v3 API for screenshot');
+    // Use ScreenshotMachine free tier
+    const screenshotUrl = `https://api.screenshotmachine.com?key=c1d705&url=${encodeURIComponent(targetUrl)}&dimension=1280x800&format=png&cacheLimit=0&delay=2000`;
+    
+    console.log('Fetching screenshot from:', screenshotUrl);
+    
+    // Fetch the screenshot
+    const response = await fetch(screenshotUrl);
+    
+    if (response.ok) {
+      const contentType = response.headers.get('content-type');
       
-      // Screenly v3 API endpoint
-      const screenlyResponse = await fetch('https://3.screeenly.com/api/v1/shots', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${SCREENLY_API_KEY}`,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify({
-          url: targetUrl,
-          viewport_width: 1280,
-          viewport_height: 800,
-          format: 'png',
-          full_page: false,
-          wait_for_event: 'load',
-          delay: 1000, // Wait 1 second after load for dynamic content
-        }),
-      });
-      
-      if (screenlyResponse.ok) {
-        const data = await screenlyResponse.json();
-        console.log('Screenly response:', data);
+      if (contentType?.includes('image')) {
+        const imageBuffer = await response.arrayBuffer();
         
-        // Screenly returns a URL to the screenshot
-        if (data.screenshot_url || data.url || data.data?.url) {
-          const imageUrl = data.screenshot_url || data.url || data.data?.url;
-          
-          // Fetch the actual image
-          const imageResponse = await fetch(imageUrl);
-          const imageBuffer = await imageResponse.arrayBuffer();
-          
-          return new NextResponse(imageBuffer, {
-            status: 200,
-            headers: {
-              'Content-Type': 'image/png',
-              'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
-            },
-          });
-        }
-      } else {
-        const errorText = await screenlyResponse.text();
-        console.error('Screenly API failed:', screenlyResponse.status, errorText);
+        return new NextResponse(imageBuffer, {
+          status: 200,
+          headers: {
+            'Content-Type': contentType || 'image/png',
+            'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
+          },
+        });
       }
     }
     
-    // Fallback to Microlink as backup
-    console.log('Falling back to Microlink API');
-    const microlinkUrl = `https://api.microlink.io/?url=${encodeURIComponent(targetUrl)}&screenshot=true&meta=false&embed=screenshot.url`;
+    // Fallback to screenshot.rocks (another free service)
+    console.log('Trying screenshot.rocks as fallback');
+    const fallbackUrl = `https://screenshot.rocks/api/screenshot?url=${encodeURIComponent(targetUrl)}&width=1280&height=800&type=png`;
     
-    const response = await fetch(microlinkUrl);
-    const data = await response.json();
+    const fallbackResponse = await fetch(fallbackUrl);
     
-    if (data.status === 'success' && data.data?.screenshot?.url) {
-      // Fetch and return the screenshot
-      const imageResponse = await fetch(data.data.screenshot.url);
-      const imageBuffer = await imageResponse.arrayBuffer();
+    if (fallbackResponse.ok) {
+      const imageBuffer = await fallbackResponse.arrayBuffer();
       
       return new NextResponse(imageBuffer, {
         status: 200,
         headers: {
           'Content-Type': 'image/png',
-          'Cache-Control': 'public, max-age=1800', // Cache for 30 minutes
+          'Cache-Control': 'public, max-age=3600',
         },
       });
     }
     
-    // Final fallback: placeholder
-    const placeholderSvg = `
-      <svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
-        <rect width="400" height="300" fill="url(#grad)"/>
+    // Final fallback: Use a service that generates a preview image
+    console.log('Using final fallback - URL2PNG style service');
+    const url2pngUrl = `https://image.thum.io/get/width/1280/crop/800/${targetUrl}`;
+    
+    return NextResponse.redirect(url2pngUrl);
+    
+  } catch (error) {
+    console.error('Screenshot error:', error);
+    
+    // Error placeholder SVG
+    const errorSvg = `
+      <svg width="1280" height="800" xmlns="http://www.w3.org/2000/svg">
+        <rect width="1280" height="800" fill="url(#grad)"/>
         <defs>
           <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
             <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
           </linearGradient>
         </defs>
-        <text x="200" y="140" font-family="Arial" font-size="18" fill="white" text-anchor="middle">
-          Screenshot Loading...
+        <text x="640" y="380" font-family="Arial" font-size="48" fill="white" text-anchor="middle">
+          📸 Screenshot Service Loading...
         </text>
-        <text x="200" y="165" font-family="Arial" font-size="12" fill="white" opacity="0.8" text-anchor="middle">
+        <text x="640" y="440" font-family="Arial" font-size="24" fill="white" opacity="0.8" text-anchor="middle">
           ${new URL(targetUrl).hostname}
         </text>
-      </svg>
-    `;
-    
-    return new NextResponse(placeholderSvg, {
-      status: 200,
-      headers: {
-        'Content-Type': 'image/svg+xml',
-        'Cache-Control': 'no-cache',
-      },
-    });
-    
-  } catch (error) {
-    console.error('Screenshot error:', error);
-    
-    // Error placeholder
-    const errorSvg = `
-      <svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
-        <rect width="400" height="300" fill="#1a1c1f"/>
-        <text x="200" y="140" font-family="Arial" font-size="48" fill="#666" text-anchor="middle">🌐</text>
-        <text x="200" y="180" font-family="Arial" font-size="14" fill="#666" text-anchor="middle">
-          Screenshot Unavailable
-        </text>
-        <text x="200" y="200" font-family="Arial" font-size="10" fill="#444" text-anchor="middle">
-          ${error instanceof Error ? error.message : 'Unknown error'}
+        <text x="640" y="480" font-family="Arial" font-size="16" fill="white" opacity="0.6" text-anchor="middle">
+          This may take a few seconds on first load
         </text>
       </svg>
     `;
@@ -136,6 +92,7 @@ export async function GET(request: NextRequest) {
       status: 200,
       headers: {
         'Content-Type': 'image/svg+xml',
+        'Cache-Control': 'no-cache',
       },
     });
   }
