@@ -286,7 +286,9 @@ export default function TempDiscoveryPage() {
                 </div>
               </div>
               
-              <p className="text-gray-600 text-sm mb-4 line-clamp-2">{token.description}</p>
+              <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                {token.description || <span className="text-gray-400 italic">No description available</span>}
+              </p>
               
               {/* Metrics */}
               <div className="grid grid-cols-3 gap-2 mb-4">
