@@ -34,7 +34,6 @@ interface Token {
 }
 
 export default function TempDiscoveryPage() {
-  const [previewMode, setPreviewMode] = useState<'iframe' | 'screenshot'>('screenshot');
   const [tokens, setTokens] = useState<Token[]>([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
@@ -42,7 +41,6 @@ export default function TempDiscoveryPage() {
   const [sortBy, setSortBy] = useState<'buy_timestamp' | 'website_score'>('buy_timestamp');
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
   const [minWebsiteScore, setMinWebsiteScore] = useState(0);
-  const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
   
   const observer = useRef<IntersectionObserver>();
   const lastTokenRef = useCallback((node: HTMLDivElement | null) => {
@@ -80,13 +78,6 @@ export default function TempDiscoveryPage() {
           setTokens(prev => [...prev, ...data.tokens]);
         }
         setHasMore(pageNum < data.pagination.totalPages);
-        
-        // Initialize loading states for new tokens
-        const newLoadingStates: Record<string, boolean> = {};
-        data.tokens.forEach((token: Token) => {
-          newLoadingStates[token.ticker] = true;
-        });
-        setLoadingStates(prev => ({ ...prev, ...newLoadingStates }));
         
         // Trigger screenshot capture for tokens without screenshots
         data.tokens.forEach(async (token: Token) => {
@@ -179,30 +170,6 @@ export default function TempDiscoveryPage() {
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold mb-2 text-white">🚀 KROM Discovery</h1>
         <p className="text-lg text-[#888]">Utility Tokens with Websites</p>
-        
-        {/* Preview Mode Toggle */}
-        <div className="mt-6 flex justify-center gap-4">
-          <button
-            onClick={() => setPreviewMode('screenshot')}
-            className={`px-6 py-2 rounded-lg transition-all ${
-              previewMode === 'screenshot'
-                ? 'bg-[#00ff88] text-black font-semibold'
-                : 'bg-[#1a1c1f] text-[#888] hover:bg-[#252729] hover:text-white border border-[#2a2d31]'
-            }`}
-          >
-            Screenshot Mode
-          </button>
-          <button
-            onClick={() => setPreviewMode('iframe')}
-            className={`px-6 py-2 rounded-lg transition-all ${
-              previewMode === 'iframe'
-                ? 'bg-[#00ff88] text-black font-semibold'
-                : 'bg-[#1a1c1f] text-[#888] hover:bg-[#252729] hover:text-white border border-[#2a2d31]'
-            }`}
-          >
-            iFrame Mode (via Proxy)
-          </button>
-        </div>
       </div>
 
       {/* Filters and Sorting */}
@@ -260,56 +227,21 @@ export default function TempDiscoveryPage() {
           >
             {/* Preview Area - Taller for phone-like dimensions */}
             <div className="relative h-[420px] bg-[#0a0b0d] overflow-hidden">
-              {previewMode === 'iframe' ? (
-                <>
-                  {loadingStates[token.ticker] && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-[#0a0b0d] z-10">
-                      <div className="text-center">
-                        <div className="w-12 h-12 border-4 border-[#00ff88] border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-                        <p className="text-sm text-[#666]">Loading preview...</p>
-                      </div>
-                    </div>
-                  )}
-                  <iframe
-                    src={`/api/temp-preview/proxy?url=${encodeURIComponent(token.url)}`}
-                    className="w-full h-full border-0 transform scale-75 origin-top-left"
-                    style={{ width: '133.33%', height: '133.33%' }}
-                    sandbox="allow-scripts allow-same-origin allow-forms"
-                    onLoad={() => setLoadingStates(prev => ({ ...prev, [token.ticker]: false }))}
-                    onError={() => setLoadingStates(prev => ({ ...prev, [token.ticker]: false }))}
-                    title={`${token.name} preview`}
-                  />
-                </>
-              ) : (
-                <div className="w-full h-full overflow-y-auto scrollbar-hide">
-                  <img
-                    src={
-                      token.screenshotUrl || 
-                      `/api/temp-preview/screenshot?url=${encodeURIComponent(token.url)}&cache=${btoa(token.url).substring(0, 8)}`
-                    }
-                    alt={`${token.name} screenshot`}
-                    className="w-full h-auto object-top"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      // If stored screenshot fails, try ApiFlash
-                      if (token.screenshotUrl && target.src === token.screenshotUrl) {
-                        target.src = `/api/temp-preview/screenshot?url=${encodeURIComponent(token.url)}&cache=${btoa(token.url).substring(0, 8)}`;
-                      } else {
-                        // If ApiFlash also fails, show placeholder
-                        target.src = `https://via.placeholder.com/400x600/1a1c1f/666666?text=${encodeURIComponent(token.name)}`;
-                      }
-                    }}
-                  />
-                </div>
-              )}
-              
-              {/* Live Indicator */}
-              {previewMode === 'iframe' && !loadingStates[token.ticker] && (
-                <div className="absolute top-2 right-2 bg-[#00ff88] text-black text-xs px-2 py-1 rounded-full flex items-center gap-1 font-semibold">
-                  <span className="w-2 h-2 bg-black rounded-full animate-pulse"></span>
-                  LIVE
-                </div>
-              )}
+              <div className="w-full h-full overflow-y-auto scrollbar-hide">
+                <img
+                  src={
+                    token.screenshotUrl || 
+                    `https://via.placeholder.com/400x600/1a1c1f/666666?text=${encodeURIComponent(token.name)}`
+                  }
+                  alt={`${token.name} screenshot`}
+                  className="w-full h-auto object-top"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    // If stored screenshot fails, show placeholder
+                    target.src = `https://via.placeholder.com/400x600/1a1c1f/666666?text=${encodeURIComponent(token.name)}`;
+                  }}
+                />
+              </div>
             </div>
 
             {/* Token Info */}
