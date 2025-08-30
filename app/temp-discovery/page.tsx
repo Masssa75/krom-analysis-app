@@ -41,6 +41,7 @@ export default function TempDiscoveryPage() {
   const [sortBy, setSortBy] = useState<'buy_timestamp' | 'website_score'>('buy_timestamp');
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
   const [minWebsiteScore, setMinWebsiteScore] = useState(0);
+  const [capturingScreenshots, setCapturingScreenshots] = useState<Set<string>>(new Set());
   
   const observer = useRef<IntersectionObserver>();
   const lastTokenRef = useCallback((node: HTMLDivElement | null) => {
@@ -82,6 +83,9 @@ export default function TempDiscoveryPage() {
         // Trigger screenshot capture for tokens without screenshots
         data.tokens.forEach(async (token: Token) => {
           if (!token.screenshotUrl && token.url) {
+            // Mark as capturing
+            setCapturingScreenshots(prev => new Set(prev).add(token.id));
+            
             try {
               const captureResponse = await fetch('/api/capture-screenshot', {
                 method: 'POST',
@@ -104,6 +108,13 @@ export default function TempDiscoveryPage() {
               }
             } catch (err) {
               console.error(`Failed to capture screenshot for ${token.ticker}:`, err);
+            } finally {
+              // Remove from capturing set
+              setCapturingScreenshots(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(token.id);
+                return newSet;
+              });
             }
           }
         });
@@ -227,21 +238,35 @@ export default function TempDiscoveryPage() {
           >
             {/* Preview Area - Taller for phone-like dimensions */}
             <div className="relative h-[420px] bg-[#0a0b0d] overflow-hidden">
-              <div className="w-full h-full overflow-y-auto scrollbar-hide">
-                <img
-                  src={
-                    token.screenshotUrl || 
-                    `https://via.placeholder.com/400x600/1a1c1f/666666?text=${encodeURIComponent(token.name)}`
-                  }
-                  alt={`${token.name} screenshot`}
-                  className="w-full h-auto object-top"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    // If stored screenshot fails, show placeholder
-                    target.src = `https://via.placeholder.com/400x600/1a1c1f/666666?text=${encodeURIComponent(token.name)}`;
-                  }}
-                />
-              </div>
+              {/* Show loading state if capturing screenshot */}
+              {capturingScreenshots.has(token.id) && !token.screenshotUrl ? (
+                <div className="w-full h-full flex flex-col items-center justify-center">
+                  <div className="relative">
+                    {/* Animated pulse effect */}
+                    <div className="absolute inset-0 bg-[#00ff88] rounded-full opacity-20 animate-ping"></div>
+                    {/* Spinner */}
+                    <div className="relative w-16 h-16 border-4 border-[#1a1c1f] border-t-[#00ff88] rounded-full animate-spin"></div>
+                  </div>
+                  <p className="mt-4 text-[#666] text-sm">Capturing screenshot...</p>
+                  <p className="mt-1 text-[#444] text-xs">This may take a few seconds</p>
+                </div>
+              ) : (
+                <div className="w-full h-full overflow-y-auto scrollbar-hide">
+                  <img
+                    src={
+                      token.screenshotUrl || 
+                      `https://via.placeholder.com/400x600/1a1c1f/666666?text=${encodeURIComponent(token.name)}`
+                    }
+                    alt={`${token.name} screenshot`}
+                    className="w-full h-auto object-top"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      // If stored screenshot fails, show placeholder
+                      target.src = `https://via.placeholder.com/400x600/1a1c1f/666666?text=${encodeURIComponent(token.name)}`;
+                    }}
+                  />
+                </div>
+              )}
             </div>
 
             {/* Token Info */}
