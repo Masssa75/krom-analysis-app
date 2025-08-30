@@ -17,10 +17,30 @@ export async function GET(request: NextRequest) {
   const offset = (page - 1) * limit;
 
   try {
-    // Build base query - ALL tokens with websites
+    // Build base query - only select necessary fields for performance
     let query = supabase
       .from('token_discovery')
-      .select('*', { count: 'exact' })
+      .select(`
+        id,
+        symbol,
+        name,
+        network,
+        contract_address,
+        website_url,
+        website_analyzed_at,
+        website_stage1_score,
+        website_stage1_tier,
+        website_stage1_analysis,
+        current_liquidity_usd,
+        current_volume_24h,
+        current_market_cap,
+        first_seen_at,
+        twitter_url,
+        telegram_url,
+        discord_url,
+        website_screenshot_url,
+        website_screenshot_captured_at
+      `)
       .not('website_url', 'is', null);
 
     // Apply filters
@@ -59,35 +79,35 @@ export async function GET(request: NextRequest) {
       throw error;
     }
 
-    // Calculate statistics using separate count queries (much faster)
-    const [totalResult, analyzedResult, promotableResult] = await Promise.all([
-      // Total tokens with websites
-      supabase
-        .from('token_discovery')
-        .select('*', { count: 'exact', head: true })
-        .not('website_url', 'is', null),
-      
-      // Analyzed tokens
-      supabase
-        .from('token_discovery')
-        .select('*', { count: 'exact', head: true })
-        .not('website_url', 'is', null)
-        .not('website_analyzed_at', 'is', null),
-      
-      // Promotable tokens (score >= 7)
-      supabase
-        .from('token_discovery')
-        .select('*', { count: 'exact', head: true })
-        .not('website_url', 'is', null)
-        .gte('website_stage1_score', 7)
-    ]);
-
+    // Skip statistics calculation for now - it's too slow
+    // We'll calculate these on-demand or cache them
     const stats = {
-      total: totalResult.count || 0,
-      analyzed: analyzedResult.count || 0,
-      promotable: promotableResult.count || 0,
-      scrapeFailed: 0  // Skip this for now as it requires complex JSON filtering
+      total: 0,
+      analyzed: 0, 
+      promotable: 0,
+      scrapeFailed: 0
     };
+    
+    // Optionally, try to get quick counts with a timeout
+    try {
+      const quickCountPromise = supabase
+        .from('token_discovery')
+        .select('id', { count: 'exact', head: true })
+        .not('website_url', 'is', null)
+        .limit(1);
+      
+      // Race between the query and a timeout
+      const result = await Promise.race([
+        quickCountPromise,
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Count timeout')), 2000))
+      ]) as any;
+      
+      if (result?.count) {
+        stats.total = result.count;
+      }
+    } catch (e) {
+      console.log('Stats query timed out, using defaults');
+    }
 
     // Format tokens for frontend
     const formattedTokens = tokens?.map(token => ({
