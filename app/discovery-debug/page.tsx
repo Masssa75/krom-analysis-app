@@ -136,7 +136,15 @@ export default function DiscoveryDebugPage() {
         sortOrder
       });
 
-      const response = await fetch(`/api/discovery-debug?${params}`);
+      // Add timeout to prevent hanging
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+
+      const response = await fetch(`/api/discovery-debug?${params}`, {
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
       const data = await response.json();
 
       if (data.tokens) {
@@ -212,8 +220,13 @@ export default function DiscoveryDebugPage() {
           }
         });
       }
-    } catch (error) {
-      console.error('Failed to fetch tokens:', error);
+    } catch (error: any) {
+      if (error.name === 'AbortError') {
+        console.error('Request timed out after 15 seconds');
+        alert('The request is taking too long. Please try again or select fewer results.');
+      } else {
+        console.error('Failed to fetch tokens:', error);
+      }
     } finally {
       setLoading(false);
     }
