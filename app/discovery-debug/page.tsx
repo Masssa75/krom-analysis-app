@@ -385,10 +385,12 @@ export default function DiscoveryDebugPage() {
                   {/* Analysis Tooltip */}
                   {token.website_stage1_analysis && (
                     <WebsiteAnalysisTooltip 
-                      analysis={token.website_stage1_analysis}
-                      websiteScore={token.website_stage1_score || 0}
-                      websiteAnalysisFull={token.website_stage1_analysis}
-                    />
+                      fullAnalysis={token.website_stage1_analysis}
+                    >
+                      <div className="cursor-pointer text-green-400 hover:text-green-300">
+                        ℹ️
+                      </div>
+                    </WebsiteAnalysisTooltip>
                   )}
                 </div>
 
