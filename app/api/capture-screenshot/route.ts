@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
-    const { url, tokenId, forceRefresh = false } = await request.json();
+    const { url, tokenId, table = 'crypto_calls', forceRefresh = false } = await request.json();
 
     if (!url) {
       return NextResponse.json(
@@ -23,6 +23,7 @@ export async function POST(request: NextRequest) {
         body: JSON.stringify({
           url,
           tokenId,
+          table,
           forceRefresh
         }),
       }
