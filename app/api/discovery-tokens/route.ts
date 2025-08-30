@@ -71,6 +71,8 @@ export async function GET(request: NextRequest) {
       roi: token.roi_percent,
       currentPrice: token.current_price,
       priceAtCall: token.price_at_call,
+      screenshotUrl: token.website_screenshot_url,
+      screenshotCapturedAt: token.website_screenshot_captured_at,
     })) || [];
 
     return NextResponse.json({

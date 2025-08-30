@@ -29,6 +29,8 @@ interface Token {
   roi: number;
   currentPrice: number;
   priceAtCall: number;
+  screenshotUrl?: string;
+  screenshotCapturedAt?: string;
 }
 
 export default function TempDiscoveryPage() {
@@ -85,6 +87,35 @@ export default function TempDiscoveryPage() {
           newLoadingStates[token.ticker] = true;
         });
         setLoadingStates(prev => ({ ...prev, ...newLoadingStates }));
+        
+        // Trigger screenshot capture for tokens without screenshots
+        data.tokens.forEach(async (token: Token) => {
+          if (!token.screenshotUrl && token.url) {
+            try {
+              const captureResponse = await fetch('/api/capture-screenshot', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  url: token.url,
+                  tokenId: token.id,
+                  forceRefresh: false
+                })
+              });
+              
+              if (captureResponse.ok) {
+                const result = await captureResponse.json();
+                // Update the token with the new screenshot URL
+                setTokens(prev => prev.map(t => 
+                  t.id === token.id 
+                    ? { ...t, screenshotUrl: result.screenshot_url }
+                    : t
+                ));
+              }
+            } catch (err) {
+              console.error(`Failed to capture screenshot for ${token.ticker}:`, err);
+            }
+          }
+        });
       }
     } catch (error) {
       console.error('Error fetching tokens:', error);
@@ -252,12 +283,21 @@ export default function TempDiscoveryPage() {
               ) : (
                 <div className="w-full h-full overflow-y-auto scrollbar-hide">
                   <img
-                    src={`/api/temp-preview/screenshot?url=${encodeURIComponent(token.url)}&cache=${btoa(token.url).substring(0, 8)}`}
+                    src={
+                      token.screenshotUrl || 
+                      `/api/temp-preview/screenshot?url=${encodeURIComponent(token.url)}&cache=${btoa(token.url).substring(0, 8)}`
+                    }
                     alt={`${token.name} screenshot`}
                     className="w-full h-auto object-top"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
-                      target.src = `https://via.placeholder.com/400x600/1a1c1f/666666?text=${encodeURIComponent(token.name)}`;
+                      // If stored screenshot fails, try ApiFlash
+                      if (token.screenshotUrl && target.src === token.screenshotUrl) {
+                        target.src = `/api/temp-preview/screenshot?url=${encodeURIComponent(token.url)}&cache=${btoa(token.url).substring(0, 8)}`;
+                      } else {
+                        // If ApiFlash also fails, show placeholder
+                        target.src = `https://via.placeholder.com/400x600/1a1c1f/666666?text=${encodeURIComponent(token.name)}`;
+                      }
                     }}
                   />
                 </div>
