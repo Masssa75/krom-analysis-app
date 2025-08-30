@@ -250,37 +250,37 @@ export default function DiscoveryDebugPage() {
         <div className="flex flex-wrap gap-2">
           <button 
             onClick={() => setFilter('all')} 
-            className={`px-4 py-2 rounded ${filter === 'all' ? 'bg-green-600 text-black' : 'bg-gray-800 hover:bg-gray-700'}`}
+            className={`px-4 py-2 rounded-lg transition-all ${filter === 'all' ? 'bg-[#00ff88] text-black font-semibold' : 'bg-[#1a1c1f] hover:bg-[#2a2d31] text-[#888]'}`}
           >
             All with Websites
           </button>
           <button 
             onClick={() => setFilter('analyzed')} 
-            className={`px-4 py-2 rounded ${filter === 'analyzed' ? 'bg-green-600 text-black' : 'bg-gray-800 hover:bg-gray-700'}`}
+            className={`px-4 py-2 rounded-lg transition-all ${filter === 'analyzed' ? 'bg-[#00ff88] text-black font-semibold' : 'bg-[#1a1c1f] hover:bg-[#2a2d31] text-[#888]'}`}
           >
             Analyzed
           </button>
           <button 
             onClick={() => setFilter('unanalyzed')} 
-            className={`px-4 py-2 rounded ${filter === 'unanalyzed' ? 'bg-green-600 text-black' : 'bg-gray-800 hover:bg-gray-700'}`}
+            className={`px-4 py-2 rounded-lg transition-all ${filter === 'unanalyzed' ? 'bg-[#00ff88] text-black font-semibold' : 'bg-[#1a1c1f] hover:bg-[#2a2d31] text-[#888]'}`}
           >
             Not Analyzed
           </button>
           <button 
             onClick={() => setFilter('lowscore')} 
-            className={`px-4 py-2 rounded ${filter === 'lowscore' ? 'bg-green-600 text-black' : 'bg-gray-800 hover:bg-gray-700'}`}
+            className={`px-4 py-2 rounded-lg transition-all ${filter === 'lowscore' ? 'bg-[#00ff88] text-black font-semibold' : 'bg-[#1a1c1f] hover:bg-[#2a2d31] text-[#888]'}`}
           >
             Low Score (≤6)
           </button>
           <button 
             onClick={() => setFilter('scrape_failed')} 
-            className={`px-4 py-2 rounded ${filter === 'scrape_failed' ? 'bg-green-600 text-black' : 'bg-gray-800 hover:bg-gray-700'}`}
+            className={`px-4 py-2 rounded-lg transition-all ${filter === 'scrape_failed' ? 'bg-[#00ff88] text-black font-semibold' : 'bg-[#1a1c1f] hover:bg-[#2a2d31] text-[#888]'}`}
           >
             Scrape Issues
           </button>
           <button 
             onClick={() => setFilter('promoted')} 
-            className={`px-4 py-2 rounded ${filter === 'promoted' ? 'bg-green-600 text-black' : 'bg-gray-800 hover:bg-gray-700'}`}
+            className={`px-4 py-2 rounded-lg transition-all ${filter === 'promoted' ? 'bg-[#00ff88] text-black font-semibold' : 'bg-[#1a1c1f] hover:bg-[#2a2d31] text-[#888]'}`}
           >
             Promoted (≥7)
           </button>
@@ -288,11 +288,11 @@ export default function DiscoveryDebugPage() {
 
         {/* Sorting Controls */}
         <div className="flex gap-4 items-center">
-          <span className="text-gray-400">Sort by:</span>
+          <span className="text-[#666]">Sort by:</span>
           <select 
             value={sortBy} 
             onChange={(e) => setSortBy(e.target.value as any)}
-            className="bg-gray-800 text-green-400 px-3 py-1 rounded"
+            className="bg-[#1a1c1f] text-[#00ff88] px-3 py-1 rounded-lg border border-[#2a2d31]"
           >
             <option value="first_seen_at">Discovery Date</option>
             <option value="website_stage1_score">Score</option>
@@ -300,7 +300,7 @@ export default function DiscoveryDebugPage() {
           </select>
           <button 
             onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-            className="bg-gray-800 hover:bg-gray-700 px-3 py-1 rounded"
+            className="bg-[#1a1c1f] hover:bg-[#2a2d31] px-3 py-1 rounded-lg border border-[#2a2d31] text-[#00ff88]"
           >
             {sortOrder === 'asc' ? '↑' : '↓'}
           </button>
@@ -308,7 +308,7 @@ export default function DiscoveryDebugPage() {
       </div>
 
       {/* Token Grid */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {tokens.map((token, index) => {
           const health = getScrapeHealth(token);
           const metrics = token.website_stage1_analysis?.scrape_metrics;
@@ -319,28 +319,34 @@ export default function DiscoveryDebugPage() {
             <div 
               key={token.id}
               ref={isLastToken ? lastTokenRef : null}
-              className="bg-gray-900 border border-gray-800 rounded-lg overflow-hidden hover:border-green-600 transition-all"
+              className="bg-[#111214] rounded-2xl border border-[#2a2d31] hover:border-[#00ff88] transition-all hover:-translate-y-1 relative overflow-hidden"
             >
-              {/* Screenshot or Placeholder */}
-              <div className="relative h-48 bg-gray-950">
+              {/* Screenshot or Placeholder - Taller for phone-like dimensions */}
+              <div className="relative h-[420px] bg-[#0a0b0d] overflow-hidden">
                 {token.website_screenshot_url ? (
-                  <img 
-                    src={token.website_screenshot_url} 
-                    alt={`${token.symbol} website`}
-                    className="w-full h-full object-cover"
-                  />
+                  <div className="w-full h-full overflow-y-auto scrollbar-hide">
+                    <img 
+                      src={token.website_screenshot_url} 
+                      alt={`${token.symbol} website`}
+                      className="w-full h-auto object-top"
+                    />
+                  </div>
                 ) : capturingScreenshots.has(token.id) ? (
-                  <div className="flex items-center justify-center h-full">
-                    <div className="text-gray-500">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-400 mx-auto mb-2"></div>
-                      <p className="text-xs">Capturing screenshot...</p>
+                  <div className="w-full h-full flex flex-col items-center justify-center">
+                    <div className="relative">
+                      {/* Animated pulse effect */}
+                      <div className="absolute inset-0 bg-[#00ff88] rounded-full opacity-20 animate-ping"></div>
+                      {/* Spinner */}
+                      <div className="relative w-16 h-16 border-4 border-[#1a1c1f] border-t-[#00ff88] rounded-full animate-spin"></div>
                     </div>
+                    <p className="mt-4 text-[#666] text-sm">Capturing screenshot...</p>
+                    <p className="mt-1 text-[#444] text-xs">This may take a few seconds</p>
                   </div>
                 ) : (
                   <div className="flex items-center justify-center h-full">
-                    <div className="text-gray-600 text-center">
-                      <div className="text-4xl mb-2">🌐</div>
-                      <p className="text-xs">No screenshot</p>
+                    <div className="text-[#666] text-center">
+                      <div className="text-6xl mb-2 opacity-50">🌐</div>
+                      <p className="text-sm">No screenshot</p>
                     </div>
                   </div>
                 )}
@@ -364,7 +370,7 @@ export default function DiscoveryDebugPage() {
               </div>
 
               {/* Token Info */}
-              <div className="p-4 space-y-3">
+              <div className="p-5 space-y-3">
                 {/* Header */}
                 <div className="flex justify-between items-start">
                   <div>
