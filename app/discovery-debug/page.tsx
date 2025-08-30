@@ -155,8 +155,13 @@ export default function DiscoveryDebugPage() {
         // Trigger screenshot capture for tokens without screenshots
         data.tokens.forEach(async (token: TokenDiscovery) => {
           if (!token.website_screenshot_url && token.website_url && !capturingScreenshots.has(token.id)) {
-            // Mark as capturing
-            setCapturingScreenshots(prev => new Set(prev).add(token.id));
+            // Don't show loading spinner immediately - wait to see if it's cached
+            let loadingTimeout: NodeJS.Timeout | null = null;
+            
+            // Only show loading after 100ms (if not cached)
+            loadingTimeout = setTimeout(() => {
+              setCapturingScreenshots(prev => new Set(prev).add(token.id));
+            }, 100);
             
             try {
               const captureResponse = await fetch('/api/capture-screenshot', {
@@ -170,17 +175,32 @@ export default function DiscoveryDebugPage() {
                 })
               });
               
+              // Clear the loading timeout if we get a quick response
+              if (loadingTimeout) {
+                clearTimeout(loadingTimeout);
+              }
+              
               if (captureResponse.ok) {
                 const result = await captureResponse.json();
                 // Update the token with the screenshot URL
                 setTokens(prev => prev.map(t => 
                   t.id === token.id 
-                    ? { ...t, website_screenshot_url: result.screenshotUrl, website_screenshot_captured_at: new Date().toISOString() }
+                    ? { ...t, website_screenshot_url: result.screenshot_url || result.screenshotUrl, website_screenshot_captured_at: result.captured_at || new Date().toISOString() }
                     : t
                 ));
+                
+                // Log if it was cached (for debugging)
+                if (result.cached) {
+                  console.log(`Screenshot for ${token.symbol} was cached (captured: ${result.captured_at})`);
+                } else {
+                  console.log(`Screenshot for ${token.symbol} newly captured`);
+                }
               }
             } catch (error) {
               console.error('Screenshot capture failed for', token.symbol, error);
+              if (loadingTimeout) {
+                clearTimeout(loadingTimeout);
+              }
             } finally {
               // Remove from capturing set
               setCapturingScreenshots(prev => {
