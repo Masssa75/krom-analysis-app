@@ -192,17 +192,28 @@ export default function FilterSidebar({ onFiltersChange }: FilterSidebarProps) {
   return (
     <div className="relative flex-shrink-0">
       {/* Sidebar Container */}
-      <div className={`bg-[#111214] border-r border-[#2a2d31] overflow-y-auto h-full transition-all duration-300 ${isSidebarCollapsed ? 'w-0 opacity-0' : 'w-[300px] opacity-100'}`}>
+      <div className={`bg-[#111214] border-r border-[#2a2d31] overflow-y-auto h-full transition-all duration-300 ${isSidebarCollapsed ? 'w-[40px]' : 'w-[300px]'}`}>
       {/* Header */}
-      <div className="p-5 border-b border-[#1a1c1f]">
-        <div className="flex items-center justify-between">
+      <div className="p-5 border-b border-[#1a1c1f] relative">
+        <div className={`flex items-center justify-between transition-all duration-300 ${isSidebarCollapsed ? 'opacity-0' : 'opacity-100'}`}>
           <h1 className="text-[32px] font-black tracking-[4px] text-[#00ff88] mb-1">KROM</h1>
         </div>
-        <p className="text-[#666] text-xs">High-Quality Crypto Projects</p>
+        <p className={`text-[#666] text-xs transition-all duration-300 ${isSidebarCollapsed ? 'opacity-0' : 'opacity-100'}`}>High-Quality Crypto Projects</p>
+        
+        {/* Toggle Tab - Inside the header */}
+        <button
+          onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+          className={`absolute top-1/2 -translate-y-1/2 bg-[#1a1c1f] hover:bg-[#252729] rounded px-2 py-3 transition-all ${isSidebarCollapsed ? 'right-2' : 'right-5'}`}
+          title={isSidebarCollapsed ? 'Show Filters' : 'Hide Filters'}
+        >
+          <span className={`text-[#666] hover:text-[#00ff88] transition-all inline-block ${isSidebarCollapsed ? 'rotate-180' : ''}`}>
+            ◀
+          </span>
+        </button>
       </div>
 
       {/* Filters Title */}
-      <div className="px-5 pt-5 pb-2 flex justify-between items-center">
+      <div className={`px-5 pt-5 pb-2 flex justify-between items-center transition-all duration-300 ${isSidebarCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
         <h2 className="text-sm uppercase tracking-[2px] text-[#666] font-semibold">FILTERS</h2>
         <button
           onClick={resetAllFilters}
@@ -213,7 +224,7 @@ export default function FilterSidebar({ onFiltersChange }: FilterSidebarProps) {
       </div>
 
       {/* Token Type Filter */}
-      <div className={`border-b border-[#1a1c1f] ${isTokenTypeCollapsed ? 'collapsed' : ''}`}>
+      <div className={`border-b border-[#1a1c1f] ${isTokenTypeCollapsed ? 'collapsed' : ''} transition-all duration-300 ${isSidebarCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
         <div 
           className="px-5 py-5 cursor-pointer flex justify-between items-center bg-[#111214] hover:bg-[#1a1c1f] hover:pl-6 transition-all"
           onClick={() => setIsTokenTypeCollapsed(!isTokenTypeCollapsed)}
@@ -268,7 +279,7 @@ export default function FilterSidebar({ onFiltersChange }: FilterSidebarProps) {
       </div>
 
       {/* Rugs Filter */}
-      <div className={`border-b border-[#1a1c1f] ${isRugsCollapsed ? 'collapsed' : ''}`}>
+      <div className={`border-b border-[#1a1c1f] ${isRugsCollapsed ? 'collapsed' : ''} transition-all duration-300 ${isSidebarCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
         <div 
           className="px-5 py-5 cursor-pointer flex justify-between items-center bg-[#111214] hover:bg-[#1a1c1f] hover:pl-6 transition-all"
           onClick={() => setIsRugsCollapsed(!isRugsCollapsed)}
@@ -330,7 +341,7 @@ export default function FilterSidebar({ onFiltersChange }: FilterSidebarProps) {
       </div>
 
       {/* Networks Filter */}
-      <div className={`border-b border-[#1a1c1f] ${isNetworksCollapsed ? 'collapsed' : ''}`}>
+      <div className={`border-b border-[#1a1c1f] ${isNetworksCollapsed ? 'collapsed' : ''} transition-all duration-300 ${isSidebarCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
         <div 
           className="px-5 py-5 cursor-pointer flex justify-between items-center bg-[#111214] hover:bg-[#1a1c1f] hover:pl-6 transition-all"
           onClick={() => setIsNetworksCollapsed(!isNetworksCollapsed)}
@@ -385,7 +396,7 @@ export default function FilterSidebar({ onFiltersChange }: FilterSidebarProps) {
       </div>
 
       {/* Analysis Scores Filter */}
-      <div className={`border-b border-[#1a1c1f] ${isScoresCollapsed ? 'collapsed' : ''}`}>
+      <div className={`border-b border-[#1a1c1f] ${isScoresCollapsed ? 'collapsed' : ''} transition-all duration-300 ${isSidebarCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
         <div 
           className="px-5 py-5 cursor-pointer flex justify-between items-center bg-[#111214] hover:bg-[#1a1c1f] hover:pl-6 transition-all"
           onClick={() => setIsScoresCollapsed(!isScoresCollapsed)}
@@ -460,17 +471,6 @@ export default function FilterSidebar({ onFiltersChange }: FilterSidebarProps) {
         </div>
       </div>
     </div>
-
-    {/* Toggle Tab */}
-    <button
-      onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-      className="absolute top-1/2 -translate-y-1/2 -right-[20px] bg-[#111214] border border-[#2a2d31] border-l-0 rounded-r-md px-1 py-4 hover:bg-[#1a1c1f] transition-all z-10"
-      title={isSidebarCollapsed ? 'Show Filters' : 'Hide Filters'}
-    >
-      <span className={`text-[#666] hover:text-[#00ff88] transition-all inline-block ${isSidebarCollapsed ? '' : 'rotate-180'}`}>
-        ◀
-      </span>
-    </button>
   </div>
   )
 }
