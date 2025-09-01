@@ -2,6 +2,22 @@
 
 ```yaml
 - main:
+  - heading "KROM" [level=1]
+  - paragraph: High-Quality Crypto Projects
+  - heading "FILTERS" [level=2]
+  - button "Reset"
+  - heading "Token Type" [level=3]
+  - text: ▼ ✓ Utility Tokens ✓ Meme Tokens
+  - heading "Rugs" [level=3]
+  - text: ▼ Include Rugs When unchecked, hides rugged or dead projects Include Imposters When unchecked, hides tokens marked as having inauthentic websites
+  - heading "Networks" [level=3]
+  - text: ▼ ✓ Ethereum ✓ Solana ✓ BSC ✓ Base Polygon Arbitrum
+  - heading "Analysis Scores" [level=3]
+  - text: ▼ Min X Score 1
+  - slider: "1"
+  - text: 1 5 10 Min Website Score 1
+  - slider: "1"
+  - text: 1 5 10
   - heading "✨ KROM Projects Rated" [level=1]
   - paragraph: High-Quality Crypto Projects with Websites
   - textbox "Search symbol or name..."
@@ -14,29 +30,6 @@
     - option "Date Added"
     - option "Analysis Date"
   - button "↓"
-  - text: "Score:"
-  - combobox:
-    - option "All Scores" [selected]
-    - option "9-10 (ALPHA)"
-    - option "7+ (SOLID+)"
-    - option "5+ (BASIC+)"
-    - option "1-4 (TRASH)"
-  - text: "Tier:"
-  - combobox:
-    - option "All Tiers" [selected]
-    - option "ALPHA"
-    - option "SOLID"
-    - option "BASIC"
-    - option "TRASH"
-  - text: "Network:"
-  - combobox:
-    - option "All Networks" [selected]
-    - option "Ethereum"
-    - option "Solana"
-    - option "BSC"
-    - option "Base"
-    - option "Polygon"
-    - option "Arbitrum"
   - text: Showing 12 projects 10/10 ethereum
   - img "AAVE screenshot"
   - heading "AAVE" [level=3]

@@ -62,6 +62,15 @@ export default function FilterSidebar({ onFiltersChange }: FilterSidebarProps) {
 
   const sectionStates = getSectionStates()
 
+  // Load sidebar collapsed state
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('kromSidebarCollapsed')
+      return saved === 'true'
+    }
+    return false
+  })
+
   const [filters, setFilters] = useState<FilterState>(getInitialFilterState)
   const [isTokenTypeCollapsed, setIsTokenTypeCollapsed] = useState(sectionStates.tokenType)
   const [includeUtility, setIncludeUtility] = useState(() => {
@@ -116,6 +125,13 @@ export default function FilterSidebar({ onFiltersChange }: FilterSidebarProps) {
       localStorage.setItem('kromProjectsFilterSections', JSON.stringify(sectionStates))
     }
   }, [isTokenTypeCollapsed, isNetworksCollapsed, isRugsCollapsed, isScoresCollapsed])
+
+  // Save sidebar collapsed state
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('kromSidebarCollapsed', String(isSidebarCollapsed))
+    }
+  }, [isSidebarCollapsed])
 
   // Reset all filters and collapse all sections
   const resetAllFilters = () => {
@@ -174,7 +190,9 @@ export default function FilterSidebar({ onFiltersChange }: FilterSidebarProps) {
   }
 
   return (
-    <div className="w-[300px] bg-[#111214] border-r border-[#2a2d31] flex-shrink-0 overflow-y-auto h-full">
+    <div className="relative flex-shrink-0">
+      {/* Sidebar Container */}
+      <div className={`bg-[#111214] border-r border-[#2a2d31] overflow-y-auto h-full transition-all duration-300 ${isSidebarCollapsed ? 'w-0 opacity-0' : 'w-[300px] opacity-100'}`}>
       {/* Header */}
       <div className="p-5 border-b border-[#1a1c1f]">
         <div className="flex items-center justify-between">
@@ -442,5 +460,17 @@ export default function FilterSidebar({ onFiltersChange }: FilterSidebarProps) {
         </div>
       </div>
     </div>
+
+    {/* Toggle Tab */}
+    <button
+      onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+      className="absolute top-1/2 -translate-y-1/2 -right-[20px] bg-[#111214] border border-[#2a2d31] border-l-0 rounded-r-md px-1 py-4 hover:bg-[#1a1c1f] transition-all z-10"
+      title={isSidebarCollapsed ? 'Show Filters' : 'Hide Filters'}
+    >
+      <span className={`text-[#666] hover:text-[#00ff88] transition-all inline-block ${isSidebarCollapsed ? '' : 'rotate-180'}`}>
+        ◀
+      </span>
+    </button>
+  </div>
   )
 }
