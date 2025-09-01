@@ -1,0 +1,518 @@
+'use client';
+
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { WebsiteAnalysisTooltip } from '@/components/WebsiteAnalysisTooltip';
+
+interface CryptoProject {
+  id: number;
+  symbol: string;
+  name: string;
+  network: string;
+  contract_address: string;
+  website_url: string;
+  website_screenshot_url: string | null;
+  website_stage1_score: number;
+  website_stage1_tier: string;
+  website_stage1_analysis: any;
+  website_stage1_analyzed_at: string;
+  current_liquidity_usd: number;
+  current_market_cap: number;
+  current_price_usd: number;
+  current_roi_percent: number;
+  is_imposter: boolean;
+  is_rugged: boolean;
+  is_dead: boolean;
+  twitter_url: string | null;
+  telegram_url: string | null;
+  created_at: string;
+}
+
+export default function ProjectsRatedPage() {
+  const [projects, setProjects] = useState<CryptoProject[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [sortBy, setSortBy] = useState<string>('website_stage1_score');
+  const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
+  const [minScore, setMinScore] = useState(0);
+  const [maxScore, setMaxScore] = useState(10);
+  const [selectedNetwork, setSelectedNetwork] = useState('all');
+  const [selectedTier, setSelectedTier] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [minLiquidity, setMinLiquidity] = useState(0);
+  const [maxLiquidity, setMaxLiquidity] = useState(1000000000);
+  const [capturingScreenshots, setCapturingScreenshots] = useState<Set<number>>(new Set());
+  
+  const observer = useRef<IntersectionObserver>();
+  const lastProjectRef = useCallback((node: HTMLDivElement | null) => {
+    if (loading) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMore) {
+        setPage(prevPage => prevPage + 1);
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, [loading, hasMore]);
+
+  // Fetch projects
+  const fetchProjects = useCallback(async (pageNum: number, reset: boolean = false) => {
+    if (loading) return;
+    setLoading(true);
+
+    try {
+      const params = new URLSearchParams({
+        page: pageNum.toString(),
+        limit: '12',
+        sortBy,
+        sortOrder,
+        minScore: minScore.toString(),
+        maxScore: maxScore.toString(),
+        network: selectedNetwork,
+        tier: selectedTier,
+        search: searchQuery,
+        minLiquidity: minLiquidity.toString(),
+        maxLiquidity: maxLiquidity.toString()
+      });
+
+      const response = await fetch(`/api/crypto-projects-rated?${params}`);
+      const data = await response.json();
+
+      if (data.data) {
+        if (reset) {
+          setProjects(data.data);
+        } else {
+          setProjects(prev => [...prev, ...data.data]);
+        }
+        setHasMore(data.pagination.hasMore);
+        
+        // Trigger screenshot capture for projects without screenshots
+        data.data.forEach(async (project: CryptoProject) => {
+          if (!project.website_screenshot_url && project.website_url) {
+            // Mark as capturing
+            setCapturingScreenshots(prev => new Set(prev).add(project.id));
+            
+            try {
+              const captureResponse = await fetch('/api/capture-screenshot', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  url: project.website_url,
+                  tokenId: project.id,
+                  table: 'crypto_projects_rated',
+                  forceRefresh: false
+                })
+              });
+              
+              if (captureResponse.ok) {
+                const result = await captureResponse.json();
+                // Update the project with the new screenshot URL
+                setProjects(prev => prev.map(p => 
+                  p.id === project.id 
+                    ? { ...p, website_screenshot_url: result.screenshot_url }
+                    : p
+                ));
+              }
+            } catch (err) {
+              console.error(`Failed to capture screenshot for ${project.symbol}:`, err);
+            } finally {
+              // Remove from capturing set
+              setCapturingScreenshots(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(project.id);
+                return newSet;
+              });
+            }
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [sortBy, sortOrder, minScore, maxScore, selectedNetwork, selectedTier, searchQuery, minLiquidity, maxLiquidity, loading]);
+
+  // Reset and fetch when filters change
+  useEffect(() => {
+    setProjects([]);
+    setPage(1);
+    setHasMore(true);
+    fetchProjects(1, true);
+  }, [sortBy, sortOrder, minScore, maxScore, selectedNetwork, selectedTier, searchQuery, minLiquidity, maxLiquidity]);
+
+  // Fetch more when page changes
+  useEffect(() => {
+    if (page > 1) {
+      fetchProjects(page);
+    }
+  }, [page]);
+
+  // Format functions
+  const formatMarketCap = (value: number | null) => {
+    if (!value) return 'N/A';
+    if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
+    if (value >= 1000) return `$${(value / 1000).toFixed(0)}K`;
+    return `$${value.toFixed(0)}`;
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays}d ago`;
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
+    return `${Math.floor(diffDays / 30)}mo ago`;
+  };
+
+  const getTierColor = (tier: string | null | undefined) => {
+    if (!tier) return { bg: '#88888822', text: '#888' };
+    
+    const colors: { [key: string]: { bg: string, text: string } } = {
+      ALPHA: { bg: '#9333ea22', text: '#a855f7' },  // Purple for ALPHA
+      SOLID: { bg: '#00ff8822', text: '#00ff88' },  // Green for SOLID
+      BASIC: { bg: '#ffcc0022', text: '#ffcc00' },  // Yellow for BASIC
+      TRASH: { bg: '#ff444422', text: '#ff4444' }   // Red for TRASH
+    };
+    return colors[tier.toUpperCase()] || { bg: '#88888822', text: '#888' };
+  };
+
+  const getScoreBadgeColor = (score: number) => {
+    if (score >= 9) return { bg: '#9333ea22', text: '#a855f7' };  // Purple
+    if (score >= 7) return { bg: '#00ff8822', text: '#00ff88' };  // Green
+    if (score >= 5) return { bg: '#ffcc0022', text: '#ffcc00' };  // Yellow
+    return { bg: '#ff444422', text: '#ff4444' };  // Red
+  };
+
+  const getNetworkBadge = (network: string) => {
+    const colors: { [key: string]: { bg: string, text: string } } = {
+      ethereum: { bg: '#627eea22', text: '#627eea' },
+      solana: { bg: '#14f19522', text: '#14f195' },
+      bsc: { bg: '#f0b90b22', text: '#f0b90b' },
+      base: { bg: '#0052ff22', text: '#0052ff' },
+      polygon: { bg: '#8247e522', text: '#8247e5' },
+      arbitrum: { bg: '#28a0f022', text: '#28a0f0' }
+    };
+    return colors[network.toLowerCase()] || { bg: '#88888822', text: '#888' };
+  };
+
+  return (
+    <div className="min-h-screen bg-[#0a0b0d] p-6">
+      {/* Header */}
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-bold mb-2 text-white">✨ KROM Projects Rated</h1>
+        <p className="text-lg text-[#888]">High-Quality Crypto Projects with Websites</p>
+      </div>
+
+      {/* Filters and Sorting */}
+      <div className="max-w-7xl mx-auto mb-6 bg-[#111214] border border-[#2a2d31] rounded-xl p-4">
+        <div className="flex flex-wrap gap-4 items-center justify-center">
+          {/* Search */}
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              placeholder="Search symbol or name..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="bg-[#1a1c1f] text-white border border-[#2a2d31] rounded-lg px-3 py-1 text-sm hover:border-[#333] focus:outline-none focus:border-[#00ff88] w-48"
+            />
+          </div>
+
+          {/* Sort By */}
+          <div className="flex items-center gap-2">
+            <label className="text-[#888] text-sm">Sort by:</label>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="bg-[#1a1c1f] text-white border border-[#2a2d31] rounded-lg px-3 py-1 text-sm hover:border-[#333] focus:outline-none focus:border-[#00ff88]"
+            >
+              <option value="website_stage1_score">Score</option>
+              <option value="current_liquidity_usd">Liquidity</option>
+              <option value="current_market_cap">Market Cap</option>
+              <option value="current_roi_percent">ROI %</option>
+              <option value="created_at">Date Added</option>
+              <option value="website_stage1_analyzed_at">Analysis Date</option>
+            </select>
+            <button
+              onClick={() => setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc')}
+              className="bg-[#1a1c1f] text-white border border-[#2a2d31] rounded-lg px-3 py-1 text-sm hover:bg-[#252729] hover:border-[#333]"
+            >
+              {sortOrder === 'desc' ? '↓' : '↑'}
+            </button>
+          </div>
+
+          {/* Score Range */}
+          <div className="flex items-center gap-2">
+            <label className="text-[#888] text-sm">Score:</label>
+            <select
+              value={`${minScore}-${maxScore}`}
+              onChange={(e) => {
+                const [min, max] = e.target.value.split('-').map(Number);
+                setMinScore(min);
+                setMaxScore(max);
+              }}
+              className="bg-[#1a1c1f] text-white border border-[#2a2d31] rounded-lg px-3 py-1 text-sm hover:border-[#333] focus:outline-none focus:border-[#00ff88]"
+            >
+              <option value="0-10">All Scores</option>
+              <option value="9-10">9-10 (ALPHA)</option>
+              <option value="7-10">7+ (SOLID+)</option>
+              <option value="5-10">5+ (BASIC+)</option>
+              <option value="0-4">1-4 (TRASH)</option>
+            </select>
+          </div>
+
+          {/* Tier Filter */}
+          <div className="flex items-center gap-2">
+            <label className="text-[#888] text-sm">Tier:</label>
+            <select
+              value={selectedTier}
+              onChange={(e) => setSelectedTier(e.target.value)}
+              className="bg-[#1a1c1f] text-white border border-[#2a2d31] rounded-lg px-3 py-1 text-sm hover:border-[#333] focus:outline-none focus:border-[#00ff88]"
+            >
+              <option value="all">All Tiers</option>
+              <option value="ALPHA">ALPHA</option>
+              <option value="SOLID">SOLID</option>
+              <option value="BASIC">BASIC</option>
+              <option value="TRASH">TRASH</option>
+            </select>
+          </div>
+
+          {/* Network Filter */}
+          <div className="flex items-center gap-2">
+            <label className="text-[#888] text-sm">Network:</label>
+            <select
+              value={selectedNetwork}
+              onChange={(e) => setSelectedNetwork(e.target.value)}
+              className="bg-[#1a1c1f] text-white border border-[#2a2d31] rounded-lg px-3 py-1 text-sm hover:border-[#333] focus:outline-none focus:border-[#00ff88]"
+            >
+              <option value="all">All Networks</option>
+              <option value="ethereum">Ethereum</option>
+              <option value="solana">Solana</option>
+              <option value="bsc">BSC</option>
+              <option value="base">Base</option>
+              <option value="polygon">Polygon</option>
+              <option value="arbitrum">Arbitrum</option>
+            </select>
+          </div>
+
+          {/* Project Count */}
+          <div className="text-[#666] text-sm">
+            Showing {projects.length} projects
+          </div>
+        </div>
+      </div>
+
+      {/* Project Grid */}
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {projects.map((project, index) => (
+          <div
+            key={project.id}
+            ref={index === projects.length - 1 ? lastProjectRef : null}
+            className="bg-[#111214] rounded-2xl border border-[#2a2d31] hover:border-[#00ff88] transition-all hover:-translate-y-1 relative overflow-hidden"
+          >
+            {/* Preview Area */}
+            <div className="relative h-[420px] bg-[#0a0b0d] overflow-hidden">
+              {/* Score Badge - Overlaid on screenshot */}
+              <div className="absolute top-4 left-4 z-20">
+                <div 
+                  className="px-3 py-1.5 rounded-lg backdrop-blur-md font-bold text-xl"
+                  style={{ 
+                    backgroundColor: getScoreBadgeColor(project.website_stage1_score).bg + 'cc',
+                    color: getScoreBadgeColor(project.website_stage1_score).text,
+                    backdropFilter: 'blur(10px)'
+                  }}
+                >
+                  {project.website_stage1_score}/10
+                </div>
+              </div>
+
+              {/* Network Badge - Top right */}
+              <div className="absolute top-4 right-4 z-20">
+                <div 
+                  className="px-2 py-1 rounded text-xs font-semibold uppercase"
+                  style={{ 
+                    backgroundColor: getNetworkBadge(project.network).bg + 'cc',
+                    color: getNetworkBadge(project.network).text,
+                    backdropFilter: 'blur(10px)'
+                  }}
+                >
+                  {project.network}
+                </div>
+              </div>
+
+              {/* Show loading state if capturing screenshot */}
+              {capturingScreenshots.has(project.id) && !project.website_screenshot_url ? (
+                <div className="w-full h-full flex flex-col items-center justify-center">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-[#00ff88] rounded-full opacity-20 animate-ping"></div>
+                    <div className="relative w-16 h-16 border-4 border-[#1a1c1f] border-t-[#00ff88] rounded-full animate-spin"></div>
+                  </div>
+                  <p className="mt-4 text-[#666] text-sm">Capturing screenshot...</p>
+                  <p className="mt-1 text-[#444] text-xs">This may take a few seconds</p>
+                </div>
+              ) : (
+                <div className="w-full h-full overflow-y-auto scrollbar-hide">
+                  <img
+                    src={
+                      project.website_screenshot_url || 
+                      `https://via.placeholder.com/400x600/1a1c1f/666666?text=${encodeURIComponent(project.name || project.symbol)}`
+                    }
+                    alt={`${project.name || project.symbol} screenshot`}
+                    className="w-full h-auto object-top"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = `https://via.placeholder.com/400x600/1a1c1f/666666?text=${encodeURIComponent(project.name || project.symbol)}`;
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Project Info */}
+            <div className="p-5">
+              <div className="flex justify-between items-start mb-3">
+                <div>
+                  <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                    {project.symbol}
+                    {project.name && project.name !== project.symbol && (
+                      <span className="text-sm text-[#666] font-normal">({project.name})</span>
+                    )}
+                  </h3>
+                  {/* Status badges */}
+                  <div className="flex gap-1 mt-1">
+                    {project.is_imposter && (
+                      <span className="px-2 py-0.5 rounded text-xs bg-red-500/20 text-red-500">IMPOSTER</span>
+                    )}
+                    {project.is_rugged && (
+                      <span className="px-2 py-0.5 rounded text-xs bg-orange-500/20 text-orange-500">RUGGED</span>
+                    )}
+                    {project.is_dead && (
+                      <span className="px-2 py-0.5 rounded text-xs bg-gray-500/20 text-gray-500">DEAD</span>
+                    )}
+                  </div>
+                </div>
+                <div className="text-right relative z-10">
+                  {project.website_stage1_tier && (
+                    <WebsiteAnalysisTooltip 
+                      fullAnalysis={project.website_stage1_analysis}
+                    >
+                      <span 
+                        className="px-2 py-0.5 rounded text-xs font-semibold uppercase inline-block cursor-help"
+                        style={{ 
+                          backgroundColor: getTierColor(project.website_stage1_tier).bg,
+                          color: getTierColor(project.website_stage1_tier).text
+                        }}
+                      >
+                        {project.website_stage1_tier}
+                      </span>
+                    </WebsiteAnalysisTooltip>
+                  )}
+                  <p className="text-xs text-[#666] mt-1">{formatDate(project.created_at)}</p>
+                </div>
+              </div>
+              
+              {/* Quick Take from analysis */}
+              {project.website_stage1_analysis?.quick_take && (
+                <p className="text-[#888] text-sm mb-4 line-clamp-2">
+                  {project.website_stage1_analysis.quick_take}
+                </p>
+              )}
+              
+              {/* Metrics */}
+              <div className="grid grid-cols-3 gap-2 mb-4">
+                <div className="text-center p-2 bg-[#1a1c1f] rounded-lg border border-[#2a2d31]">
+                  <p className="text-xs text-[#666]">Market Cap</p>
+                  <p className="text-sm font-semibold text-white">{formatMarketCap(project.current_market_cap)}</p>
+                </div>
+                <div className="text-center p-2 bg-[#1a1c1f] rounded-lg border border-[#2a2d31]">
+                  <p className="text-xs text-[#666]">Liquidity</p>
+                  <p className="text-sm font-semibold text-white">{formatMarketCap(project.current_liquidity_usd)}</p>
+                </div>
+                <div className="text-center p-2 bg-[#1a1c1f] rounded-lg border border-[#2a2d31]">
+                  <p className="text-xs text-[#666]">ROI</p>
+                  <p className={`text-sm font-semibold ${project.current_roi_percent && project.current_roi_percent > 0 ? 'text-[#00ff88]' : project.current_roi_percent && project.current_roi_percent < 0 ? 'text-[#ff4444]' : 'text-[#888]'}`}>
+                    {project.current_roi_percent ? `${project.current_roi_percent > 0 ? '+' : ''}${project.current_roi_percent.toFixed(0)}%` : 'N/A'}
+                  </p>
+                </div>
+              </div>
+              
+              {/* Actions */}
+              <div className="flex gap-2">
+                <a
+                  href={project.website_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 bg-[#00ff88] text-black text-center py-2 rounded-lg hover:bg-[#00cc66] transition-colors text-sm font-semibold"
+                >
+                  Visit Website ↗
+                </a>
+                {project.contract_address && (
+                  <a
+                    href={`https://dexscreener.com/${project.network}/${project.contract_address}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 bg-[#1a1c1f] text-[#888] py-2 rounded-lg hover:bg-[#252729] hover:text-white transition-colors text-center text-sm border border-[#2a2d31]"
+                  >
+                    Chart 📊
+                  </a>
+                )}
+              </div>
+
+              {/* Social Links */}
+              {(project.twitter_url || project.telegram_url) && (
+                <div className="flex gap-2 mt-2">
+                  {project.twitter_url && (
+                    <a
+                      href={project.twitter_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 bg-[#1d9bf0]/20 text-[#1d9bf0] py-1.5 rounded-lg hover:bg-[#1d9bf0]/30 transition-colors text-center text-xs border border-[#1d9bf0]/30"
+                    >
+                      Twitter/X
+                    </a>
+                  )}
+                  {project.telegram_url && (
+                    <a
+                      href={project.telegram_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 bg-[#0088cc]/20 text-[#0088cc] py-1.5 rounded-lg hover:bg-[#0088cc]/30 transition-colors text-center text-xs border border-[#0088cc]/30"
+                    >
+                      Telegram
+                    </a>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Loading Indicator */}
+      {loading && (
+        <div className="flex justify-center mt-8">
+          <div className="w-12 h-12 border-4 border-[#00ff88] border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      )}
+
+      {/* No More Results */}
+      {!hasMore && projects.length > 0 && (
+        <div className="text-center mt-8 text-[#666]">
+          <p>No more projects to load</p>
+        </div>
+      )}
+
+      {/* No Results */}
+      {!loading && projects.length === 0 && (
+        <div className="text-center mt-8">
+          <p className="text-xl mb-2 text-white">No projects found</p>
+          <p className="text-[#666]">Try adjusting your filters</p>
+        </div>
+      )}
+    </div>
+  );
+}
