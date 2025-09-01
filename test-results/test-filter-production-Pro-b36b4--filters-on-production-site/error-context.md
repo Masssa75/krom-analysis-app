@@ -1,0 +1,275 @@
+# Page snapshot
+
+```yaml
+- main:
+  - heading "✨ KROM Projects Rated" [level=1]
+  - paragraph: High-Quality Crypto Projects with Websites
+  - textbox "Search symbol or name..."
+  - text: "Sort by:"
+  - combobox:
+    - option "Score" [selected]
+    - option "Liquidity"
+    - option "Market Cap"
+    - option "ROI %"
+    - option "Date Added"
+    - option "Analysis Date"
+  - button "↓"
+  - text: "Score:"
+  - combobox:
+    - option "All Scores" [selected]
+    - option "9-10 (ALPHA)"
+    - option "7+ (SOLID+)"
+    - option "5+ (BASIC+)"
+    - option "1-4 (TRASH)"
+  - text: "Tier:"
+  - combobox:
+    - option "All Tiers" [selected]
+    - option "ALPHA"
+    - option "SOLID"
+    - option "BASIC"
+    - option "TRASH"
+  - text: "Network:"
+  - combobox:
+    - option "All Networks" [selected]
+    - option "Ethereum"
+    - option "Solana"
+    - option "BSC"
+    - option "Base"
+    - option "Polygon"
+    - option "Arbitrum"
+  - text: Showing 12 projects 10/10 ethereum
+  - img "AAVE screenshot"
+  - heading "AAVE" [level=3]
+  - text: ALPHA
+  - paragraph: Yesterday
+  - paragraph: Top-tier DeFi lending protocol, 68B TVL, 5yr track record
+  - paragraph: Market Cap
+  - paragraph: $9.0M
+  - paragraph: Liquidity
+  - paragraph: N/A
+  - paragraph: ROI
+  - paragraph: +820%
+  - link "Visit Website ↗":
+    - /url: https://app.pendlecoin.fi
+  - link "Chart 📊":
+    - /url: https://dexscreener.com/ethereum/0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9
+  - link "Twitter/X":
+    - /url: https://x.com/0xpenfi
+  - text: 10/10 ethereum
+  - img "ETHEREUM screenshot"
+  - heading "ETHEREUM" [level=3]
+  - text: DEAD SOLID
+  - paragraph: Yesterday
+  - paragraph: Real-time ETH burn analytics with $880B TVS, but no team info
+  - paragraph: Market Cap
+  - paragraph: $51K
+  - paragraph: Liquidity
+  - paragraph: N/A
+  - paragraph: ROI
+  - paragraph: "-71%"
+  - link "Visit Website ↗":
+    - /url: https://ultrasound.money/
+  - link "Chart 📊":
+    - /url: https://dexscreener.com/ethereum/0x788A4C13A8945B15E2009D4526A3d4aBdB81928D
+  - link "Twitter/X":
+    - /url: https://x.com/ultrasoundcto
+  - link "Telegram":
+    - /url: https://t.me/ultrasoundmoneyERC20
+  - text: 10/10 ethereum
+  - img "LIQUID screenshot"
+  - heading "LIQUID" [level=3]
+  - text: SOLID
+  - paragraph: Yesterday
+  - paragraph: AI crypto agent platform with audits, but no token info
+  - paragraph: Market Cap
+  - paragraph: $1.6M
+  - paragraph: Liquidity
+  - paragraph: N/A
+  - paragraph: ROI
+  - paragraph: "-62%"
+  - link "Visit Website ↗":
+    - /url: https://liquidagent.ai
+  - link "Chart 📊":
+    - /url: https://dexscreener.com/ethereum/0x11DFC652eb62c723ad8c2ae731FcEdE58aB07564
+  - link "Twitter/X":
+    - /url: https://x.com/liquidagentai
+  - link "Telegram":
+    - /url: https://t.me/liquidagentai
+  - text: 10/10 solana
+  - img "BIO screenshot"
+  - heading "BIO" [level=3]
+  - text: ALPHA
+  - paragraph: Yesterday
+  - paragraph: DeSci funding platform w/ working products & strong backers
+  - paragraph: Market Cap
+  - paragraph: $461.3M
+  - paragraph: Liquidity
+  - paragraph: N/A
+  - paragraph: ROI
+  - paragraph: "-99%"
+  - link "Visit Website ↗":
+    - /url: https://bigpharm.ai/
+  - link "Chart 📊":
+    - /url: https://dexscreener.com/solana/bioJ9JTqW62MLz7UKHU69gtKhPpGi1BQhccj2kmSvUJ
+  - link "Twitter/X":
+    - /url: https://x.com/Big_Pharmai
+  - link "Telegram":
+    - /url: https://t.me/big_pharmai_portal
+  - text: 10/10 ethereum
+  - img "KOHAKU screenshot"
+  - heading "KOHAKU" [level=3]
+  - text: SOLID
+  - paragraph: Yesterday
+  - paragraph: EF protocol upgrade with major partners, but no token details
+  - paragraph: Market Cap
+  - paragraph: $115K
+  - paragraph: Liquidity
+  - paragraph: N/A
+  - paragraph: ROI
+  - paragraph: "-20%"
+  - link "Visit Website ↗":
+    - /url: https://kohakueth.live/
+  - link "Chart 📊":
+    - /url: https://dexscreener.com/ethereum/0xbd821d84770B65F679a47452367258cF86579d02
+  - link "Twitter/X":
+    - /url: https://x.com/KOHAKU_ETH
+  - link "Telegram":
+    - /url: https://t.me/kohakueth
+  - text: 10/10 ethereum
+  - img "BIO screenshot"
+  - heading "BIO" [level=3]
+  - text: ALPHA
+  - paragraph: Yesterday
+  - paragraph: Leading DeSci platform with real biotech utility
+  - paragraph: Market Cap
+  - paragraph: $429.8M
+  - paragraph: Liquidity
+  - paragraph: N/A
+  - paragraph: ROI
+  - paragraph: +11%
+  - link "Visit Website ↗":
+    - /url: https://www.erectusdao.org/
+  - link "Chart 📊":
+    - /url: https://dexscreener.com/ethereum/0xcb1592591996765ec0efc1f92599a19767ee5ffa
+  - link "Twitter/X":
+    - /url: https://x.com/ErectusDAO
+  - link "Telegram":
+    - /url: https://t.me/erectusdao
+  - text: 10/10 solana
+  - img "A13B screenshot"
+  - heading "A13B" [level=3]
+  - text: DEAD SOLID
+  - paragraph: Yesterday
+  - paragraph: Enterprise AI platform with working APIs, but no crypto token details
+  - paragraph: Market Cap
+  - paragraph: $5K
+  - paragraph: Liquidity
+  - paragraph: N/A
+  - paragraph: ROI
+  - paragraph: "-97%"
+  - link "Visit Website ↗":
+    - /url: https://hunyuan.tencent.com/
+  - link "Chart 📊":
+    - /url: https://dexscreener.com/solana/BjTrhfNC8UUi3AGmwzmbDA77cswgEtdVT55zFqfbpump
+  - link "Twitter/X":
+    - /url: https://x.com/nrqa__/status/1938535830332817650?s=61
+  - text: 9/10 base
+  - img "TGN screenshot"
+  - heading "TGN" [level=3]
+  - text: ALPHA
+  - paragraph: Yesterday
+  - paragraph: Real eco-impact utility with strong community
+  - paragraph: Market Cap
+  - paragraph: $5.7M
+  - paragraph: Liquidity
+  - paragraph: N/A
+  - paragraph: ROI
+  - paragraph: +10%
+  - link "Visit Website ↗":
+    - /url: https://www.treegens.org
+  - link "Chart 📊":
+    - /url: https://dexscreener.com/base/0xd75dfa972c6136f1c594fec1945302f885e1ab29
+  - link "Twitter/X":
+    - /url: https://x.com/thetreegens
+  - link "Telegram":
+    - /url: https://t.me/TreegenFam
+  - text: 9/10 solana
+  - img "PUT IN screenshot"
+  - heading "PUT IN" [level=3]
+  - text: IMPOSTER DEAD ALPHA
+  - paragraph: Yesterday
+  - paragraph: Top-tier Solana DEX aggregator with working portfolio tool
+  - paragraph: Market Cap
+  - paragraph: N/A
+  - paragraph: Liquidity
+  - paragraph: N/A
+  - paragraph: ROI
+  - paragraph: N/A
+  - link "Visit Website ↗":
+    - /url: https://solanatracker.app
+  - link "Chart 📊":
+    - /url: https://dexscreener.com/solana/Ny2oKJtBXxBDk9jAYYq8fvttsx12Uqy1seKVCutpump
+  - link "Twitter/X":
+    - /url: https://x.com/PixOnChain
+  - link "Telegram":
+    - /url: https://t.me/usdtextended
+  - text: 9/10 ethereum
+  - img "NAKA screenshot"
+  - heading "NAKA" [level=3]
+  - text: SOLID
+  - paragraph: Yesterday
+  - paragraph: Strong historical branding and tokenomics, but lacks social links and team info
+  - paragraph: Market Cap
+  - paragraph: $290K
+  - paragraph: Liquidity
+  - paragraph: N/A
+  - paragraph: ROI
+  - paragraph: +4%
+  - link "Visit Website ↗":
+    - /url: https://www.nakago.xyz/
+  - link "Chart 📊":
+    - /url: https://dexscreener.com/ethereum/0x6967b9a8c0b14849CFE8f9E5732B401433fD2898
+  - link "Twitter/X":
+    - /url: https://x.com/nakagoinu
+  - link "Telegram":
+    - /url: https://t.me/NakaGoInu
+  - text: 9/10 bsc
+  - img "SPUSD screenshot"
+  - heading "SPUSD" [level=3]
+  - text: DEAD ALPHA
+  - paragraph: Yesterday
+  - paragraph: Soul-bound sUSDC yield protocol on BSC
+  - paragraph: Market Cap
+  - paragraph: $5K
+  - paragraph: Liquidity
+  - paragraph: N/A
+  - paragraph: ROI
+  - paragraph: N/A
+  - link "Visit Website ↗":
+    - /url: https://www.soulpeg.io
+  - link "Chart 📊":
+    - /url: https://dexscreener.com/bsc/0x40ff3dea2eec93a7b71879874dc4407918da77a6
+  - link "Twitter/X":
+    - /url: https://x.com/soulpeglabs
+  - link "Telegram":
+    - /url: https://t.me/soulpeg
+  - text: 9/10 solana
+  - img "HUAWEI screenshot"
+  - heading "HUAWEI" [level=3]
+  - text: DEAD ALPHA
+  - paragraph: Yesterday
+  - paragraph: Fortune 500 tech company, not a crypto project
+  - paragraph: Market Cap
+  - paragraph: $6K
+  - paragraph: Liquidity
+  - paragraph: N/A
+  - paragraph: ROI
+  - paragraph: N/A
+  - link "Visit Website ↗":
+    - /url: https://www.huawei.com/en/
+  - link "Chart 📊":
+    - /url: https://dexscreener.com/solana/joDBpdoXoijKRNaYk28LK8bCYmKsMAbdmCGeTni4Adt
+  - link "Twitter/X":
+    - /url: https://x.com/pmarca/status/1885650387262382097?s=46&t=j2P1Y47hcEfI2qxcuphxzQ
+- alert
+```

@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { WebsiteAnalysisTooltip } from '@/components/WebsiteAnalysisTooltip';
+import FilterSidebar from '@/components/FilterSidebar';
+import { useDebounce } from '@/lib/useDebounce';
 
 interface CryptoProject {
   id: number;
@@ -25,6 +27,20 @@ interface CryptoProject {
   twitter_url: string | null;
   telegram_url: string | null;
   created_at: string;
+  
+  // Add X analysis fields
+  x_analysis_score?: number;
+  x_analysis_tier?: string;
+  analysis_token_type?: string; // For token type filtering
+}
+
+interface FilterState {
+  tokenType: 'all' | 'meme' | 'utility'
+  networks: string[]
+  excludeRugs?: boolean
+  excludeImposters?: boolean
+  minXScore?: number
+  minWebsiteScore?: number
 }
 
 export default function ProjectsRatedPage() {
@@ -34,13 +50,19 @@ export default function ProjectsRatedPage() {
   const [hasMore, setHasMore] = useState(true);
   const [sortBy, setSortBy] = useState<string>('website_stage1_score');
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
-  const [minScore, setMinScore] = useState(0);
-  const [maxScore, setMaxScore] = useState(10);
-  const [selectedNetwork, setSelectedNetwork] = useState('all');
-  const [selectedTier, setSelectedTier] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [minLiquidity, setMinLiquidity] = useState(0);
-  const [maxLiquidity, setMaxLiquidity] = useState(1000000000);
+  const [filters, setFilters] = useState<FilterState>({
+    tokenType: 'all',
+    networks: ['ethereum', 'solana', 'bsc', 'base'],
+    excludeRugs: true,
+    excludeImposters: true,
+    minXScore: 1,
+    minWebsiteScore: 1
+  });
+  
+  // Debounce filters with 400ms delay
+  const debouncedFilters = useDebounce(filters, 400);
+  
   const [capturingScreenshots, setCapturingScreenshots] = useState<Set<number>>(new Set());
   const [attemptedScreenshots, setAttemptedScreenshots] = useState<Set<number>>(() => {
     // Initialize from sessionStorage on mount
@@ -86,14 +108,33 @@ export default function ProjectsRatedPage() {
         limit: '12',
         sortBy,
         sortOrder,
-        minScore: minScore.toString(),
-        maxScore: maxScore.toString(),
-        network: selectedNetwork,
-        tier: selectedTier,
         search: searchQuery,
-        minLiquidity: minLiquidity.toString(),
-        maxLiquidity: maxLiquidity.toString()
       });
+      
+      // Add filter parameters
+      if (debouncedFilters.tokenType && debouncedFilters.tokenType !== 'all') {
+        params.append('tokenType', debouncedFilters.tokenType);
+      }
+      
+      if (debouncedFilters.networks && debouncedFilters.networks.length > 0) {
+        params.append('networks', debouncedFilters.networks.join(','));
+      }
+      
+      if (debouncedFilters.excludeRugs === false) {
+        params.append('includeRugs', 'true');
+      }
+      
+      if (debouncedFilters.excludeImposters === false) {
+        params.append('includeImposters', 'true');
+      }
+      
+      if (debouncedFilters.minXScore && debouncedFilters.minXScore > 1) {
+        params.append('minXScore', debouncedFilters.minXScore.toString());
+      }
+      
+      if (debouncedFilters.minWebsiteScore && debouncedFilters.minWebsiteScore > 1) {
+        params.append('minWebsiteScore', debouncedFilters.minWebsiteScore.toString());
+      }
 
       const response = await fetch(`/api/crypto-projects-rated?${params}`);
       const data = await response.json();
@@ -173,7 +214,7 @@ export default function ProjectsRatedPage() {
     } finally {
       setLoading(false);
     }
-  }, [sortBy, sortOrder, minScore, maxScore, selectedNetwork, selectedTier, searchQuery, minLiquidity, maxLiquidity, loading]);
+  }, [sortBy, sortOrder, searchQuery, debouncedFilters, loading, attemptedScreenshots]);
 
   // Reset and fetch when filters change
   useEffect(() => {
@@ -181,7 +222,7 @@ export default function ProjectsRatedPage() {
     setPage(1);
     setHasMore(true);
     fetchProjects(1, true);
-  }, [sortBy, sortOrder, minScore, maxScore, selectedNetwork, selectedTier, searchQuery, minLiquidity, maxLiquidity]);
+  }, [sortBy, sortOrder, searchQuery, debouncedFilters]);
 
   // Fetch more when page changes
   useEffect(() => {
@@ -242,319 +283,277 @@ export default function ProjectsRatedPage() {
     return colors[network.toLowerCase()] || { bg: '#88888822', text: '#888' };
   };
 
+  const handleFiltersChange = (newFilters: FilterState) => {
+    setFilters(newFilters);
+  };
+
   return (
-    <div className="min-h-screen bg-[#0a0b0d] p-6">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold mb-2 text-white">✨ KROM Projects Rated</h1>
-        <p className="text-lg text-[#888]">High-Quality Crypto Projects with Websites</p>
-      </div>
-
-      {/* Filters and Sorting */}
-      <div className="max-w-7xl mx-auto mb-6 bg-[#111214] border border-[#2a2d31] rounded-xl p-4">
-        <div className="flex flex-wrap gap-4 items-center justify-center">
-          {/* Search */}
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              placeholder="Search symbol or name..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-[#1a1c1f] text-white border border-[#2a2d31] rounded-lg px-3 py-1 text-sm hover:border-[#333] focus:outline-none focus:border-[#00ff88] w-48"
-            />
+    <div className="fixed inset-0 flex bg-[#0a0b0d]">
+      {/* Filter Sidebar */}
+      <FilterSidebar onFiltersChange={handleFiltersChange} />
+      
+      {/* Main Content */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="p-6">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold mb-2 text-white">✨ KROM Projects Rated</h1>
+            <p className="text-lg text-[#888]">High-Quality Crypto Projects with Websites</p>
           </div>
 
-          {/* Sort By */}
-          <div className="flex items-center gap-2">
-            <label className="text-[#888] text-sm">Sort by:</label>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="bg-[#1a1c1f] text-white border border-[#2a2d31] rounded-lg px-3 py-1 text-sm hover:border-[#333] focus:outline-none focus:border-[#00ff88]"
-            >
-              <option value="website_stage1_score">Score</option>
-              <option value="current_liquidity_usd">Liquidity</option>
-              <option value="current_market_cap">Market Cap</option>
-              <option value="current_roi_percent">ROI %</option>
-              <option value="created_at">Date Added</option>
-              <option value="website_stage1_analyzed_at">Analysis Date</option>
-            </select>
-            <button
-              onClick={() => setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc')}
-              className="bg-[#1a1c1f] text-white border border-[#2a2d31] rounded-lg px-3 py-1 text-sm hover:bg-[#252729] hover:border-[#333]"
-            >
-              {sortOrder === 'desc' ? '↓' : '↑'}
-            </button>
-          </div>
-
-          {/* Score Range */}
-          <div className="flex items-center gap-2">
-            <label className="text-[#888] text-sm">Score:</label>
-            <select
-              value={`${minScore}-${maxScore}`}
-              onChange={(e) => {
-                const [min, max] = e.target.value.split('-').map(Number);
-                setMinScore(min);
-                setMaxScore(max);
-              }}
-              className="bg-[#1a1c1f] text-white border border-[#2a2d31] rounded-lg px-3 py-1 text-sm hover:border-[#333] focus:outline-none focus:border-[#00ff88]"
-            >
-              <option value="0-10">All Scores</option>
-              <option value="9-10">9-10 (ALPHA)</option>
-              <option value="7-10">7+ (SOLID+)</option>
-              <option value="5-10">5+ (BASIC+)</option>
-              <option value="0-4">1-4 (TRASH)</option>
-            </select>
-          </div>
-
-          {/* Tier Filter */}
-          <div className="flex items-center gap-2">
-            <label className="text-[#888] text-sm">Tier:</label>
-            <select
-              value={selectedTier}
-              onChange={(e) => setSelectedTier(e.target.value)}
-              className="bg-[#1a1c1f] text-white border border-[#2a2d31] rounded-lg px-3 py-1 text-sm hover:border-[#333] focus:outline-none focus:border-[#00ff88]"
-            >
-              <option value="all">All Tiers</option>
-              <option value="ALPHA">ALPHA</option>
-              <option value="SOLID">SOLID</option>
-              <option value="BASIC">BASIC</option>
-              <option value="TRASH">TRASH</option>
-            </select>
-          </div>
-
-          {/* Network Filter */}
-          <div className="flex items-center gap-2">
-            <label className="text-[#888] text-sm">Network:</label>
-            <select
-              value={selectedNetwork}
-              onChange={(e) => setSelectedNetwork(e.target.value)}
-              className="bg-[#1a1c1f] text-white border border-[#2a2d31] rounded-lg px-3 py-1 text-sm hover:border-[#333] focus:outline-none focus:border-[#00ff88]"
-            >
-              <option value="all">All Networks</option>
-              <option value="ethereum">Ethereum</option>
-              <option value="solana">Solana</option>
-              <option value="bsc">BSC</option>
-              <option value="base">Base</option>
-              <option value="polygon">Polygon</option>
-              <option value="arbitrum">Arbitrum</option>
-            </select>
-          </div>
-
-          {/* Project Count */}
-          <div className="text-[#666] text-sm">
-            Showing {projects.length} projects
-          </div>
-        </div>
-      </div>
-
-      {/* Project Grid */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {projects.map((project, index) => (
-          <div
-            key={project.id}
-            ref={index === projects.length - 1 ? lastProjectRef : null}
-            className="bg-[#111214] rounded-2xl border border-[#2a2d31] hover:border-[#00ff88] transition-all hover:-translate-y-1 relative overflow-hidden"
-          >
-            {/* Preview Area */}
-            <div className="relative h-[420px] bg-[#0a0b0d] overflow-hidden">
-              {/* Score Badge - Overlaid on screenshot */}
-              <div className="absolute top-4 left-4 z-20">
-                <div 
-                  className="px-3 py-1.5 rounded-lg backdrop-blur-md font-bold text-xl"
-                  style={{ 
-                    backgroundColor: getScoreBadgeColor(project.website_stage1_score).bg + 'cc',
-                    color: getScoreBadgeColor(project.website_stage1_score).text,
-                    backdropFilter: 'blur(10px)'
-                  }}
-                >
-                  {project.website_stage1_score}/10
-                </div>
+          {/* Top Controls Bar */}
+          <div className="max-w-7xl mx-auto mb-6 bg-[#111214] border border-[#2a2d31] rounded-xl p-4">
+            <div className="flex flex-wrap gap-4 items-center justify-between">
+              {/* Search */}
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  placeholder="Search symbol or name..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="bg-[#1a1c1f] text-white border border-[#2a2d31] rounded-lg px-3 py-1 text-sm hover:border-[#333] focus:outline-none focus:border-[#00ff88] w-48"
+                />
               </div>
 
-              {/* Network Badge - Top right */}
-              <div className="absolute top-4 right-4 z-20">
-                <div 
-                  className="px-2 py-1 rounded text-xs font-semibold uppercase"
-                  style={{ 
-                    backgroundColor: getNetworkBadge(project.network).bg + 'cc',
-                    color: getNetworkBadge(project.network).text,
-                    backdropFilter: 'blur(10px)'
-                  }}
+              {/* Sort By */}
+              <div className="flex items-center gap-2">
+                <label className="text-[#888] text-sm">Sort by:</label>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="bg-[#1a1c1f] text-white border border-[#2a2d31] rounded-lg px-3 py-1 text-sm hover:border-[#333] focus:outline-none focus:border-[#00ff88]"
                 >
-                  {project.network}
-                </div>
+                  <option value="website_stage1_score">Score</option>
+                  <option value="current_liquidity_usd">Liquidity</option>
+                  <option value="current_market_cap">Market Cap</option>
+                  <option value="current_roi_percent">ROI %</option>
+                  <option value="created_at">Date Added</option>
+                  <option value="website_stage1_analyzed_at">Analysis Date</option>
+                </select>
+                <button
+                  onClick={() => setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc')}
+                  className="bg-[#1a1c1f] text-white border border-[#2a2d31] rounded-lg px-3 py-1 text-sm hover:bg-[#252729] hover:border-[#333]"
+                >
+                  {sortOrder === 'desc' ? '↓' : '↑'}
+                </button>
               </div>
 
-              {/* Show loading state if capturing screenshot */}
-              {capturingScreenshots.has(project.id) && !project.website_screenshot_url ? (
-                <div className="w-full h-full flex flex-col items-center justify-center">
-                  <div className="relative">
-                    <div className="absolute inset-0 bg-[#00ff88] rounded-full opacity-20 animate-ping"></div>
-                    <div className="relative w-16 h-16 border-4 border-[#1a1c1f] border-t-[#00ff88] rounded-full animate-spin"></div>
-                  </div>
-                  <p className="mt-4 text-[#666] text-sm">Capturing screenshot...</p>
-                  <p className="mt-1 text-[#444] text-xs">This may take a few seconds</p>
-                </div>
-              ) : (
-                <div className="w-full h-full overflow-y-auto scrollbar-hide">
-                  <img
-                    src={
-                      project.website_screenshot_url || 
-                      `https://via.placeholder.com/400x600/1a1c1f/666666?text=${encodeURIComponent(project.name || project.symbol)}`
-                    }
-                    alt={`${project.name || project.symbol} screenshot`}
-                    className="w-full h-auto object-top"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = `https://via.placeholder.com/400x600/1a1c1f/666666?text=${encodeURIComponent(project.name || project.symbol)}`;
-                    }}
-                  />
-                </div>
-              )}
+              {/* Project Count */}
+              <div className="text-[#666] text-sm">
+                Showing {projects.length} projects
+              </div>
             </div>
+          </div>
 
-            {/* Project Info */}
-            <div className="p-5">
-              <div className="flex justify-between items-start mb-3">
-                <div>
-                  <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                    {project.symbol}
-                    {project.name && project.name !== project.symbol && (
-                      <span className="text-sm text-[#666] font-normal">({project.name})</span>
-                    )}
-                  </h3>
-                  {/* Status badges */}
-                  <div className="flex gap-1 mt-1">
-                    {project.is_imposter && (
-                      <span className="px-2 py-0.5 rounded text-xs bg-red-500/20 text-red-500">IMPOSTER</span>
-                    )}
-                    {project.is_rugged && (
-                      <span className="px-2 py-0.5 rounded text-xs bg-orange-500/20 text-orange-500">RUGGED</span>
-                    )}
-                    {project.is_dead && (
-                      <span className="px-2 py-0.5 rounded text-xs bg-gray-500/20 text-gray-500">DEAD</span>
-                    )}
-                  </div>
-                </div>
-                <div className="text-right relative z-10">
-                  {project.website_stage1_tier && (
-                    <WebsiteAnalysisTooltip 
-                      fullAnalysis={project.website_stage1_analysis}
+          {/* Project Grid */}
+          <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {projects.map((project, index) => (
+              <div
+                key={project.id}
+                ref={index === projects.length - 1 ? lastProjectRef : null}
+                className="bg-[#111214] rounded-2xl border border-[#2a2d31] hover:border-[#00ff88] transition-all hover:-translate-y-1 relative overflow-hidden"
+              >
+                {/* Preview Area */}
+                <div className="relative h-[420px] bg-[#0a0b0d] overflow-hidden">
+                  {/* Score Badge - Overlaid on screenshot */}
+                  <div className="absolute top-4 left-4 z-20">
+                    <div 
+                      className="px-3 py-1.5 rounded-lg backdrop-blur-md font-bold text-xl"
+                      style={{ 
+                        backgroundColor: getScoreBadgeColor(project.website_stage1_score).bg + 'cc',
+                        color: getScoreBadgeColor(project.website_stage1_score).text,
+                        backdropFilter: 'blur(10px)'
+                      }}
                     >
-                      <span 
-                        className="px-2 py-0.5 rounded text-xs font-semibold uppercase inline-block cursor-help"
-                        style={{ 
-                          backgroundColor: getTierColor(project.website_stage1_tier).bg,
-                          color: getTierColor(project.website_stage1_tier).text
+                      {project.website_stage1_score}/10
+                    </div>
+                  </div>
+
+                  {/* Network Badge - Top right */}
+                  <div className="absolute top-4 right-4 z-20">
+                    <div 
+                      className="px-2 py-1 rounded text-xs font-semibold uppercase"
+                      style={{ 
+                        backgroundColor: getNetworkBadge(project.network).bg + 'cc',
+                        color: getNetworkBadge(project.network).text,
+                        backdropFilter: 'blur(10px)'
+                      }}
+                    >
+                      {project.network}
+                    </div>
+                  </div>
+
+                  {/* Show loading state if capturing screenshot */}
+                  {capturingScreenshots.has(project.id) && !project.website_screenshot_url ? (
+                    <div className="w-full h-full flex flex-col items-center justify-center">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-[#00ff88] rounded-full opacity-20 animate-ping"></div>
+                        <div className="relative w-16 h-16 border-4 border-[#1a1c1f] border-t-[#00ff88] rounded-full animate-spin"></div>
+                      </div>
+                      <p className="mt-4 text-[#666] text-sm">Capturing screenshot...</p>
+                      <p className="mt-1 text-[#444] text-xs">This may take a few seconds</p>
+                    </div>
+                  ) : (
+                    <div className="w-full h-full overflow-y-auto scrollbar-hide">
+                      <img
+                        src={
+                          project.website_screenshot_url || 
+                          `https://via.placeholder.com/400x600/1a1c1f/666666?text=${encodeURIComponent(project.name || project.symbol)}`
+                        }
+                        alt={`${project.name || project.symbol} screenshot`}
+                        className="w-full h-auto object-top"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = `https://via.placeholder.com/400x600/1a1c1f/666666?text=${encodeURIComponent(project.name || project.symbol)}`;
                         }}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Project Info */}
+                <div className="p-5">
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                        {project.symbol}
+                        {project.name && project.name !== project.symbol && (
+                          <span className="text-sm text-[#666] font-normal">({project.name})</span>
+                        )}
+                      </h3>
+                      {/* Status badges */}
+                      <div className="flex gap-1 mt-1">
+                        {project.is_imposter && (
+                          <span className="px-2 py-0.5 rounded text-xs bg-red-500/20 text-red-500">IMPOSTER</span>
+                        )}
+                        {project.is_rugged && (
+                          <span className="px-2 py-0.5 rounded text-xs bg-orange-500/20 text-orange-500">RUGGED</span>
+                        )}
+                        {project.is_dead && (
+                          <span className="px-2 py-0.5 rounded text-xs bg-gray-500/20 text-gray-500">DEAD</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-right relative z-10">
+                      {project.website_stage1_tier && (
+                        <WebsiteAnalysisTooltip 
+                          fullAnalysis={project.website_stage1_analysis}
+                        >
+                          <span 
+                            className="px-2 py-0.5 rounded text-xs font-semibold uppercase inline-block cursor-help"
+                            style={{ 
+                              backgroundColor: getTierColor(project.website_stage1_tier).bg,
+                              color: getTierColor(project.website_stage1_tier).text
+                            }}
+                          >
+                            {project.website_stage1_tier}
+                          </span>
+                        </WebsiteAnalysisTooltip>
+                      )}
+                      <p className="text-xs text-[#666] mt-1">{formatDate(project.created_at)}</p>
+                    </div>
+                  </div>
+                  
+                  {/* Quick Take from analysis */}
+                  {project.website_stage1_analysis?.quick_take && (
+                    <p className="text-[#888] text-sm mb-4 line-clamp-2">
+                      {project.website_stage1_analysis.quick_take}
+                    </p>
+                  )}
+                  
+                  {/* Metrics */}
+                  <div className="grid grid-cols-3 gap-2 mb-4">
+                    <div className="text-center p-2 bg-[#1a1c1f] rounded-lg border border-[#2a2d31]">
+                      <p className="text-xs text-[#666]">Market Cap</p>
+                      <p className="text-sm font-semibold text-white">{formatMarketCap(project.current_market_cap)}</p>
+                    </div>
+                    <div className="text-center p-2 bg-[#1a1c1f] rounded-lg border border-[#2a2d31]">
+                      <p className="text-xs text-[#666]">Liquidity</p>
+                      <p className="text-sm font-semibold text-white">{formatMarketCap(project.current_liquidity_usd)}</p>
+                    </div>
+                    <div className="text-center p-2 bg-[#1a1c1f] rounded-lg border border-[#2a2d31]">
+                      <p className="text-xs text-[#666]">ROI</p>
+                      <p className={`text-sm font-semibold ${project.current_roi_percent && project.current_roi_percent > 0 ? 'text-[#00ff88]' : project.current_roi_percent && project.current_roi_percent < 0 ? 'text-[#ff4444]' : 'text-[#888]'}`}>
+                        {project.current_roi_percent ? `${project.current_roi_percent > 0 ? '+' : ''}${project.current_roi_percent.toFixed(0)}%` : 'N/A'}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {/* Actions */}
+                  <div className="flex gap-2">
+                    <a
+                      href={project.website_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 bg-[#00ff88] text-black text-center py-2 rounded-lg hover:bg-[#00cc66] transition-colors text-sm font-semibold"
+                    >
+                      Visit Website ↗
+                    </a>
+                    {project.contract_address && (
+                      <a
+                        href={`https://dexscreener.com/${project.network}/${project.contract_address}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 bg-[#1a1c1f] text-[#888] py-2 rounded-lg hover:bg-[#252729] hover:text-white transition-colors text-center text-sm border border-[#2a2d31]"
                       >
-                        {project.website_stage1_tier}
-                      </span>
-                    </WebsiteAnalysisTooltip>
-                  )}
-                  <p className="text-xs text-[#666] mt-1">{formatDate(project.created_at)}</p>
-                </div>
-              </div>
-              
-              {/* Quick Take from analysis */}
-              {project.website_stage1_analysis?.quick_take && (
-                <p className="text-[#888] text-sm mb-4 line-clamp-2">
-                  {project.website_stage1_analysis.quick_take}
-                </p>
-              )}
-              
-              {/* Metrics */}
-              <div className="grid grid-cols-3 gap-2 mb-4">
-                <div className="text-center p-2 bg-[#1a1c1f] rounded-lg border border-[#2a2d31]">
-                  <p className="text-xs text-[#666]">Market Cap</p>
-                  <p className="text-sm font-semibold text-white">{formatMarketCap(project.current_market_cap)}</p>
-                </div>
-                <div className="text-center p-2 bg-[#1a1c1f] rounded-lg border border-[#2a2d31]">
-                  <p className="text-xs text-[#666]">Liquidity</p>
-                  <p className="text-sm font-semibold text-white">{formatMarketCap(project.current_liquidity_usd)}</p>
-                </div>
-                <div className="text-center p-2 bg-[#1a1c1f] rounded-lg border border-[#2a2d31]">
-                  <p className="text-xs text-[#666]">ROI</p>
-                  <p className={`text-sm font-semibold ${project.current_roi_percent && project.current_roi_percent > 0 ? 'text-[#00ff88]' : project.current_roi_percent && project.current_roi_percent < 0 ? 'text-[#ff4444]' : 'text-[#888]'}`}>
-                    {project.current_roi_percent ? `${project.current_roi_percent > 0 ? '+' : ''}${project.current_roi_percent.toFixed(0)}%` : 'N/A'}
-                  </p>
-                </div>
-              </div>
-              
-              {/* Actions */}
-              <div className="flex gap-2">
-                <a
-                  href={project.website_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 bg-[#00ff88] text-black text-center py-2 rounded-lg hover:bg-[#00cc66] transition-colors text-sm font-semibold"
-                >
-                  Visit Website ↗
-                </a>
-                {project.contract_address && (
-                  <a
-                    href={`https://dexscreener.com/${project.network}/${project.contract_address}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1 bg-[#1a1c1f] text-[#888] py-2 rounded-lg hover:bg-[#252729] hover:text-white transition-colors text-center text-sm border border-[#2a2d31]"
-                  >
-                    Chart 📊
-                  </a>
-                )}
-              </div>
+                        Chart 📊
+                      </a>
+                    )}
+                  </div>
 
-              {/* Social Links */}
-              {(project.twitter_url || project.telegram_url) && (
-                <div className="flex gap-2 mt-2">
-                  {project.twitter_url && (
-                    <a
-                      href={project.twitter_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 bg-[#1d9bf0]/20 text-[#1d9bf0] py-1.5 rounded-lg hover:bg-[#1d9bf0]/30 transition-colors text-center text-xs border border-[#1d9bf0]/30"
-                    >
-                      Twitter/X
-                    </a>
-                  )}
-                  {project.telegram_url && (
-                    <a
-                      href={project.telegram_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 bg-[#0088cc]/20 text-[#0088cc] py-1.5 rounded-lg hover:bg-[#0088cc]/30 transition-colors text-center text-xs border border-[#0088cc]/30"
-                    >
-                      Telegram
-                    </a>
+                  {/* Social Links */}
+                  {(project.twitter_url || project.telegram_url) && (
+                    <div className="flex gap-2 mt-2">
+                      {project.twitter_url && (
+                        <a
+                          href={project.twitter_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 bg-[#1d9bf0]/20 text-[#1d9bf0] py-1.5 rounded-lg hover:bg-[#1d9bf0]/30 transition-colors text-center text-xs border border-[#1d9bf0]/30"
+                        >
+                          Twitter/X
+                        </a>
+                      )}
+                      {project.telegram_url && (
+                        <a
+                          href={project.telegram_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 bg-[#0088cc]/20 text-[#0088cc] py-1.5 rounded-lg hover:bg-[#0088cc]/30 transition-colors text-center text-xs border border-[#0088cc]/30"
+                        >
+                          Telegram
+                        </a>
+                      )}
+                    </div>
                   )}
                 </div>
-              )}
-            </div>
+              </div>
+            ))}
           </div>
-        ))}
+
+          {/* Loading Indicator */}
+          {loading && (
+            <div className="flex justify-center mt-8">
+              <div className="w-12 h-12 border-4 border-[#00ff88] border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          )}
+
+          {/* No More Results */}
+          {!hasMore && projects.length > 0 && (
+            <div className="text-center mt-8 text-[#666]">
+              <p>No more projects to load</p>
+            </div>
+          )}
+
+          {/* No Results */}
+          {!loading && projects.length === 0 && (
+            <div className="text-center mt-8">
+              <p className="text-xl mb-2 text-white">No projects found</p>
+              <p className="text-[#666]">Try adjusting your filters</p>
+            </div>
+          )}
+        </div>
       </div>
-
-      {/* Loading Indicator */}
-      {loading && (
-        <div className="flex justify-center mt-8">
-          <div className="w-12 h-12 border-4 border-[#00ff88] border-t-transparent rounded-full animate-spin"></div>
-        </div>
-      )}
-
-      {/* No More Results */}
-      {!hasMore && projects.length > 0 && (
-        <div className="text-center mt-8 text-[#666]">
-          <p>No more projects to load</p>
-        </div>
-      )}
-
-      {/* No Results */}
-      {!loading && projects.length === 0 && (
-        <div className="text-center mt-8">
-          <p className="text-xl mb-2 text-white">No projects found</p>
-          <p className="text-[#666]">Try adjusting your filters</p>
-        </div>
-      )}
     </div>
   );
 }
