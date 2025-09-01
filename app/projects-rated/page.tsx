@@ -42,6 +42,26 @@ export default function ProjectsRatedPage() {
   const [minLiquidity, setMinLiquidity] = useState(0);
   const [maxLiquidity, setMaxLiquidity] = useState(1000000000);
   const [capturingScreenshots, setCapturingScreenshots] = useState<Set<number>>(new Set());
+  const [attemptedScreenshots, setAttemptedScreenshots] = useState<Set<number>>(() => {
+    // Initialize from sessionStorage on mount
+    if (typeof window !== 'undefined') {
+      const attempted = new Set<number>();
+      const now = Date.now();
+      for (let i = 0; i < sessionStorage.length; i++) {
+        const key = sessionStorage.key(i);
+        if (key && key.startsWith('screenshot_attempt_')) {
+          const id = parseInt(key.replace('screenshot_attempt_', ''));
+          const timestamp = parseInt(sessionStorage.getItem(key) || '0');
+          // Only include if attempted within last 5 minutes
+          if (now - timestamp < 5 * 60 * 1000) {
+            attempted.add(id);
+          }
+        }
+      }
+      return attempted;
+    }
+    return new Set();
+  });
   
   const observer = useRef<IntersectionObserver>();
   const lastProjectRef = useCallback((node: HTMLDivElement | null) => {
@@ -94,15 +114,13 @@ export default function ProjectsRatedPage() {
         // Trigger screenshot capture for projects without screenshots
         data.data.forEach(async (project: CryptoProject) => {
           if (!project.website_screenshot_url && project.website_url) {
-            // Check if we've already attempted this project recently (stored in sessionStorage)
-            const attemptKey = `screenshot_attempt_${project.id}`;
-            const lastAttempt = sessionStorage.getItem(attemptKey);
-            const now = Date.now();
-            
-            // Skip if we attempted within the last 5 minutes
-            if (lastAttempt && (now - parseInt(lastAttempt)) < 5 * 60 * 1000) {
+            // Skip if already attempted recently
+            if (attemptedScreenshots.has(project.id)) {
               return;
             }
+            
+            const attemptKey = `screenshot_attempt_${project.id}`;
+            const now = Date.now();
             
             // Mark as capturing
             setCapturingScreenshots(prev => new Set(prev).add(project.id));
@@ -128,14 +146,16 @@ export default function ProjectsRatedPage() {
                     : p
                 ));
               } else {
-                // Store failed attempt timestamp to prevent immediate retries
+                // Store failed attempt timestamp and add to attempted set
                 sessionStorage.setItem(attemptKey, now.toString());
+                setAttemptedScreenshots(prev => new Set(prev).add(project.id));
                 const error = await captureResponse.text();
                 console.warn(`Screenshot capture failed for ${project.symbol}:`, error);
               }
             } catch (err) {
-              // Store failed attempt timestamp
+              // Store failed attempt timestamp and add to attempted set
               sessionStorage.setItem(attemptKey, now.toString());
+              setAttemptedScreenshots(prev => new Set(prev).add(project.id));
               console.error(`Failed to capture screenshot for ${project.symbol}:`, err);
             } finally {
               // Remove from capturing set
