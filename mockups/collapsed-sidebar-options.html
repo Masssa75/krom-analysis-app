@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collapsed Sidebar Design Options</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0a0b0d;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: #00ff88;
+            margin-bottom: 10px;
+        }
+        
+        .description {
+            color: #666;
+            margin-bottom: 40px;
+        }
+        
+        .option {
+            margin-bottom: 60px;
+            border: 1px solid #2a2d31;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .option-header {
+            background: #111214;
+            padding: 15px 20px;
+            border-bottom: 1px solid #2a2d31;
+        }
+        
+        .option-title {
+            color: #00ff88;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .option-description {
+            color: #888;
+            font-size: 14px;
+        }
+        
+        .demo-container {
+            background: #0a0b0d;
+            height: 600px;
+            display: flex;
+            position: relative;
+        }
+        
+        .sidebar {
+            background: #111214;
+            border-right: 1px solid #2a2d31;
+            width: 50px;
+            height: 100%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .main-content {
+            flex: 1;
+            background: #0a0b0d;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #444;
+        }
+        
+        /* Shared button styles */
+        .sidebar-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            background: #1a1c1f;
+            border: 1px solid #2a2d31;
+            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 18px;
+        }
+        
+        .sidebar-btn:hover {
+            background: #252729;
+            color: #00ff88;
+            border-color: #00ff88;
+        }
+        
+        .sidebar-btn:hover svg {
+            stroke: #00ff88;
+            fill: #00ff88;
+        }
+        
+        svg {
+            width: 20px;
+            height: 20px;
+            stroke: #666;
+            fill: none;
+            stroke-width: 2;
+            transition: all 0.2s;
+        }
+        
+        svg.fill {
+            fill: #666;
+            stroke: none;
+        }
+        
+        /* Option 1: Vertical Text */
+        .option1 .sidebar {
+            align-items: center;
+            padding: 20px 0;
+        }
+        
+        .option1 .vertical-text {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            color: #666;
+            font-size: 14px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: color 0.2s;
+            padding: 10px 0;
+        }
+        
+        .option1 .vertical-text:hover {
+            color: #00ff88;
+        }
+        
+        .option1 .toggle-btn {
+            margin-bottom: 30px;
+        }
+        
+        /* Option 2: Icon Stack */
+        .option2 .sidebar {
+            align-items: center;
+            padding: 15px 0;
+            gap: 15px;
+        }
+        
+        /* Option 3: Floating Action Buttons */
+        .option3 .sidebar {
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .option3 .fab-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .option3 .fab {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #1a1c1f;
+            border: 2px solid #2a2d31;
+            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 16px;
+        }
+        
+        .option3 .fab:hover {
+            background: #00ff88;
+            color: #000;
+            transform: scale(1.1);
+        }
+        
+        .option3 .fab.primary {
+            background: #00ff88;
+            color: #000;
+            border-color: #00ff88;
+        }
+        
+        /* Option 4: Minimal with Tooltip */
+        .option4 .sidebar {
+            padding: 10px 0;
+        }
+        
+        .option4 .icon-btn {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .option4 .icon-btn:hover {
+            background: #1a1c1f;
+            color: #00ff88;
+        }
+        
+        .option4 .tooltip {
+            position: absolute;
+            left: 60px;
+            background: #252729;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            border: 1px solid #333;
+        }
+        
+        .option4 .icon-btn:hover .tooltip {
+            opacity: 1;
+        }
+        
+        /* Option 5: Tab Style */
+        .option5 .sidebar {
+            padding: 0;
+        }
+        
+        .option5 .tab {
+            width: 50px;
+            height: 60px;
+            border-bottom: 1px solid #2a2d31;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .option5 .tab:hover {
+            background: #1a1c1f;
+        }
+        
+        .option5 .tab.active {
+            background: #1a1c1f;
+            border-right: 3px solid #00ff88;
+        }
+        
+        .option5 .tab-icon {
+            width: 20px;
+            height: 20px;
+            stroke: #666;
+            fill: none;
+            stroke-width: 2;
+        }
+        
+        .option5 .tab-label {
+            font-size: 9px;
+            color: #666;
+            text-transform: uppercase;
+        }
+        
+        .option5 .tab:hover .tab-icon {
+            stroke: #00ff88;
+        }
+        
+        .option5 .tab:hover .tab-label {
+            color: #00ff88;
+        }
+        
+        .option5 .tab.active .tab-icon {
+            stroke: #00ff88;
+        }
+        
+        .option5 .tab.active .tab-label {
+            color: #00ff88;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Collapsed Sidebar Design Options</h1>
+        <p class="description">5 different approaches for the collapsed filter sidebar state</p>
+        
+        <!-- Option 1: Vertical Text -->
+        <div class="option">
+            <div class="option-header">
+                <div class="option-title">Option 1: Vertical "FILTERS" Text</div>
+                <div class="option-description">Clean and minimal with vertical text label and toggle button</div>
+            </div>
+            <div class="demo-container option1">
+                <div class="sidebar">
+                    <div class="sidebar-btn toggle-btn">
+                        <svg viewBox="0 0 24 24">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                    </div>
+                    <div class="vertical-text">FILTERS</div>
+                </div>
+                <div class="main-content">Main Content Area</div>
+            </div>
+        </div>
+        
+        <!-- Option 2: Icon Stack -->
+        <div class="option">
+            <div class="option-header">
+                <div class="option-title">Option 2: Icon Stack</div>
+                <div class="option-description">Functional buttons with filter, settings, and expand icons</div>
+            </div>
+            <div class="demo-container option2">
+                <div class="sidebar">
+                    <div class="sidebar-btn">
+                        <svg viewBox="0 0 24 24">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                    </div>
+                    <div class="sidebar-btn">
+                        <svg viewBox="0 0 24 24">
+                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                        </svg>
+                    </div>
+                    <div class="sidebar-btn">
+                        <svg viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M12 1v6m0 6v6m4.22-13.22l4.24 4.24M18.36 18.36l4.24 4.24M20.66 12H21m-18 0h6m11.31 5.66l-4.24-4.24M7.76 7.76L3.52 3.52M6.34 12H1m4.24 5.66l4.24 4.24"></path>
+                        </svg>
+                    </div>
+                    <div class="sidebar-btn">
+                        <svg viewBox="0 0 24 24">
+                            <line x1="18" y1="20" x2="18" y2="10"></line>
+                            <line x1="12" y1="20" x2="12" y2="4"></line>
+                            <line x1="6" y1="20" x2="6" y2="14"></line>
+                        </svg>
+                    </div>
+                </div>
+                <div class="main-content">Main Content Area</div>
+            </div>
+        </div>
+        
+        <!-- Option 3: Floating Action Buttons -->
+        <div class="option">
+            <div class="option-header">
+                <div class="option-title">Option 3: Floating Action Buttons (FAB)</div>
+                <div class="option-description">Material Design inspired with primary action button</div>
+            </div>
+            <div class="demo-container option3">
+                <div class="sidebar">
+                    <div class="fab-container">
+                        <div class="fab primary">
+                            <svg viewBox="0 0 24 24" class="fill">
+                                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                            </svg>
+                        </div>
+                        <div class="fab">
+                            <svg viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M12 1v6m0 6v6m4.22-13.22l4.24 4.24M18.36 18.36l4.24 4.24M20.66 12H21m-18 0h6m11.31 5.66l-4.24-4.24M7.76 7.76L3.52 3.52M6.34 12H1m4.24 5.66l4.24 4.24"></path>
+                            </svg>
+                        </div>
+                        <div class="fab">
+                            <svg viewBox="0 0 24 24">
+                                <line x1="18" y1="20" x2="18" y2="10"></line>
+                                <line x1="12" y1="20" x2="12" y2="4"></line>
+                                <line x1="6" y1="20" x2="6" y2="14"></line>
+                            </svg>
+                        </div>
+                        <div class="fab">
+                            <svg viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="main-content">Main Content Area</div>
+            </div>
+        </div>
+        
+        <!-- Option 4: Minimal with Tooltip -->
+        <div class="option">
+            <div class="option-header">
+                <div class="option-title">Option 4: Minimal Icons with Tooltips</div>
+                <div class="option-description">Ultra-minimal with hover tooltips for clarity</div>
+            </div>
+            <div class="demo-container option4">
+                <div class="sidebar">
+                    <div class="icon-btn">
+                        <svg viewBox="0 0 24 24">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                        <span class="tooltip">Expand Filters</span>
+                    </div>
+                    <div class="icon-btn">
+                        <svg viewBox="0 0 24 24">
+                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                        </svg>
+                        <span class="tooltip">Quick Filters</span>
+                    </div>
+                    <div class="icon-btn">
+                        <svg viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M12 1v6m0 6v6m4.22-13.22l4.24 4.24M18.36 18.36l4.24 4.24M20.66 12H21m-18 0h6m11.31 5.66l-4.24-4.24M7.76 7.76L3.52 3.52M6.34 12H1m4.24 5.66l4.24 4.24"></path>
+                        </svg>
+                        <span class="tooltip">Settings</span>
+                    </div>
+                    <div class="icon-btn">
+                        <svg viewBox="0 0 24 24">
+                            <line x1="18" y1="20" x2="18" y2="10"></line>
+                            <line x1="12" y1="20" x2="12" y2="4"></line>
+                            <line x1="6" y1="20" x2="6" y2="14"></line>
+                        </svg>
+                        <span class="tooltip">Stats</span>
+                    </div>
+                </div>
+                <div class="main-content">Main Content Area</div>
+            </div>
+        </div>
+        
+        <!-- Option 5: Tab Style -->
+        <div class="option">
+            <div class="option-header">
+                <div class="option-title">Option 5: Tab Navigation Style</div>
+                <div class="option-description">Vertical tabs with icons and mini labels</div>
+            </div>
+            <div class="demo-container option5">
+                <div class="sidebar">
+                    <div class="tab active">
+                        <svg viewBox="0 0 24 24" class="tab-icon">
+                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                        </svg>
+                        <span class="tab-label">Filter</span>
+                    </div>
+                    <div class="tab">
+                        <svg viewBox="0 0 24 24" class="tab-icon">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M12 1v6m0 6v6m4.22-13.22l4.24 4.24M18.36 18.36l4.24 4.24M20.66 12H21m-18 0h6m11.31 5.66l-4.24-4.24M7.76 7.76L3.52 3.52M6.34 12H1m4.24 5.66l4.24 4.24"></path>
+                        </svg>
+                        <span class="tab-label">Config</span>
+                    </div>
+                    <div class="tab">
+                        <svg viewBox="0 0 24 24" class="tab-icon">
+                            <line x1="18" y1="20" x2="18" y2="10"></line>
+                            <line x1="12" y1="20" x2="12" y2="4"></line>
+                            <line x1="6" y1="20" x2="6" y2="14"></line>
+                        </svg>
+                        <span class="tab-label">Stats</span>
+                    </div>
+                    <div class="tab">
+                        <svg viewBox="0 0 24 24" class="tab-icon">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                        </svg>
+                        <span class="tab-label">Favs</span>
+                    </div>
+                </div>
+                <div class="main-content">Main Content Area</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

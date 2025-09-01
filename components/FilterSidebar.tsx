@@ -192,28 +192,91 @@ export default function FilterSidebar({ onFiltersChange }: FilterSidebarProps) {
   return (
     <div className="relative flex-shrink-0">
       {/* Sidebar Container */}
-      <div className={`bg-[#111214] border-r border-[#2a2d31] overflow-y-auto h-full transition-all duration-300 ${isSidebarCollapsed ? 'w-[40px]' : 'w-[300px]'}`}>
-      {/* Header */}
-      <div className="p-5 border-b border-[#1a1c1f] relative">
-        <div className={`flex items-center justify-between transition-all duration-300 ${isSidebarCollapsed ? 'opacity-0' : 'opacity-100'}`}>
-          <h1 className="text-[32px] font-black tracking-[4px] text-[#00ff88] mb-1">KROM</h1>
+      <div className={`bg-[#111214] border-r border-[#2a2d31] h-full transition-all duration-300 ${isSidebarCollapsed ? 'w-[50px]' : 'w-[300px] overflow-y-auto'}`}>
+      
+      {isSidebarCollapsed ? (
+        /* Collapsed State - Icon Stack */
+        <div className="flex flex-col items-center py-4 gap-3">
+          {/* Toggle/Expand Button */}
+          <button
+            onClick={() => setIsSidebarCollapsed(false)}
+            className="w-9 h-9 rounded-md bg-[#1a1c1f] border border-[#2a2d31] flex items-center justify-center hover:bg-[#252729] hover:border-[#00ff88] transition-all group"
+            title="Expand Filters"
+          >
+            <svg viewBox="0 0 24 24" className="w-5 h-5 stroke-[#666] group-hover:stroke-[#00ff88] transition-colors" fill="none" strokeWidth="2">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+          
+          {/* Filter Icon */}
+          <button
+            className="w-9 h-9 rounded-md bg-[#1a1c1f] border border-[#2a2d31] flex items-center justify-center hover:bg-[#252729] hover:border-[#00ff88] transition-all group"
+            title="Filters"
+          >
+            <svg viewBox="0 0 24 24" className="w-5 h-5 stroke-[#666] group-hover:stroke-[#00ff88] transition-colors" fill="none" strokeWidth="2">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            </svg>
+          </button>
+          
+          {/* Settings Icon */}
+          <button
+            className="w-9 h-9 rounded-md bg-[#1a1c1f] border border-[#2a2d31] flex items-center justify-center hover:bg-[#252729] hover:border-[#00ff88] transition-all group"
+            title="Settings"
+          >
+            <svg viewBox="0 0 24 24" className="w-5 h-5 stroke-[#666] group-hover:stroke-[#00ff88] transition-colors" fill="none" strokeWidth="2">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M12 1v6m0 6v6m4.22-13.22l4.24 4.24M18.36 18.36l4.24 4.24M20.66 12H21m-18 0h6m11.31 5.66l-4.24-4.24M7.76 7.76L3.52 3.52M6.34 12H1m4.24 5.66l4.24 4.24"></path>
+            </svg>
+          </button>
+          
+          {/* Notifications Icon */}
+          <button
+            className="w-9 h-9 rounded-md bg-[#1a1c1f] border border-[#2a2d31] flex items-center justify-center hover:bg-[#252729] hover:border-[#00ff88] transition-all group relative"
+            title="Notifications"
+          >
+            <svg viewBox="0 0 24 24" className="w-5 h-5 stroke-[#666] group-hover:stroke-[#00ff88] transition-colors" fill="none" strokeWidth="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            {/* Notification dot - optional */}
+            <span className="absolute top-1 right-1 w-2 h-2 bg-[#00ff88] rounded-full"></span>
+          </button>
+          
+          {/* Account Icon */}
+          <button
+            className="w-9 h-9 rounded-md bg-[#1a1c1f] border border-[#2a2d31] flex items-center justify-center hover:bg-[#252729] hover:border-[#00ff88] transition-all group"
+            title="Account"
+          >
+            <svg viewBox="0 0 24 24" className="w-5 h-5 stroke-[#666] group-hover:stroke-[#00ff88] transition-colors" fill="none" strokeWidth="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </button>
         </div>
-        <p className={`text-[#666] text-xs transition-all duration-300 ${isSidebarCollapsed ? 'opacity-0' : 'opacity-100'}`}>High-Quality Crypto Projects</p>
-        
-        {/* Toggle Tab - Inside the header */}
-        <button
-          onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-          className={`absolute top-1/2 -translate-y-1/2 bg-[#1a1c1f] hover:bg-[#252729] rounded px-2 py-3 transition-all ${isSidebarCollapsed ? 'right-2' : 'right-5'}`}
-          title={isSidebarCollapsed ? 'Show Filters' : 'Hide Filters'}
-        >
-          <span className={`text-[#666] hover:text-[#00ff88] transition-all inline-block ${isSidebarCollapsed ? 'rotate-180' : ''}`}>
-            ◀
-          </span>
-        </button>
-      </div>
+      ) : (
+        /* Expanded State - Original Content */
+        <>
+          {/* Header */}
+          <div className="p-5 border-b border-[#1a1c1f] relative">
+            <div className="flex items-center justify-between">
+              <h1 className="text-[32px] font-black tracking-[4px] text-[#00ff88] mb-1">KROM</h1>
+            </div>
+            <p className="text-[#666] text-xs">High-Quality Crypto Projects</p>
+            
+            {/* Collapse Button - Inside the header */}
+            <button
+              onClick={() => setIsSidebarCollapsed(true)}
+              className="absolute top-1/2 -translate-y-1/2 right-5 bg-[#1a1c1f] hover:bg-[#252729] rounded px-2 py-3 transition-all"
+              title="Hide Filters"
+            >
+              <svg viewBox="0 0 24 24" className="w-4 h-4 stroke-[#666] hover:stroke-[#00ff88] transition-colors" fill="none" strokeWidth="2">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+            </button>
+          </div>
 
-      {/* Filters Title */}
-      <div className={`px-5 pt-5 pb-2 flex justify-between items-center transition-all duration-300 ${isSidebarCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+          {/* Filters Title */}
+          <div className="px-5 pt-5 pb-2 flex justify-between items-center">
         <h2 className="text-sm uppercase tracking-[2px] text-[#666] font-semibold">FILTERS</h2>
         <button
           onClick={resetAllFilters}
@@ -223,8 +286,8 @@ export default function FilterSidebar({ onFiltersChange }: FilterSidebarProps) {
         </button>
       </div>
 
-      {/* Token Type Filter */}
-      <div className={`border-b border-[#1a1c1f] ${isTokenTypeCollapsed ? 'collapsed' : ''} transition-all duration-300 ${isSidebarCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+          {/* Token Type Filter */}
+          <div className={`border-b border-[#1a1c1f] ${isTokenTypeCollapsed ? 'collapsed' : ''}`}>
         <div 
           className="px-5 py-5 cursor-pointer flex justify-between items-center bg-[#111214] hover:bg-[#1a1c1f] hover:pl-6 transition-all"
           onClick={() => setIsTokenTypeCollapsed(!isTokenTypeCollapsed)}
@@ -278,8 +341,8 @@ export default function FilterSidebar({ onFiltersChange }: FilterSidebarProps) {
         </div>
       </div>
 
-      {/* Rugs Filter */}
-      <div className={`border-b border-[#1a1c1f] ${isRugsCollapsed ? 'collapsed' : ''} transition-all duration-300 ${isSidebarCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+          {/* Rugs Filter */}
+          <div className={`border-b border-[#1a1c1f] ${isRugsCollapsed ? 'collapsed' : ''}`}>
         <div 
           className="px-5 py-5 cursor-pointer flex justify-between items-center bg-[#111214] hover:bg-[#1a1c1f] hover:pl-6 transition-all"
           onClick={() => setIsRugsCollapsed(!isRugsCollapsed)}
@@ -340,8 +403,8 @@ export default function FilterSidebar({ onFiltersChange }: FilterSidebarProps) {
         </div>
       </div>
 
-      {/* Networks Filter */}
-      <div className={`border-b border-[#1a1c1f] ${isNetworksCollapsed ? 'collapsed' : ''} transition-all duration-300 ${isSidebarCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+          {/* Networks Filter */}
+          <div className={`border-b border-[#1a1c1f] ${isNetworksCollapsed ? 'collapsed' : ''}`}>
         <div 
           className="px-5 py-5 cursor-pointer flex justify-between items-center bg-[#111214] hover:bg-[#1a1c1f] hover:pl-6 transition-all"
           onClick={() => setIsNetworksCollapsed(!isNetworksCollapsed)}
@@ -395,8 +458,8 @@ export default function FilterSidebar({ onFiltersChange }: FilterSidebarProps) {
         </div>
       </div>
 
-      {/* Analysis Scores Filter */}
-      <div className={`border-b border-[#1a1c1f] ${isScoresCollapsed ? 'collapsed' : ''} transition-all duration-300 ${isSidebarCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+          {/* Analysis Scores Filter */}
+          <div className={`border-b border-[#1a1c1f] ${isScoresCollapsed ? 'collapsed' : ''}`}>
         <div 
           className="px-5 py-5 cursor-pointer flex justify-between items-center bg-[#111214] hover:bg-[#1a1c1f] hover:pl-6 transition-all"
           onClick={() => setIsScoresCollapsed(!isScoresCollapsed)}
@@ -469,8 +532,10 @@ export default function FilterSidebar({ onFiltersChange }: FilterSidebarProps) {
             </div>
           </div>
         </div>
+          </div>
+        </>
+      )}
       </div>
     </div>
-  </div>
   )
 }
