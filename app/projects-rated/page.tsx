@@ -355,33 +355,6 @@ export default function ProjectsRatedPage() {
               >
                 {/* Preview Area */}
                 <div className="relative h-[420px] bg-[#0a0b0d] overflow-hidden">
-                  {/* Score Badge - Overlaid on screenshot */}
-                  <div className="absolute top-4 left-4 z-20">
-                    <div 
-                      className="px-3 py-1.5 rounded-lg backdrop-blur-md font-bold text-xl"
-                      style={{ 
-                        backgroundColor: getScoreBadgeColor(project.website_stage1_score).bg + 'cc',
-                        color: getScoreBadgeColor(project.website_stage1_score).text,
-                        backdropFilter: 'blur(10px)'
-                      }}
-                    >
-                      {project.website_stage1_score}/10
-                    </div>
-                  </div>
-
-                  {/* Network Badge - Top right */}
-                  <div className="absolute top-4 right-4 z-20">
-                    <div 
-                      className="px-2 py-1 rounded text-xs font-semibold uppercase"
-                      style={{ 
-                        backgroundColor: getNetworkBadge(project.network).bg + 'cc',
-                        color: getNetworkBadge(project.network).text,
-                        backdropFilter: 'blur(10px)'
-                      }}
-                    >
-                      {project.network}
-                    </div>
-                  </div>
 
                   {/* Show loading state if capturing screenshot */}
                   {capturingScreenshots.has(project.id) && !project.website_screenshot_url ? (
@@ -421,8 +394,17 @@ export default function ProjectsRatedPage() {
                           <span className="text-sm text-[#666] font-normal">({project.name})</span>
                         )}
                       </h3>
-                      {/* Status badges */}
-                      <div className="flex gap-1 mt-1">
+                      {/* Status badges and network */}
+                      <div className="flex gap-1 mt-1 items-center">
+                        <span 
+                          className="px-2 py-0.5 rounded text-xs font-medium uppercase"
+                          style={{ 
+                            backgroundColor: getNetworkBadge(project.network).bg,
+                            color: getNetworkBadge(project.network).text
+                          }}
+                        >
+                          {project.network}
+                        </span>
                         {project.is_imposter && (
                           <span className="px-2 py-0.5 rounded text-xs bg-red-500/20 text-red-500">IMPOSTER</span>
                         )}
@@ -501,31 +483,6 @@ export default function ProjectsRatedPage() {
                     )}
                   </div>
 
-                  {/* Social Links */}
-                  {(project.twitter_url || project.telegram_url) && (
-                    <div className="flex gap-2 mt-2">
-                      {project.twitter_url && (
-                        <a
-                          href={project.twitter_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex-1 bg-[#1d9bf0]/20 text-[#1d9bf0] py-1.5 rounded-lg hover:bg-[#1d9bf0]/30 transition-colors text-center text-xs border border-[#1d9bf0]/30"
-                        >
-                          Twitter/X
-                        </a>
-                      )}
-                      {project.telegram_url && (
-                        <a
-                          href={project.telegram_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex-1 bg-[#0088cc]/20 text-[#0088cc] py-1.5 rounded-lg hover:bg-[#0088cc]/30 transition-colors text-center text-xs border border-[#0088cc]/30"
-                        >
-                          Telegram
-                        </a>
-                      )}
-                    </div>
-                  )}
                 </div>
               </div>
             ))}
