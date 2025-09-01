@@ -82,13 +82,28 @@ export default function ProjectsRatedPage() {
         if (reset) {
           setProjects(data.data);
         } else {
-          setProjects(prev => [...prev, ...data.data]);
+          // Filter out any duplicates when appending
+          setProjects(prev => {
+            const existingIds = new Set(prev.map(p => p.id));
+            const newProjects = data.data.filter((p: CryptoProject) => !existingIds.has(p.id));
+            return [...prev, ...newProjects];
+          });
         }
         setHasMore(data.pagination.hasMore);
         
         // Trigger screenshot capture for projects without screenshots
         data.data.forEach(async (project: CryptoProject) => {
           if (!project.website_screenshot_url && project.website_url) {
+            // Check if we've already attempted this project recently (stored in sessionStorage)
+            const attemptKey = `screenshot_attempt_${project.id}`;
+            const lastAttempt = sessionStorage.getItem(attemptKey);
+            const now = Date.now();
+            
+            // Skip if we attempted within the last 5 minutes
+            if (lastAttempt && (now - parseInt(lastAttempt)) < 5 * 60 * 1000) {
+              return;
+            }
+            
             // Mark as capturing
             setCapturingScreenshots(prev => new Set(prev).add(project.id));
             
@@ -112,8 +127,15 @@ export default function ProjectsRatedPage() {
                     ? { ...p, website_screenshot_url: result.screenshot_url }
                     : p
                 ));
+              } else {
+                // Store failed attempt timestamp to prevent immediate retries
+                sessionStorage.setItem(attemptKey, now.toString());
+                const error = await captureResponse.text();
+                console.warn(`Screenshot capture failed for ${project.symbol}:`, error);
               }
             } catch (err) {
+              // Store failed attempt timestamp
+              sessionStorage.setItem(attemptKey, now.toString());
               console.error(`Failed to capture screenshot for ${project.symbol}:`, err);
             } finally {
               // Remove from capturing set
